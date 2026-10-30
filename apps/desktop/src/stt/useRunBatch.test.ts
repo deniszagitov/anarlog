@@ -264,6 +264,23 @@ describe("isTerminalTranscriptionError", () => {
 });
 
 describe("getBatchFallbackTarget", () => {
+  test("does not send local recordings to a paid cloud fallback", () => {
+    vi.stubEnv("VITE_LOCAL_AI", "true");
+    try {
+      expect(
+        getBatchFallbackTarget({
+          isPaid: true,
+          accessToken: "token",
+          apiBaseUrl: "https://api.test",
+          currentPlatform: "macos",
+          currentArch: "aarch64",
+        }),
+      ).toBeNull();
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   test("uses hosted cloud transcription for paid users with a session", () => {
     expect(
       getBatchFallbackTarget({
@@ -377,6 +394,29 @@ describe("useRunBatch", () => {
     useConfigValueMock.mockImplementation((key) =>
       key === "ai_language" ? "en" : [],
     );
+  });
+
+  test("does not fall back or send saved audio to another provider for local-only requests", async () => {
+    useBillingAccessMock.mockReturnValue({ isPaid: true });
+    const { result, rerender } = renderHook(() => useRunBatch("session-1"));
+    await expect(
+      result.current("/original.mp3", { requireSelectedLocalProvider: true }),
+    ).rejects.toThrow("Select a local");
+    useSTTConnectionMock.mockReturnValue({
+      conn: {
+        provider: "anarlog",
+        model: "soniqo-realtime",
+        baseUrl: "soniqo://local",
+        apiKey: "",
+      },
+    });
+    isSupportedLanguagesBatchMock.mockResolvedValue(false);
+    rerender();
+    await expect(
+      result.current("/original.mp3", { requireSelectedLocalProvider: true }),
+    ).rejects.toThrow("not available for batch transcription");
+    expect(startTranscriptionMock).not.toHaveBeenCalled();
+    expect(getSessionForRequestMock).not.toHaveBeenCalled();
   });
 
   test.each([

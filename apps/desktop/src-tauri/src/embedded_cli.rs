@@ -7,6 +7,7 @@ use std::path::PathBuf;
 use serde::Serialize;
 
 const DEV_BUNDLE_ID: &str = "com.hyprnote.dev";
+const LOCAL_AI_BUNDLE_ID: &str = "so.anarlog.local-ai";
 const FLATPAK_BUNDLE_ID: &str = "so.anarlog.Anarlog";
 const LEGACY_STABLE_BUNDLE_ID: &str = "com.hyprnote.Hyprnote";
 #[cfg(any(target_os = "macos", target_os = "linux"))]
@@ -228,6 +229,7 @@ fn command_name_from_identifier(identifier: &str) -> &'static str {
         STAGING_BUNDLE_ID => "anarlog-staging",
         NIGHTLY_BUNDLE_ID => "anarlog-nightly",
         DEV_BUNDLE_ID => "anarlog-dev",
+        LOCAL_AI_BUNDLE_ID => "anarlog-local",
         _ => "anarlog",
     }
 }

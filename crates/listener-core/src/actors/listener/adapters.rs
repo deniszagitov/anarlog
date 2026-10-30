@@ -216,6 +216,7 @@ pub(super) async fn spawn_rx_task(
         GoogleGenerativeAi => GoogleGenerativeAiAdapter,
         Anarlog => AnarlogAdapter,
     }, batch_only: [
+        LocalOpenAi,
         AmazonBedrock,
         AquaVoice,
         Pyannote,

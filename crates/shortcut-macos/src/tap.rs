@@ -188,12 +188,13 @@ extern "C" fn tap_callback(
         } else {
             None
         };
-        let mut modifiers = decode_flags(flags, fn_is_pressed);
-        if CGEventSourceKeyState(1, 0x36) {
-            modifiers.insert(Modifier::RightCommand);
-        }
-        let modifier_release =
-            event_type == KCG_EVENT_FLAGS_CHANGED && !CGEventSourceKeyState(1, keycode);
+        let modifiers = decode_flags(flags, fn_is_pressed);
+        let modifier_release = event_type == KCG_EVENT_FLAGS_CHANGED
+            && if keycode == 0x36 {
+                flags & FLAG_RIGHT_COMMAND == 0
+            } else {
+                !CGEventSourceKeyState(1, keycode)
+            };
         let consumed = (ctx.callback)(TapEvent::Key(KeyEvent::new(key, modifiers)));
         if consumed && event_type != KCG_EVENT_KEY_UP && !modifier_release {
             return ptr::null_mut();
@@ -207,6 +208,10 @@ fn decode_flags(flags: u64, fn_pressed: bool) -> Modifiers {
     let mut m = Modifiers::empty();
     if flags & FLAG_COMMAND != 0 {
         m.insert(Modifier::Command);
+    }
+    // Session key state can lag this event at the HID tap.
+    if flags & FLAG_RIGHT_COMMAND != 0 {
+        m.insert(Modifier::RightCommand);
     }
     if flags & FLAG_ALTERNATE != 0 {
         m.insert(Modifier::Option);
@@ -242,6 +247,7 @@ const FLAG_SHIFT: u64 = 1 << 17;
 const FLAG_CONTROL: u64 = 1 << 18;
 const FLAG_ALTERNATE: u64 = 1 << 19;
 const FLAG_COMMAND: u64 = 1 << 20;
+const FLAG_RIGHT_COMMAND: u64 = 0x10;
 const FLAG_SECONDARY_FN: u64 = 1 << 23;
 
 type CGEventTapCallBack = extern "C" fn(
@@ -293,10 +299,55 @@ unsafe extern "C" {
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Mutex;
+
     use super::*;
+    use crate::{HotKey, HotKeyProcessor, Options, Output};
 
     unsafe extern "C" {
         fn CGEventCreateKeyboardEvent(source: *const c_void, key: u16, down: bool) -> *mut c_void;
+        fn CGEventSetFlags(event: *mut c_void, flags: u64);
+    }
+
+    #[test]
+    fn right_command_uses_the_event_state_before_the_session_state_updates() {
+        let mut processor = HotKeyProcessor::new(HotKey::modifier_only(Modifiers::from([
+            Modifier::RightCommand,
+        ])));
+        processor.set_options(Options {
+            double_tap_lock_enabled: false,
+            ..Default::default()
+        });
+        let processor = Mutex::new(processor);
+        let outputs = Arc::new(Mutex::new(Vec::new()));
+        let received = outputs.clone();
+        let ctx = TapContext {
+            callback: Arc::new(move |event| {
+                if let TapEvent::Key(key) = event
+                    && let Some(output) = processor.lock().unwrap().process_key(key)
+                {
+                    received.lock().unwrap().push(output);
+                    return true;
+                }
+                false
+            }),
+            tap_port: AtomicPtr::new(ptr::null_mut()),
+            fn_pressed: AtomicBool::new(false),
+        };
+        let user_info = (&ctx as *const TapContext).cast_mut().cast();
+        for flags in [FLAG_COMMAND | 0x10, 0] {
+            let event = unsafe { CGEventCreateKeyboardEvent(ptr::null(), 0x36, true) };
+            assert!(!event.is_null());
+            unsafe { CGEventSetFlags(event, flags) };
+            let forwarded =
+                tap_callback(ptr::null_mut(), KCG_EVENT_FLAGS_CHANGED, event, user_info);
+            assert_eq!(forwarded.is_null(), flags != 0);
+            unsafe { CFRelease(event) };
+        }
+        assert_eq!(
+            *outputs.lock().unwrap(),
+            [Output::StartRecording, Output::StopRecording]
+        );
     }
 
     #[test]

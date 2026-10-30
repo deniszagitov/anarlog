@@ -20,6 +20,7 @@ import { AuthProvider } from "./context";
 import { buildWebAppUrl } from "~/shared/utils";
 
 const mocks = vi.hoisted(() => ({
+  authConfigured: true,
   analyticsClearGroups: vi.fn(),
   analyticsEvent: vi.fn(),
   analyticsIdentify: vi.fn(),
@@ -61,29 +62,32 @@ vi.mock("./connect-local-library-dialog", () => ({
 vi.mock("./client", () => ({
   persistAuthSession: mocks.persistAuthSession,
   readPersistedAuthSession: mocks.readPersistedAuthSession,
-  supabase: {
-    auth: {
-      getSession: mocks.getSession,
-      onAuthStateChange: vi.fn(
-        (
-          callback: (event: AuthChangeEvent, session: Session | null) => void,
-        ) => {
-          mocks.authCallback = callback;
-          return {
-            data: {
-              subscription: {
-                unsubscribe: vi.fn(),
+  get supabase() {
+    if (!mocks.authConfigured) return null;
+    return {
+      auth: {
+        getSession: mocks.getSession,
+        onAuthStateChange: vi.fn(
+          (
+            callback: (event: AuthChangeEvent, session: Session | null) => void,
+          ) => {
+            mocks.authCallback = callback;
+            return {
+              data: {
+                subscription: {
+                  unsubscribe: vi.fn(),
+                },
               },
-            },
-          };
-        },
-      ),
-      refreshSession: mocks.refreshSession,
-      setSession: vi.fn(),
-      signOut: mocks.signOut,
-      startAutoRefresh: mocks.startAutoRefresh,
-      stopAutoRefresh: mocks.stopAutoRefresh,
-    },
+            };
+          },
+        ),
+        refreshSession: mocks.refreshSession,
+        setSession: vi.fn(),
+        signOut: mocks.signOut,
+        startAutoRefresh: mocks.startAutoRefresh,
+        stopAutoRefresh: mocks.stopAutoRefresh,
+      },
+    };
   },
 }));
 
@@ -219,6 +223,9 @@ function SessionProbe() {
   const [requestAccessToken, setRequestAccessToken] = useState("none");
   return (
     <>
+      <div data-testid="session-ready">
+        {session === undefined ? "loading" : "ready"}
+      </div>
       <div data-testid="session">{session?.user.id ?? "none"}</div>
       <div data-testid="access-token">{session?.access_token ?? "none"}</div>
       <div data-testid="authorization">
@@ -262,6 +269,7 @@ function renderAuthProvider() {
 
 describe("AuthProvider", () => {
   beforeEach(() => {
+    mocks.authConfigured = true;
     mocks.analyticsClearGroups.mockReset();
     mocks.analyticsEvent.mockReset();
     mocks.analyticsIdentify.mockReset();
@@ -308,6 +316,17 @@ describe("AuthProvider", () => {
   afterEach(() => {
     vi.useRealTimers();
     cleanup();
+  });
+
+  it("settles as signed out when no Supabase client is configured", async () => {
+    mocks.authConfigured = false;
+    renderAuthProvider();
+
+    await waitFor(() => {
+      expect(screen.getByTestId("session-ready").textContent).toBe("ready");
+    });
+    expect(screen.getByTestId("session").textContent).toBe("none");
+    expect(screen.getByTestId("authorization").textContent).toBe("none");
   });
 
   it("associates signed-in analytics without account contact details", async () => {

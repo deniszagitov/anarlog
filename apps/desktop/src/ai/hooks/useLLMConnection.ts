@@ -28,6 +28,7 @@ import { createTracedFetch, tracedFetch } from "../traced-fetch";
 import { useAuth } from "~/auth";
 import { useBillingAccess } from "~/auth/billing-context";
 import { env } from "~/env";
+import { isLocalAiBuild, isLocalInferenceEndpoint } from "~/local-ai";
 import { type ProviderId, PROVIDERS } from "~/settings/ai/llm/shared";
 import {
   CHATGPT_API_BASE_URL,
@@ -66,6 +67,7 @@ export type LLMConnectionStatus =
   | { status: "pending"; reason: "missing_provider" }
   | { status: "pending"; reason: "missing_model"; providerId: ProviderId }
   | { status: "error"; reason: "provider_not_found"; providerId: string }
+  | { status: "error"; reason: "local_only"; providerId: string }
   | { status: "error"; reason: "unauthenticated"; providerId: "anarlog" }
   | { status: "error"; reason: "not_pro"; providerId: "anarlog" }
   | {
@@ -225,6 +227,17 @@ const resolveLLMConnection = (params: {
     providerDefinition.baseUrl?.trim() ||
     "";
   const apiKey = providerConfig?.api_key?.trim() || "";
+
+  if (
+    isLocalAiBuild() &&
+    (modelId.includes(":cloud") ||
+      (providerId !== "apple_foundation" && !isLocalInferenceEndpoint(baseUrl)))
+  ) {
+    return {
+      conn: null,
+      status: { status: "error", reason: "local_only", providerId },
+    };
+  }
 
   const context: ProviderEligibilityContext = {
     isAuthenticated: !!session,
@@ -461,6 +474,7 @@ const createProviderModel = (
         fetch: ollamaFetch,
         name: conn.providerId,
         baseURL: conn.baseUrl,
+        supportsStructuredOutputs: true,
       });
       return wrapWithThinkingMiddleware(provider.chatModel(conn.modelId));
     }

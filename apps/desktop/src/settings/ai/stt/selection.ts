@@ -42,6 +42,14 @@ export function getDefaultSttSelection(
   currentProvider?: string,
   currentModel?: string,
 ) {
+  if (
+    (currentProvider === "custom" || currentProvider === "nvidia") &&
+    statuses[currentProvider]?.configured &&
+    !currentModel?.trim()
+  ) {
+    return null;
+  }
+
   for (const provider of providerIds) {
     const status = statuses[provider];
     if (!status?.configured) {

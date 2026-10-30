@@ -88,6 +88,7 @@ pub(in crate::batch) async fn run_direct_batch_for_adapter_kind(
         Fireworks => FireworksAdapter,
         OpenAI => OpenAIAdapter,
         AmazonBedrock => owhisper_client::AmazonBedrockAdapter,
+        LocalOpenAi => owhisper_client::LocalOpenAiAdapter,
         OpenRouter => OpenRouterAdapter,
         SiliconFlow => SiliconFlowAdapter,
         Zai => ZaiAdapter,

@@ -1,8 +1,10 @@
 use std::path::{Path, PathBuf};
 
 pub const VAULT_CONFIG_FILENAME: &str = "global.json";
+const DEV_BUNDLE_ID: &str = "com.hyprnote.dev";
 const STAGING_BUNDLE_ID: &str = "com.hyprnote.staging";
 const NIGHTLY_BUNDLE_ID: &str = "com.hyprnote.nightly";
+const LOCAL_AI_BUNDLE_ID: &str = "so.anarlog.local-ai";
 const RELEASE_APP_FOLDER: &str = "anarlog";
 const LEGACY_RELEASE_APP_FOLDER: &str = "hyprnote";
 
@@ -19,7 +21,12 @@ pub fn compute_default_base(bundle_id: &str) -> Option<PathBuf> {
 // This base holds settings, the store, and the vault config. Nightly keeps its
 // own; the desktop app maps only the database itself onto stable's folder.
 fn resolve_app_folder<'a>(data_dir: &Path, bundle_id: &'a str, is_debug: bool) -> &'a str {
-    if is_debug || matches!(bundle_id, STAGING_BUNDLE_ID | NIGHTLY_BUNDLE_ID) {
+    if is_debug
+        || matches!(
+            bundle_id,
+            DEV_BUNDLE_ID | STAGING_BUNDLE_ID | NIGHTLY_BUNDLE_ID | LOCAL_AI_BUNDLE_ID
+        )
+    {
         bundle_id
     } else if has_app_data(&data_dir.join(LEGACY_RELEASE_APP_FOLDER))
         && !has_app_data(&data_dir.join(RELEASE_APP_FOLDER))
@@ -40,6 +47,24 @@ fn has_app_data(path: &Path) -> bool {
 mod tests {
     use super::*;
     use tempfile::tempdir;
+
+    #[test]
+    fn local_ai_build_never_reuses_existing_release_storage() {
+        let temp = tempdir().unwrap();
+        for folder in [RELEASE_APP_FOLDER, LEGACY_RELEASE_APP_FOLDER] {
+            std::fs::create_dir(temp.path().join(folder)).unwrap();
+            std::fs::write(temp.path().join(folder).join("app.db"), "original notes").unwrap();
+        }
+
+        let local_folder = resolve_app_folder(temp.path(), LOCAL_AI_BUNDLE_ID, false);
+        assert_ne!(local_folder, RELEASE_APP_FOLDER);
+        assert_ne!(local_folder, LEGACY_RELEASE_APP_FOLDER);
+        assert!(!temp.path().join(local_folder).join("app.db").exists());
+        assert_eq!(
+            std::fs::read_to_string(temp.path().join(RELEASE_APP_FOLDER).join("app.db")).unwrap(),
+            "original notes"
+        );
+    }
 
     #[test]
     fn resolve_app_folder_uses_anarlog_for_new_stable_installs() {
@@ -105,10 +130,12 @@ mod tests {
     }
 
     #[test]
-    fn resolve_app_folder_returns_bundle_id_in_debug_builds() {
-        assert_eq!(
-            resolve_app_folder(Path::new("/tmp"), "com.hyprnote.stable", true),
-            "com.hyprnote.stable"
-        );
+    fn development_builds_keep_isolated_storage() {
+        for (identifier, is_debug) in [("com.hyprnote.stable", true), ("com.hyprnote.dev", false)] {
+            assert_eq!(
+                resolve_app_folder(Path::new("/tmp"), identifier, is_debug),
+                identifier
+            );
+        }
     }
 }

@@ -28,12 +28,12 @@ pub use adapter::{
     DashScopeAdapter, DashScopeStreamingAdapter, DeepgramAdapter, DeepgramFluxAdapter,
     ElevenLabsAdapter, FireworksAdapter, GladiaAdapter, GoogleCloudAdapter,
     GoogleGenerativeAiAdapter, GradiumAdapter, GroqAdapter, InworldAdapter, LanguageQuality,
-    LanguageSupport, MetaAdapter, MistralAdapter, ModulateAdapter, NariAdapter, NvidiaAdapter,
-    OpenAIAdapter, OpenRouterAdapter, PyannoteAdapter, RealtimeSttAdapter, RevAiAdapter,
-    SiliconFlowAdapter, SmallestAIAdapter, SonioxAdapter, SpeechmaticsAdapter, TogetherAdapter,
-    WhisperCppAdapter, WisprFlowAdapter, XaiAdapter, ZaiAdapter, append_provider_param,
-    documented_language_codes_batch, documented_language_codes_live, is_anarlog_proxy,
-    is_local_host, normalize_languages,
+    LanguageSupport, LocalOpenAiAdapter, MetaAdapter, MistralAdapter, ModulateAdapter, NariAdapter,
+    NvidiaAdapter, OpenAIAdapter, OpenRouterAdapter, PyannoteAdapter, RealtimeSttAdapter,
+    RevAiAdapter, SiliconFlowAdapter, SmallestAIAdapter, SonioxAdapter, SpeechmaticsAdapter,
+    TogetherAdapter, WhisperCppAdapter, WisprFlowAdapter, XaiAdapter, ZaiAdapter,
+    append_provider_param, documented_language_codes_batch, documented_language_codes_live,
+    is_anarlog_proxy, is_local_host, normalize_languages,
 };
 pub use adapter::{StreamingBatchEvent, StreamingBatchStream};
 

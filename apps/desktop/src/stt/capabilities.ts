@@ -4,6 +4,8 @@ import {
   type TranscriptionMode,
 } from "@anlg/plugin-transcription";
 
+import { isLocalAiBuild } from "~/local-ai";
+
 type LiveTranscriptionConfig = {
   languages: string[];
   omittedLanguages?: string[];
@@ -187,6 +189,7 @@ export function getSttModelTranscriptionMode(
   provider?: string | null,
   model?: string | null,
 ): TranscriptionMode | undefined {
+  if (isLocalAiBuild() && provider === "custom") return "batch";
   if (isLocalFileSttModel(provider, model)) {
     return "batch";
   }
@@ -322,6 +325,7 @@ export async function isSupportedLanguagesBatch(
   model: string | null | undefined,
   languages: readonly string[],
 ) {
+  if (isLocalAiBuild() && provider === "custom") return true;
   const result = await listenerCommands.isSupportedLanguagesBatch(
     languageSupportProvider(provider),
     model ?? null,
@@ -450,6 +454,7 @@ export async function isLiveTranscriptionSupported(
   provider?: string | null,
   model?: string | null,
 ) {
+  if (isLocalAiBuild() && provider === "custom") return false;
   if (!provider || !model) {
     return false;
   }

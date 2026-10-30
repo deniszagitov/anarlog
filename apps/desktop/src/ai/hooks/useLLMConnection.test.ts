@@ -1,7 +1,8 @@
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 import { renderHook } from "@testing-library/react";
-import { generateText, streamText } from "ai";
+import { generateText, Output, streamText } from "ai";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { z } from "zod";
 
 import { normalizeLLMProviderId, useLanguageModel } from "./useLLMConnection";
 
@@ -127,6 +128,47 @@ it("sends OpenRouter app-attribution headers for the BYOK openrouter provider", 
     maxRetries: 0,
   });
   expect(await completion.text).toBe("Hello from OpenRouter");
+  unmount();
+});
+
+it("passes Ollama the JSON schema needed for validated meeting facts", async () => {
+  mocks.provider = "ollama";
+  vi.mocked(tauriFetch).mockImplementation(async (_input, init) => {
+    const body = JSON.parse(String(init?.body));
+    expect(body.response_format).toMatchObject({
+      type: "json_schema",
+      json_schema: {
+        schema: {
+          type: "object",
+          properties: { decision: { type: "string" } },
+          required: ["decision"],
+        },
+      },
+    });
+    return Response.json({
+      id: "local-facts",
+      model: "mtplx",
+      created: 0,
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: "assistant",
+            content: JSON.stringify({ decision: "Release Friday" }),
+          },
+          finish_reason: "stop",
+        },
+      ],
+    });
+  });
+  const { result, unmount } = renderHook(() => useLanguageModel());
+  const completion = await generateText({
+    model: result.current!,
+    prompt: "Extract the decision from this synthetic meeting.",
+    maxRetries: 0,
+    output: Output.object({ schema: z.object({ decision: z.string() }) }),
+  });
+  expect(completion.output).toEqual({ decision: "Release Friday" });
   unmount();
 });
 

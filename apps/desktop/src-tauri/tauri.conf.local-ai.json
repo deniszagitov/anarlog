@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Anarlog Local",
+  "mainBinaryName": "anarlog-local",
+  "identifier": "so.anarlog.local-ai",
+  "bundle": {
+    "createUpdaterArtifacts": false,
+    "externalBin": [
+      "binaries/char-chrome-native-host",
+      "binaries/check-permissions",
+      "resources/cli/anarlog-cli"
+    ]
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["anarlog-local"]
+      }
+    },
+    "updater": {
+      "active": false,
+      "endpoints": []
+    }
+  }
+}

@@ -82,8 +82,10 @@ export function DictationShortcut({ shortcut }: { shortcut: string }) {
           aria-pressed={recording}
           disabled={save.isPending && !recording}
           aria-busy={save.isPending && !recording}
-          onClick={() => {
+          onClick={(event) => {
             if (recording) return finish();
+            // WebKit does not focus buttons on click.
+            event.currentTarget.focus();
             attempt.current += 1;
             save.reset();
             useDictationStatus.setState({ capturingShortcut: true });

@@ -26,6 +26,7 @@ import type { LocalModel } from "@anlg/plugin-local-stt";
 import { Cpu, Shuffle, Waveform } from "@anlg/ui/components/icons";
 
 import { env } from "~/env";
+import { isLocalAiBuild } from "~/local-ai";
 import {
   AnarlogProviderIcon,
   ProviderBrandImage,
@@ -1233,11 +1234,13 @@ const _PROVIDERS = [
   {
     disabled: false,
     id: "custom",
-    displayName: "Custom",
-    description: "Deepgram-compatible",
-    badge: null,
+    displayName: isLocalAiBuild() ? "Local ASR (Ollama / MLX)" : "Custom",
+    description: isLocalAiBuild()
+      ? "Local OpenAI-compatible ASR"
+      : "Deepgram-compatible",
+    badge: isLocalAiBuild() ? "After recording" : null,
     icon: <Shuffle />,
-    baseUrl: undefined,
+    baseUrl: isLocalAiBuild() ? "http://127.0.0.1:11434/v1" : undefined,
     models: [],
     requirements: [
       { kind: "requires_config", fields: ["base_url", "api_key"] },
@@ -1286,5 +1289,9 @@ const PROVIDER_ORDER = [
   "aquavoice",
 ] as const;
 
-export const PROVIDERS = sortProviders(_PROVIDERS, PROVIDER_ORDER);
+export const PROVIDERS = sortProviders(_PROVIDERS, PROVIDER_ORDER).filter(
+  (provider) =>
+    !isLocalAiBuild() ||
+    ["soniqo", "apple_speech", "local_file", "custom"].includes(provider.id),
+);
 export type ProviderId = (typeof _PROVIDERS)[number]["id"];

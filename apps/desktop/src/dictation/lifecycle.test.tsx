@@ -237,6 +237,32 @@ describe("dictation access and lifecycle", () => {
     expect(mocks.discardRecording).toHaveBeenCalledWith("/tmp/dictation.wav");
   });
 
+  it("inserts local dictation without an account or billing response", async () => {
+    vi.stubEnv("VITE_LOCAL_AI", "true");
+    try {
+      mocks.session = null;
+      mocks.billing.isPro = false;
+      mocks.billing.isReady = false;
+      render(<DictationLifecycle />);
+      await waitFor(() =>
+        expect(useDictationStatus.getState().ready).toBe(true),
+      );
+      await act(async () => {
+        mocks.listener?.({ payload: { type: "pressed" } });
+      });
+      await act(async () => {
+        mocks.listener?.({ payload: { type: "released" } });
+      });
+      await waitFor(() =>
+        expect(mocks.insertText).toHaveBeenCalledWith("focused-field", "Hello"),
+      );
+      expect(mocks.getSessionForRequest).not.toHaveBeenCalled();
+      expect(mocks.billing.isPro).toBe(false);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   it("reuses the finalized live transcript even when preview display is disabled", async () => {
     mocks.settings.dictation_live_preview = false;
     mocks.connection = {

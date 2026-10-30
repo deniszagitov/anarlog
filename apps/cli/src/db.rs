@@ -56,6 +56,7 @@ fn resolve_default_path_for_command(data_dir: &Path, command_name: Option<&OsStr
     let channel_identifier = match command_name {
         Some("anarlog-dev") => Some("com.hyprnote.dev"),
         Some("anarlog-staging") => Some("com.hyprnote.staging"),
+        Some("anarlog-local") => Some("so.anarlog.local-ai"),
         _ => None,
     };
     if let Some(identifier) = channel_identifier {
@@ -124,6 +125,11 @@ mod tests {
         let stable = dir.path().join("anarlog/app.db");
         std::fs::create_dir_all(stable.parent().unwrap()).unwrap();
         std::fs::write(&stable, "").unwrap();
+
+        assert_eq!(
+            resolve_default_path_for_command(dir.path(), Some(OsStr::new("anarlog-local"))),
+            dir.path().join("so.anarlog.local-ai/app.db")
+        );
 
         assert_eq!(
             resolve_default_path_for_command(dir.path(), Some(OsStr::new("anarlog-dev"))),

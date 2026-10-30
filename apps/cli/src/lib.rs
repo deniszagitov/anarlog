@@ -77,7 +77,10 @@ pub async fn run(mut args: Args) -> Result<u8> {
             }
             if matches!(
                 &command,
-                cli::MeetingCommand::Import { .. } | cli::MeetingCommand::ImportStatus { .. }
+                cli::MeetingCommand::Import { .. }
+                    | cli::MeetingCommand::ImportStatus { .. }
+                    | cli::MeetingCommand::Transcribe { .. }
+                    | cli::MeetingCommand::TranscribeStatus { .. }
             ) {
                 if !matches!(source, cli::MeetingSource::Local) {
                     return Err(Error::operation(

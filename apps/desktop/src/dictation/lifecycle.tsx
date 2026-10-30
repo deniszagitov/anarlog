@@ -18,6 +18,7 @@ import { useDictationStatus } from "./state";
 
 import { useAuth } from "~/auth";
 import { useBillingAccess } from "~/auth/billing-context";
+import { isLocalAiBuild, useLocalFeatureAccess } from "~/local-ai";
 import { useSettingsReady } from "~/settings/queries";
 import { useConfigValue } from "~/shared/config";
 import { useListener } from "~/stt/contexts";
@@ -34,6 +35,8 @@ export function waitForDictationCleanup() {
 export function DictationLifecycle() {
   const { session } = useAuth();
   const { isPro, isReady } = useBillingAccess();
+  const localAccess = isLocalAiBuild();
+  const { allowed: canDictate } = useLocalFeatureAccess();
   const settingsReady = useSettingsReady();
   const enabled = useConfigValue("dictation_enabled");
   const shortcut = useConfigValue("dictation_shortcut");
@@ -46,9 +49,15 @@ export function DictationLifecycle() {
     (state) => state.live.status !== "inactive" || state.live.loading,
   );
 
-  if (!session || !isReady || !isPro || !settingsReady || !enabled) return null;
+  if (
+    (!localAccess && (!session || !isReady || !isPro)) ||
+    !canDictate ||
+    !settingsReady ||
+    !enabled
+  )
+    return null;
   return (
-    <TranscriptRetention key={session.user.id}>
+    <TranscriptRetention key={session?.user.id ?? "local"}>
       {!meetingActive && !capturingShortcut && (
         <ActiveDictation
           key={`${shortcut}:${handsFree}:${retry}`}

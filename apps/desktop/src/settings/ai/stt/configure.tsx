@@ -6,6 +6,7 @@ import { Accordion } from "@anlg/ui/components/ui/accordion";
 import { useSttSettings } from "./context";
 import { ProviderId, PROVIDERS } from "./shared";
 
+import { isLocalAiBuild } from "~/local-ai";
 import {
   filterProviders,
   NonAnarlogProviderCard,
@@ -118,7 +119,9 @@ function ProviderContext({ providerId }: { providerId: ProviderId }) {
                                                     : providerId === "revai"
                                                       ? `Use [Rev AI](https://docs.rev.ai/api/asynchronous/get-started) asynchronous transcription. Anarlog uploads the recording, waits for the job, and retrieves word timestamps and speaker labels.`
                                                       : providerId === "custom"
-                                                        ? `Point this at any **Deepgram-compatible** endpoint, including a server on this computer or your local network.`
+                                                        ? isLocalAiBuild()
+                                                          ? `Connect a local **OpenAI-compatible ASR** server. For Ollama, use \`http://127.0.0.1:11434/v1\` and enter \`ollama\` as the API key. For the MLX server, use its loopback URL and access token. Select the exact speech model served by that runtime. Transcription runs after recording; text-only models have chunk timing, not word alignment.`
+                                                          : `Point this at any **Deepgram-compatible** endpoint, including a server on this computer or your local network.`
                                                         : "";
 
   if (!content.trim()) {

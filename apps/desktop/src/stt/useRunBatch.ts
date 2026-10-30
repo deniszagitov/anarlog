@@ -23,6 +23,7 @@ import { useAuth } from "~/auth";
 import { useBillingAccess } from "~/auth/billing-context";
 import { withCloudsyncActivity } from "~/db/cloudsync-activity";
 import { env } from "~/env";
+import { isLocalAiBuild, isLocalInferenceEndpoint } from "~/local-ai";
 import {
   deleteProcessedAudioForRetention,
   normalizeAudioRetention,
@@ -53,6 +54,8 @@ type RunOptions = {
     persist: (words: WordWithId[], hints: SpeakerHintWithId[]) => Promise<void>;
   };
   deferAudioFinalization?: boolean;
+  preserveAudio?: boolean;
+  requireSelectedLocalProvider?: boolean;
   handlePersist?: BatchPersistCallback;
   notifyOnCompletion?: boolean;
   resume?: { provider: BatchProvider; model: string };
@@ -227,6 +230,7 @@ export function getBatchFallbackTarget({
   currentPlatform?: ReturnType<typeof platform>;
   currentArch?: ReturnType<typeof arch>;
 }): BatchTarget | null {
+  if (isLocalAiBuild()) return null;
   if (isPaid && accessToken) {
     return {
       provider: "anarlog",
@@ -358,6 +362,17 @@ export const useRunBatch = (sessionId: string) => {
               label: selectedModel,
             }
           : null;
+      if (
+        options?.requireSelectedLocalProvider &&
+        !(
+          isOnDeviceSttModel(selectedProviderId, selectedModel) ||
+          isLocalFileSttModel(selectedProviderId, selectedModel)
+        )
+      ) {
+        throw new Error(
+          "Select a local speech-to-text provider before transcribing an existing meeting. No provider was changed.",
+        );
+      }
       const selectedOnDeviceUnsupported = !!(
         selectedTarget &&
         (isOnDeviceSttModel(selectedProviderId, selectedModel) ||
@@ -374,22 +389,26 @@ export const useRunBatch = (sessionId: string) => {
           : false;
       options?.signal?.throwIfAborted();
       const requiresCloudSession =
-        billing.isPaid ||
-        (selectedTarget?.provider === "anarlog" &&
-          selectedTarget.model === "cloud");
+        !isLocalAiBuild() &&
+        !options?.requireSelectedLocalProvider &&
+        (billing.isPaid ||
+          (selectedTarget?.provider === "anarlog" &&
+            selectedTarget.model === "cloud"));
       const requestSession = requiresCloudSession
         ? await auth.getSessionForRequest().catch(() => null)
         : null;
       options?.signal?.throwIfAborted();
       const cloudAccessToken =
         requestSession?.access_token ?? auth.session?.access_token;
-      const fallbackTarget = getBatchFallbackTarget({
-        isPaid: billing.isPaid,
-        accessToken: cloudAccessToken,
-        apiBaseUrl: env.VITE_AI_API_URL ?? env.VITE_API_URL,
-        currentPlatform,
-        currentArch,
-      });
+      const fallbackTarget = options?.requireSelectedLocalProvider
+        ? null
+        : getBatchFallbackTarget({
+            isPaid: billing.isPaid,
+            accessToken: cloudAccessToken,
+            apiBaseUrl: env.VITE_AI_API_URL ?? env.VITE_API_URL,
+            currentPlatform,
+            currentArch,
+          });
       const shouldUseSelectedTarget =
         selectedTargetSupported ||
         (fallbackTarget && sameBatchTarget(selectedTarget, fallbackTarget));
@@ -411,6 +430,16 @@ export const useRunBatch = (sessionId: string) => {
             ? `${selectedProviderLabel(conn, selectedModel)} is not available for batch transcription with the selected languages. Choose languages it supports, or configure another speech-to-text provider.`
             : `${selectedProviderLabel(conn, selectedModel)} is not available for batch transcription on this platform. Configure a batch-capable speech-to-text provider.`,
         );
+      }
+
+      if (
+        isLocalAiBuild() &&
+        !isOnDeviceSttModel(target.provider, target.model) &&
+        !isLocalFileSttModel(target.provider, target.model) &&
+        (!isLocalInferenceEndpoint(target.baseUrl) ||
+          (target.provider === "anarlog" && target.model === "cloud"))
+      ) {
+        throw new Error("Local AI requires a local transcription provider.");
       }
 
       if (target.provider === "anarlog" && target.model === "cloud") {
@@ -669,7 +698,7 @@ export const useRunBatch = (sessionId: string) => {
                 });
               }
             }
-            if (!options?.deferAudioFinalization) {
+            if (!options?.deferAudioFinalization && !options?.preserveAudio) {
               await deleteProcessedAudioForRetention(audioRetention, sessionId);
             }
           } catch (error) {

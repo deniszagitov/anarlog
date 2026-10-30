@@ -25,6 +25,7 @@ mod groq;
 pub mod http;
 mod inworld;
 mod language;
+mod local_openai;
 pub(crate) mod meta;
 mod mistral;
 mod modulate;
@@ -41,6 +42,8 @@ pub(crate) mod smallestai;
 pub(crate) mod soniox;
 mod speechmatics;
 mod together;
+#[cfg(feature = "local")]
+mod wav;
 mod whispercpp;
 mod wisprflow;
 mod xai;
@@ -67,6 +70,7 @@ pub use gradium::*;
 pub use groq::*;
 pub use inworld::*;
 pub use language::{LanguageQuality, LanguageSupport};
+pub use local_openai::*;
 pub use meta::*;
 pub use mistral::*;
 pub use modulate::*;
@@ -504,6 +508,8 @@ pub enum AdapterKind {
     Nvidia,
     #[strum(serialize = "amazon_bedrock")]
     AmazonBedrock,
+    #[strum(serialize = "local_openai")]
+    LocalOpenAi,
     #[strum(serialize = "wisprflow")]
     WisprFlow,
     #[strum(serialize = "aquavoice")]
@@ -591,6 +597,7 @@ impl AdapterKind {
                             | Self::Alebex
                             | Self::Nvidia
                             | Self::AmazonBedrock
+                            | Self::LocalOpenAi
                     )
                 })
         {
@@ -673,6 +680,18 @@ impl AdapterKind {
                 OPENAI_COMPATIBLE_MAX_UPLOAD_BYTES,
                 openai_batch_max_duration(model),
             ),
+            Self::LocalOpenAi => (
+                u64::MAX,
+                Duration::from_secs(
+                    if model.is_some_and(|model| {
+                        model.contains("whisper") || model.contains("parakeet")
+                    }) {
+                        590
+                    } else {
+                        25
+                    },
+                ),
+            ),
             Self::Groq | Self::Together | Self::Xai | Self::AmazonBedrock => (
                 OPENAI_COMPATIBLE_MAX_UPLOAD_BYTES,
                 OPENAI_COMPATIBLE_MAX_DURATION,
@@ -699,7 +718,8 @@ impl AdapterKind {
 
     pub fn has_live_mode(&self) -> bool {
         match self {
-            Self::AmazonBedrock
+            Self::LocalOpenAi
+            | Self::AmazonBedrock
             | Self::AquaVoice
             | Self::Argmax
             | Self::Pyannote
@@ -750,7 +770,7 @@ impl AdapterKind {
             Self::Modulate => ModulateAdapter::language_support_live(languages, model),
             Self::Alebex => AlebexAdapter::language_support_live(languages, model),
             Self::Nvidia => NvidiaAdapter::language_support_live(languages, model),
-            Self::AmazonBedrock => LanguageSupport::NotSupported,
+            Self::AmazonBedrock | Self::LocalOpenAi => LanguageSupport::NotSupported,
             Self::WisprFlow => WisprFlowAdapter::language_support(languages),
             Self::AquaVoice => LanguageSupport::NotSupported,
             Self::Cartesia => CartesiaAdapter::language_support_live(languages),
@@ -796,6 +816,9 @@ impl AdapterKind {
             Self::Inworld | Self::Gradium | Self::Modulate | Self::Alebex | Self::Nvidia => {
                 LanguageSupport::NotSupported
             }
+            Self::LocalOpenAi => LanguageSupport::Supported {
+                quality: LanguageQuality::NoData,
+            },
             Self::AmazonBedrock => OpenAIAdapter::language_support_batch(languages),
             Self::WisprFlow => WisprFlowAdapter::language_support(languages),
             Self::AquaVoice => AquaVoiceAdapter::language_support_batch(languages),

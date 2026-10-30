@@ -4,6 +4,7 @@ import { cleanupRecordingImports } from "@anlg/plugin-db";
 import { commands as fsSyncCommands } from "@anlg/plugin-fs-sync";
 import { commands as fsCommands } from "@anlg/plugin-fs2";
 import { commands as settingsCommands } from "@anlg/plugin-settings";
+import { commands as transcriptionCommands } from "@anlg/plugin-transcription";
 import { useMountEffect } from "@anlg/ui/hooks/use-mount-effect";
 
 import { useAuth } from "~/auth";
@@ -16,8 +17,10 @@ import { useSession } from "~/session/queries";
 import { useAiProvidersState } from "~/settings/providers";
 import { useSettingsReady } from "~/settings/queries";
 import { useRunBatch } from "~/stt/useRunBatch";
+import { useSTTConnection } from "~/stt/useSTTConnection";
 
-const workerId = crypto.randomUUID();
+// Version the heartbeat so older workers cannot accept in-place transcription jobs.
+const workerId = `transcribe-v1:${crypto.randomUUID()}`;
 type ImportJob = { id: string; meeting_id: string; file_path: string };
 
 async function heartbeat() {
@@ -78,7 +81,8 @@ export function RecordingImportWorker() {
     queryFn: () =>
       liveQueryClient.execute<ImportJob>(
         `SELECT id, meeting_id, file_path FROM local_recording_import_jobs
-       WHERE processing_status = 'queued' OR (worker_id = ? AND processing_status IN ('importing', 'transcribing', 'summarizing'))
+       WHERE (processing_status = 'queued' AND NOT EXISTS (SELECT 1 FROM local_recording_import_jobs AS active WHERE active.processing_status IN ('importing', 'transcribing', 'summarizing')))
+          OR (worker_id = ? AND processing_status IN ('importing', 'transcribing', 'summarizing'))
        ORDER BY CASE WHEN processing_status = 'queued' THEN 1 ELSE 0 END, updated_at, id LIMIT 1`,
         [workerId],
       ),
@@ -99,6 +103,8 @@ function ReadyImport({ job }: { job: ImportJob }) {
   const settingsReady = useSettingsReady();
   const stt = useAiProvidersState("stt");
   const llm = useAiProvidersState("llm");
+  const sttConnection = useSTTConnection();
+  const runBatch = useRunBatch(job.meeting_id);
   const billing = useBillingAccess();
   const auth = useAuth();
   // Signed-out users have no billing claims to load; local providers still run.
@@ -106,16 +112,22 @@ function ReadyImport({ job }: { job: ImportJob }) {
   return session &&
     settingsReady &&
     stt.isReady &&
+    sttConnection.isReady &&
     llm.isReady &&
     billingSettled ? (
-    <RunImport job={job} />
+    <RunImport job={job} runBatch={runBatch} />
   ) : null;
 }
 
 const runningImports = new Set<string>();
 
-function RunImport({ job }: { job: ImportJob }) {
-  const runBatch = useRunBatch(job.meeting_id);
+function RunImport({
+  job,
+  runBatch,
+}: {
+  job: ImportJob;
+  runBatch: ReturnType<typeof useRunBatch>;
+}) {
   useMountEffect(() => {
     // Defer acquisition until after React's mount/cleanup probe. Once started,
     // processing outlives this component so navigation does not fail the job.
@@ -154,6 +166,7 @@ async function processImport(
   const claimed = await liveQueryClient.execute<{ id: string }>(
     `UPDATE local_recording_import_jobs SET worker_id = ?, processing_status = 'importing', updated_at = unixepoch()
      WHERE id = ? AND processing_status = 'queued'
+     AND NOT EXISTS (SELECT 1 FROM local_recording_import_jobs AS other WHERE other.id != local_recording_import_jobs.id AND other.processing_status IN ('importing', 'transcribing', 'summarizing'))
      AND NOT EXISTS (SELECT 1 FROM managed_app_settings WHERE id = 'intelligence_disabled' AND value_json = 'true') RETURNING id`,
     [workerId, job.id],
   );
@@ -172,17 +185,50 @@ async function processImport(
       "transcription",
       `recording-import:${job.id}`,
       async () => {
-        const imported = await fsSyncCommands.audioImport(
-          job.meeting_id,
-          job.file_path,
-        );
-        if (imported.status === "error") throw new Error(imported.error);
-        await catalogLocalSessionAudio(job.meeting_id);
+        const inPlace = job.file_path === "";
+        if (inPlace) {
+          phase = "checking active transcriptions";
+          const active =
+            await transcriptionCommands.listTranscriptionSessions();
+          if (active.status === "error") throw new Error(active.error);
+          if (active.data.length > 0) {
+            await update(
+              "failed",
+              "pending",
+              "Another transcription is active or awaiting completion. No new transcription was started; wait for it to finish before retrying.",
+            );
+            return;
+          }
+          // A UI transcription may have completed since CLI submission.
+          const existing = await liveQueryClient.execute<{
+            has_transcript: number;
+          }>(
+            `SELECT EXISTS(SELECT 1 FROM transcripts WHERE session_id = ? AND deleted_at IS NULL
+             AND json_array_length(words_json) > 0) AS has_transcript`,
+            [job.meeting_id],
+          );
+          if (existing[0]?.has_transcript) {
+            await update("done", "skipped_existing_transcript");
+            return;
+          }
+        }
+        const audio = inPlace
+          ? await fsSyncCommands.audioPath(job.meeting_id)
+          : await fsSyncCommands.audioImport(job.meeting_id, job.file_path);
+        if (audio.status === "error") throw new Error(audio.error);
+        if (!inPlace) await catalogLocalSessionAudio(job.meeting_id);
         phase = "transcribing";
         await update(phase);
-        await runBatch(imported.data, {
-          promotion: { scope: "whole_session" },
+        await runBatch(audio.data, {
+          promotion: { scope: inPlace ? "preserve_existing" : "whole_session" },
+          ...(inPlace
+            ? { requireSelectedLocalProvider: true, preserveAudio: true }
+            : {}),
         });
+        if (inPlace) {
+          await update("done", "skipped_transcription_only");
+          return;
+        }
         phase = "summarizing";
         await update(phase);
         const enhancer = getEnhancerService();

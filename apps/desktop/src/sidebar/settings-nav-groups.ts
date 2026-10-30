@@ -27,6 +27,7 @@ import {
   Waveform,
 } from "@anlg/ui/components/icons";
 
+import { isLocalAiBuild } from "~/local-ai";
 import { privacyMessages } from "~/settings/general/app-settings";
 import { useMyWorkspacesWithMirror } from "~/settings/team/mirror";
 import { type SettingsTab, type TabInput } from "~/store/zustand/tabs";
@@ -72,7 +73,7 @@ export function useSettingsNavGroups(): SettingsNavGroup[] {
           id: "sync",
           label: t`Sync`,
           icon: ArrowsClockwise,
-          requiresPro: true,
+          requiresPro: !isLocalAiBuild(),
         },
         { id: "appearance", label: t`Appearance`, icon: Sun },
         { id: "notifications", label: t`Notifications`, icon: Bell },
@@ -86,14 +87,14 @@ export function useSettingsNavGroups(): SettingsNavGroup[] {
           id: "dictation",
           label: t`Dictation`,
           icon: Microphone,
-          requiresPro: true,
+          requiresPro: !isLocalAiBuild(),
         },
         { id: "intelligence", label: t`Intelligence`, icon: Sparkle },
         {
           id: "dictionary",
           label: t`Dictionary`,
           icon: BookOpen,
-          requiresPro: true,
+          requiresPro: !isLocalAiBuild(),
         },
       ],
     },
@@ -130,7 +131,7 @@ export function useSettingsNavGroups(): SettingsNavGroup[] {
           label: t`Automations`,
           icon: Lightning,
           destination: { type: "automations" },
-          requiresPro: true,
+          requiresPro: !isLocalAiBuild(),
         },
       ],
     },

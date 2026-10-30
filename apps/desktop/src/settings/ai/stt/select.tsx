@@ -43,6 +43,7 @@ import { cn } from "@anlg/utils";
 import { useSttSettings } from "./context";
 import { HealthStatusIndicator, useConnectionHealth } from "./health";
 import { LocalFileModel } from "./local-file-model";
+import { LocalServerModel } from "./local-server-model";
 import { LocalModelBackendBadge, LocalModelLabel } from "./model-icon";
 import { recommendOnDeviceModel } from "./on-device-recommendation";
 import {
@@ -62,6 +63,7 @@ import {
 
 import { useBillingAccess } from "~/auth/billing-context";
 import { useNotifications } from "~/contexts/notifications";
+import { isLocalAiBuild } from "~/local-ai";
 import {
   providerRowId,
   ProviderIconSlot,
@@ -340,6 +342,11 @@ export function SelectProviderAndModel() {
           <div className="min-w-0 flex-3">
             <LocalFileModel healthStatus={health.status} />
           </div>
+        ) : visibleProvider === "custom" && isLocalAiBuild() ? (
+          <LocalServerModel
+            value={displayedSttModel || ""}
+            onChange={handleModelChange}
+          />
         ) : visibleProvider === "custom" || visibleProvider === "nvidia" ? (
           <div className="min-w-0 flex-3">
             <Input

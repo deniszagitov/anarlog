@@ -93,7 +93,10 @@ impl DataSource {
 
 pub async fn run(source: &DataSource, command: MeetingCommand, json: bool) -> Result<()> {
     match command {
-        MeetingCommand::Import { .. } | MeetingCommand::ImportStatus { .. } => {
+        MeetingCommand::Import { .. }
+        | MeetingCommand::ImportStatus { .. }
+        | MeetingCommand::Transcribe { .. }
+        | MeetingCommand::TranscribeStatus { .. } => {
             unreachable!("handled before opening read-only source")
         }
         MeetingCommand::PilotUsage { from_ms, until_ms } => match source {

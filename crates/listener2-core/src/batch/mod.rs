@@ -248,7 +248,7 @@ async fn run_batch_inner(
 
     let post_process = (runtime.clone(), params.clone(), listen_params.clone());
     let mut output = match params.provider {
-        BatchProvider::Am | BatchProvider::OpenAI => {
+        BatchProvider::Am | BatchProvider::OpenAI | BatchProvider::Deepgram => {
             let adapter_kind = resolve_batch_adapter_kind(&params, &listen_params);
             if supports_progressive_batch(adapter_kind, listen_params.model.as_deref()) {
                 run_progressive_batch_session(runtime, params, listen_params).await
@@ -288,10 +288,17 @@ fn resolve_batch_adapter_kind(
         &listen_params.languages,
         listen_params.model.as_deref(),
     );
-    if matches!(params.provider, BatchProvider::OpenAI) && resolved != AdapterKind::AmazonBedrock {
-        AdapterKind::OpenAI
-    } else {
-        resolved
+    match params.provider {
+        BatchProvider::OpenAI
+            if !matches!(
+                resolved,
+                AdapterKind::AmazonBedrock | AdapterKind::LocalOpenAi
+            ) =>
+        {
+            AdapterKind::OpenAI
+        }
+        BatchProvider::Deepgram if resolved != AdapterKind::LocalOpenAi => AdapterKind::Deepgram,
+        _ => resolved,
     }
 }
 
@@ -418,6 +425,93 @@ mod tests {
             max_speakers: None,
             known_speakers: vec![],
         }
+    }
+
+    #[tokio::test]
+    async fn explicit_local_asr_override_reaches_the_multipart_endpoint() {
+        use axum::{Json, Router, body::Bytes, http::HeaderMap, routing::post};
+
+        async fn local_asr(headers: HeaderMap, body: Bytes) -> Json<serde_json::Value> {
+            assert!(
+                headers["content-type"]
+                    .to_str()
+                    .unwrap()
+                    .starts_with("multipart/form-data;")
+            );
+            assert!(body.windows(4).any(|window| window == b"RIFF"));
+            assert!(String::from_utf8_lossy(&body).contains("gemma4:e2b-mlx"));
+            Json(serde_json::json!({
+                "text": "Local speech.",
+                "words": [{"word": "Local speech.", "start": 0.0, "end": 0.2, "speaker": 0}]
+            }))
+        }
+
+        async fn deepgram(_body: Bytes) -> Json<serde_json::Value> {
+            Json(serde_json::json!({
+                "metadata": {},
+                "results": {"channels": [{"alternatives": [{
+                    "transcript": "Existing custom speech.", "confidence": 1.0,
+                    "words": [{"word": "Existing custom speech.", "start": 0.0, "end": 0.2, "confidence": 1.0, "speaker": 0}]
+                }]}]}
+            }))
+        }
+
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let address = listener.local_addr().unwrap();
+        let server = tokio::spawn(async move {
+            axum::serve(
+                listener,
+                Router::new()
+                    .route("/v1/audio/transcriptions", post(local_asr))
+                    .route("/v1/listen", post(deepgram)),
+            )
+            .await
+            .unwrap();
+        });
+        let audio = tempfile::Builder::new().suffix(".wav").tempfile().unwrap();
+        let mut writer = hound::WavWriter::create(
+            audio.path(),
+            hound::WavSpec {
+                channels: 1,
+                sample_rate: 16_000,
+                bits_per_sample: 16,
+                sample_format: hound::SampleFormat::Int,
+            },
+        )
+        .unwrap();
+        for _ in 0..4_000 {
+            writer.write_sample(0i16).unwrap();
+        }
+        writer.finalize().unwrap();
+
+        for provider in [BatchProvider::Deepgram, BatchProvider::OpenAI] {
+            let mut params = batch_params(
+                provider,
+                &format!("http://{address}/v1?provider=local_openai"),
+            );
+            params.file_path = audio.path().to_string_lossy().into_owned();
+            params.model = Some("gemma4:e2b-mlx".into());
+            let output = run_batch(Arc::new(test_fixtures::NeverCancelled), params)
+                .await
+                .unwrap();
+            assert_eq!(output.mode, BatchRunMode::Direct);
+            assert_eq!(output.response.metadata["model"], "gemma4:e2b-mlx");
+            assert_eq!(
+                output.response.results.channels[0].alternatives[0].transcript,
+                "Local speech."
+            );
+        }
+
+        let mut legacy = batch_params(BatchProvider::Deepgram, &format!("http://{address}/v1"));
+        legacy.file_path = audio.path().to_string_lossy().into_owned();
+        let output = run_batch(Arc::new(test_fixtures::NeverCancelled), legacy)
+            .await
+            .unwrap();
+        assert_eq!(
+            output.response.results.channels[0].alternatives[0].transcript,
+            "Existing custom speech."
+        );
+        server.abort();
     }
 
     #[test]

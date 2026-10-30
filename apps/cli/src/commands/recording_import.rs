@@ -1,11 +1,15 @@
 use crate::{Args, Result, cli::MeetingCommand, db, output};
-use anlg_agent_access::{ImportRecordingInput, get_recording_import, import_recording};
+use anlg_agent_access::{
+    ImportRecordingInput, get_recording_import, import_recording, transcribe_meeting,
+};
 
 pub async fn run(args: &Args, command: MeetingCommand, json: bool) -> Result<u8> {
-    let operation = if matches!(&command, MeetingCommand::ImportStatus { .. }) {
-        "meetings.import_status"
-    } else {
-        "meetings.import"
+    let operation = match &command {
+        MeetingCommand::Import { .. } => "meetings.import",
+        MeetingCommand::ImportStatus { .. } => "meetings.import_status",
+        MeetingCommand::Transcribe { .. } => "meetings.transcribe",
+        MeetingCommand::TranscribeStatus { .. } => "meetings.transcribe_status",
+        _ => unreachable!("recording processing command"),
     };
     let (mut job, wait, timeout) = match command {
         MeetingCommand::Import {
@@ -29,7 +33,11 @@ pub async fn run(args: &Args, command: MeetingCommand, json: bool) -> Result<u8>
             .await?;
             (job, wait, timeout)
         }
-        MeetingCommand::ImportStatus { id } => {
+        MeetingCommand::Transcribe { id, wait, timeout } => {
+            let db = db::open_write(args).await?;
+            (transcribe_meeting(db.pool(), &id).await?, wait, timeout)
+        }
+        MeetingCommand::ImportStatus { id } | MeetingCommand::TranscribeStatus { id } => {
             let db = db::open(args).await?;
             (get_recording_import(db.pool(), &id).await?, false, 0)
         }

@@ -20,7 +20,7 @@ import {
 } from "@anlg/ui/components/ui/input-group";
 
 import { trackAnalyticsEvent } from "~/analytics";
-import { useBillingAccess } from "~/auth/billing-context";
+import { useLocalFeatureAccess } from "~/local-ai";
 import { SettingsPageTitle } from "~/settings/page-title";
 import { PlanGate } from "~/settings/plan-gate";
 import { useSetSettingValue } from "~/settings/queries";
@@ -30,12 +30,12 @@ import { normalizeKeywordList, parseDictionaryTermsText } from "~/stt/keywords";
 export function SettingsDictionary() {
   const terms = useConfigValue("personalization_dictionary_terms");
   const setTerms = useSetSettingValue("personalization_dictionary_terms");
-  const { isPro } = useBillingAccess();
+  const { allowed } = useLocalFeatureAccess();
 
   return (
     <div className="flex flex-col gap-8">
       <SettingsPageTitle title={<Trans>Dictionary</Trans>} />
-      <PlanGate plan="pro" allowed={isPro}>
+      <PlanGate plan="pro" allowed={allowed}>
         <DictionarySettings terms={terms} onSave={setTerms} />
       </PlanGate>
     </div>

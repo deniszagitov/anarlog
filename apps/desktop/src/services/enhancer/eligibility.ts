@@ -4,7 +4,9 @@ import {
   type SummaryEligibilitySkipCode,
 } from "@anlg/utils/summary-eligibility";
 
-import { countTranscriptWordCharacters } from "./summary-length";
+import { countNormalizedCharacters } from "./summary-length";
+
+const wordSegmenter = new Intl.Segmenter(undefined, { granularity: "word" });
 
 export type EnhanceEligibilitySkipCode = SummaryEligibilitySkipCode;
 
@@ -13,12 +15,16 @@ export function getEligibility(
     words: ReadonlyArray<{ text?: unknown }>;
   }>,
 ): SummaryEligibility {
+  const text = transcripts
+    .flatMap((transcript) => transcript.words)
+    .map((word) => (typeof word.text === "string" ? word.text : ""))
+    .join(" ");
+
   return getSummaryEligibility({
     transcriptCount: transcripts.length,
-    wordCount: transcripts.reduce(
-      (total, transcript) => total + transcript.words.length,
-      0,
-    ),
-    characterCount: countTranscriptWordCharacters(transcripts),
+    wordCount: Array.from(wordSegmenter.segment(text)).filter(
+      (segment) => segment.isWordLike,
+    ).length,
+    characterCount: countNormalizedCharacters(text),
   });
 }

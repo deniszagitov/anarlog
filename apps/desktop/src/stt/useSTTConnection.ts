@@ -7,6 +7,7 @@ import type { AIProviderStorage } from "@anlg/store";
 import { useAuth } from "~/auth";
 import { useBillingAccess } from "~/auth/billing-context";
 import { env } from "~/env";
+import { isLocalAiBuild, isLocalInferenceEndpoint } from "~/local-ai";
 import { type ProviderId, PROVIDERS } from "~/settings/ai/stt/shared";
 import { useAiProvidersState } from "~/settings/providers";
 import { useSettingsReady } from "~/settings/queries";
@@ -151,7 +152,7 @@ export const useSTTConnection = () => {
     }
 
     if (isCloudModel) {
-      if (!auth?.session || !billing.isPaid) {
+      if (isLocalAiBuild() || !auth?.session || !billing.isPaid) {
         return null;
       }
 
@@ -168,8 +169,16 @@ export const useSTTConnection = () => {
     if (!baseUrl || (!apiKey && current_stt_provider !== "nvidia")) {
       return null;
     }
+    if (isLocalAiBuild() && !isLocalInferenceEndpoint(baseUrl)) {
+      return null;
+    }
 
     let routedBaseUrl = baseUrl;
+    if (isLocalAiBuild() && current_stt_provider === "custom") {
+      const url = new URL(baseUrl);
+      url.searchParams.set("provider", "local_openai");
+      routedBaseUrl = url.toString();
+    }
     if (
       [
         "inworld",

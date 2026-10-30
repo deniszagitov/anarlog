@@ -15,6 +15,7 @@ import {
   useRenderedTranscriptData,
   useTranscriptTimelineMetadata,
 } from "./data-hooks";
+import { splitTranscriptParagraphs } from "./paragraphs";
 import {
   EMPTY_TRANSCRIPT_SEARCH,
   SegmentRenderer,
@@ -186,7 +187,11 @@ function TranscriptSegments({
     rawSegments,
     currentActive ? request : null,
   );
-  const segments = useStableSegments(resolvedSegments);
+  const paragraphs = useMemo(
+    () => resolvedSegments.flatMap(splitTranscriptParagraphs),
+    [resolvedSegments],
+  );
+  const segments = useStableSegments(paragraphs);
   const { offsetMs, sessionId } = useTranscriptTimelineMetadata(
     transcriptId,
     !currentActive,

@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
     upgradeToPro: vi.fn(),
   },
   toastWarning: vi.fn(),
+  setTerms: vi.fn(),
 }));
 
 vi.mock("@lingui/react/macro", () => ({
@@ -38,7 +39,7 @@ vi.mock("@lingui/react/macro", () => ({
 }));
 
 vi.mock("~/settings/queries", () => ({
-  useSetSettingValue: () => vi.fn(),
+  useSetSettingValue: () => mocks.setTerms,
 }));
 
 vi.mock("~/auth/billing-context", () => ({
@@ -61,9 +62,30 @@ describe("DictionarySettings", () => {
     mocks.billing.isUpgradingToPro = false;
     mocks.billing.upgradeToPro.mockClear();
     mocks.toastWarning.mockClear();
+    mocks.setTerms.mockClear();
   });
 
-  afterEach(cleanup);
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllEnvs();
+  });
+
+  it("saves local dictionary terms without granting a cloud subscription", async () => {
+    vi.stubEnv("VITE_LOCAL_AI", "true");
+    mocks.billing.isPro = false;
+    render(<SettingsDictionary />);
+
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "Parakeet" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+
+    await waitFor(() =>
+      expect(mocks.setTerms).toHaveBeenCalledWith('["Parakeet"]'),
+    );
+    expect(mocks.billing.isPro).toBe(false);
+    expect(mocks.toastWarning).not.toHaveBeenCalled();
+  });
 
   it("shows the dictionary editor and toasts on the free plan", () => {
     mocks.billing.isPro = false;

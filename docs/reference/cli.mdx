@@ -150,3 +150,17 @@ The result contains `meeting_id`, `job_id`, `processing_status`, `summary_status
 `--wait` waits for a terminal result. `--timeout SECONDS` defaults to 3600 (range 1–86400). Exit status is 0 for successful submission/completion, 1 for failure, and 2 for a wait timeout. A timeout or interruption of the CLI does not cancel the desktop job. Poll `import-status` to continue observing it. JSON command identifiers are `meetings.import` and `meetings.import_status`.
 
 Reuse `--request-key` only for retries of the same logical import. It returns the original job and meeting, including after failure, rather than starting another paid transcription. A new import needs a new key. The source is copied privately before submission, so moving the original afterwards is safe; the desktop removes this temporary copy after the job finishes. Interrupted running jobs are marked failed when the desktop is available again; completed transcript/meeting data is preserved. Inspect the meeting before explicitly submitting a new import.
+
+
+## Transcribe an existing meeting (local only)
+
+```bash
+anarlog --json meetings --source local transcribe MEETING_ID --wait --timeout 3600
+anarlog --json meetings --source local transcribe-status JOB_ID
+```
+
+`meetings transcribe` queues missing text from an existing meeting's saved recording. It requires an updated desktop worker on the same database and uses only the currently selected local speech-to-text provider; an unavailable or unsupported selection fails without choosing another provider. The meeting ID, notes and original audio are preserved. This command does not import a new meeting or generate a summary (`summary_status: skipped_transcription_only`).
+
+Concurrent submissions for the same active meeting return its existing job. Another queued or running recording job blocks submission; wait for a terminal status before submitting the next meeting. A native transcription already active in the desktop blocks processing as well. A meeting that already has transcript words is left unchanged; no replacement job is queued. After a failed job, inspect its status and saved text before explicitly retrying.
+
+`meetings transcribe-status` returns `job_id`, `meeting_id`, `processing_status`, `summary_status`, and nullable `error`. JSON command identifiers are `meetings.transcribe` and `meetings.transcribe_status`. `--wait` and `--timeout` use the import exit statuses: 0 for submission/completion, 1 for failure, 2 for a timeout. Timeout does not cancel the durable job. Cloud and auto sources are rejected. This is a desktop execution bridge, not a headless service; upgrading the CLI alone is insufficient.

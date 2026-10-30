@@ -19,7 +19,7 @@ import { useMountEffect } from "@anlg/ui/hooks/use-mount-effect";
 import { configureCenteredPlayback, shouldResumeBeforePlay } from "./playback";
 import { loadWaveform } from "./waveform";
 
-import { useBillingAccess } from "~/auth/billing-context";
+import { useLocalFeatureAccess } from "~/local-ai";
 import {
   isSessionAudioIdle,
   subscribeToSessionAudioRetention,
@@ -139,7 +139,7 @@ export function AudioPlayerProvider({
   children: ReactNode;
 }) {
   const queryClient = useQueryClient();
-  const { isPro } = useBillingAccess();
+  const { allowed: isPro } = useLocalFeatureAccess();
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
   const [wavesurfer, setWavesurfer] = useState<WaveSurfer | null>(null);
   const [state, setState] = useState<AudioPlayerState>("stopped");

@@ -32,6 +32,7 @@ import type { ReactNode } from "react";
 import { Shuffle } from "@anlg/ui/components/icons";
 
 import { env } from "~/env";
+import { isLocalAiBuild } from "~/local-ai";
 import {
   AnarlogProviderIcon,
   ProviderBrandImage,
@@ -717,5 +718,14 @@ const PROVIDER_ORDER = [
   "apple_foundation",
 ] as const;
 
-export const PROVIDERS: Provider[] = sortProviders(_PROVIDERS, PROVIDER_ORDER);
+export const PROVIDERS: Provider[] = sortProviders(
+  _PROVIDERS,
+  PROVIDER_ORDER,
+).filter(
+  (provider) =>
+    !isLocalAiBuild() ||
+    ["ollama", "lmstudio", "unsloth", "apple_foundation", "custom"].includes(
+      provider.id,
+    ),
+);
 export type ProviderId = (typeof _PROVIDERS)[number]["id"];

@@ -59,20 +59,20 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("dictation shortcut recorder", () => {
-  it("captures a combination and saves automatically", async () => {
+  it("captures a shortcut when clicking does not focus the button", async () => {
     setup();
-    const button = await start();
+    await start();
     expect(useDictationStatus.getState().capturingShortcut).toBe(true);
-    fireEvent.keyDown(button, {
-      key: "d",
-      code: "KeyD",
-      ctrlKey: true,
+    fireEvent.keyDown(document.activeElement ?? document.body, {
+      key: "B",
+      code: "KeyB",
       altKey: true,
+      shiftKey: true,
     });
     await waitFor(() =>
       expect(mocks.save).toHaveBeenCalledWith(
         "dictation_shortcut",
-        "Control+Alt+KeyD",
+        "Alt+Shift+KeyB",
       ),
     );
     await waitFor(() =>

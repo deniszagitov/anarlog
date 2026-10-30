@@ -424,6 +424,12 @@ impl Environment {
     }
 
     fn for_executable(executable: &str) -> Self {
+        if executable == "anarlog-local" {
+            return Self {
+                scheme: "anarlog-local",
+                bundle_id: "so.anarlog.local-ai",
+            };
+        }
         if executable.contains("nightly") {
             return Self {
                 scheme: "anarlog-nightly",
@@ -462,6 +468,9 @@ mod tests {
 
     #[test]
     fn each_channel_uses_its_own_login_callback_and_token_store() {
+        let local = Environment::for_executable("anarlog-local");
+        assert_eq!(local.scheme, "anarlog-local");
+        assert_eq!(local.bundle_id, "so.anarlog.local-ai");
         let environment = Environment::for_executable("anarlog-nightly");
         assert_eq!(environment.scheme, "anarlog-nightly");
         assert_eq!(environment.bundle_id, "com.hyprnote.nightly");

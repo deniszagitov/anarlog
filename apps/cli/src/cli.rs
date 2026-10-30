@@ -54,6 +54,8 @@ impl Args {
                 MeetingCommand::PilotUsage { .. } => "meetings_pilot_usage",
                 MeetingCommand::Import { .. } => "meetings_import",
                 MeetingCommand::ImportStatus { .. } => "meetings_import_status",
+                MeetingCommand::Transcribe { .. } => "meetings_transcribe",
+                MeetingCommand::TranscribeStatus { .. } => "meetings_transcribe_status",
                 MeetingCommand::List { .. } => "meetings_list",
                 MeetingCommand::Folders { .. } => "meetings_folders",
                 MeetingCommand::Get { .. } => "meetings_get",
@@ -78,7 +80,7 @@ impl Args {
             Command::Proposals {
                 command: ProposalCommand::Create { .. } | ProposalCommand::Decline { .. },
             } | Command::Meetings {
-                command: MeetingCommand::Import { .. },
+                command: MeetingCommand::Import { .. } | MeetingCommand::Transcribe { .. },
                 ..
             } | Command::Mcp
         )
@@ -194,6 +196,16 @@ pub enum MeetingCommand {
     },
     /// Read durable status for a recording import
     ImportStatus { id: String },
+    /// Transcribe missing text from an existing meeting's saved audio with the selected local provider
+    Transcribe {
+        id: String,
+        #[arg(long)]
+        wait: bool,
+        #[arg(long, default_value_t = 3600, value_parser = clap::value_parser!(u64).range(1..=86400))]
+        timeout: u64,
+    },
+    /// Read durable status for an existing meeting transcription
+    TranscribeStatus { id: String },
     /// Read local capture intervals without meeting content or identifiers
     PilotUsage {
         #[arg(long)]

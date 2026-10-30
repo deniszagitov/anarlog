@@ -529,6 +529,18 @@ describe("EnhancerService", () => {
     });
   });
 
+  it("summarizes text-only ASR stored as one audio span", async () => {
+    snapshot = createSnapshot({ wordCount: 1 });
+    snapshot.transcripts[0].words[0].text =
+      "Сегодня мы проверяем локальную транскрибацию. В пятницу выпустим новую версию приложения. " +
+      "Алексей подготовит тестовые записи на русском языке. Данные остаются на этом компьютере.";
+    snapshot.transcripts[0].words[0].end_ms = 11_484;
+    const ai = createMockAITaskStore(() => ({ status: "success" }));
+    const service = new EnhancerService(createDeps({ aiTaskStore: ai.store }));
+
+    await expect(service.enhanceAndWait("session-1")).resolves.toBe("done");
+  });
+
   it("resumes a durable regeneration job after restart", async () => {
     snapshot = createSnapshot({
       notes: [createNote({ content: "Previous summary" })],

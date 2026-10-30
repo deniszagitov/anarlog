@@ -1789,6 +1789,10 @@ msgstr "Could not generate meeting insights. Try again."
 msgid "Could not identify this device. Try again."
 msgstr "Could not identify this device. Try again."
 
+#: src/settings/ai/stt/local-server-model.tsx
+msgid "Could not load models"
+msgstr "Could not load models"
+
 #: src/session-sharing/delivery-panel.tsx
 msgid "Could not load Slack channels. Reconnect Slack and try again."
 msgstr "Could not load Slack channels. Reconnect Slack and try again."
@@ -2436,6 +2440,7 @@ msgstr "Enrich"
 msgid "Enrich contact from CRM"
 msgstr "Enrich contact from CRM"
 
+#: src/settings/ai/stt/local-server-model.tsx
 #: src/settings/ai/stt/select.tsx
 msgid "Enter a model identifier"
 msgstr "Enter a model identifier"

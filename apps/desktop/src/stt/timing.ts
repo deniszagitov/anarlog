@@ -48,6 +48,8 @@ export function isTranscriptWordSeekable(word: { metadata?: unknown }) {
 export function getValidTimingSource(
   source: unknown,
 ): TranscriptTimingSource | undefined {
+  if (source === "audio_chunk") return "synthetic_text";
+
   return source === "provider_word" ||
     source === "provider_segment_interpolated" ||
     source === "synthetic_text"

@@ -183,7 +183,9 @@ pub fn main() {
         });
 
     let sentry_client = {
-        let dsn = if std::env::var_os("ANARLOG_DISABLE_SENTRY").is_some() {
+        let dsn = if identifier == "so.anarlog.local-ai"
+            || std::env::var_os("ANARLOG_DISABLE_SENTRY").is_some()
+        {
             None
         } else {
             option_env!("SENTRY_DSN")

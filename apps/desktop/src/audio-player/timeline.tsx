@@ -12,7 +12,7 @@ import { cn } from "@anlg/utils";
 import { useAudioPlayer, useAudioTime } from "./provider";
 import { TimelineMeta, TimelineShell } from "./timeline-shell";
 
-import { useBillingAccess } from "~/auth/billing-context";
+import { useLocalFeatureAccess } from "~/local-ai";
 import { useNativeContextMenu } from "~/shared/hooks/useNativeContextMenu";
 
 const PLAYBACK_RATES = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
@@ -22,7 +22,7 @@ export function Timeline({
 }: {
   contentClassName?: string;
 } = {}) {
-  const { isPro } = useBillingAccess();
+  const { allowed: isPro } = useLocalFeatureAccess();
   const {
     registerContainer,
     state,

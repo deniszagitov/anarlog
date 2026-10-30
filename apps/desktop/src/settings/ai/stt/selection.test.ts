@@ -206,6 +206,23 @@ describe("getPreferredProviderModel", () => {
 });
 
 describe("getDefaultSttSelection", () => {
+  test("does not replace a custom provider while its model identifier is empty", () => {
+    expect(
+      getDefaultSttSelection(
+        ["custom", "soniqo"],
+        {
+          custom: { configured: true, models: [] },
+          soniqo: {
+            configured: true,
+            models: [{ id: "soniqo-parakeet-batch" }],
+          },
+        },
+        "custom",
+        "",
+      ),
+    ).toBeNull();
+  });
+
   test("keeps the active configured provider and repairs its missing model", () => {
     expect(
       getDefaultSttSelection(

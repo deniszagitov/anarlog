@@ -91,7 +91,9 @@ async function settleWithin<T>(
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const [session, setSession] = useState<Session | null | undefined>(
+    supabase ? undefined : null,
+  );
   const [fingerprint, setFingerprint] = useState<string | null>(null);
   const [isFingerprintSettled, setIsFingerprintSettled] = useState(false);
   const [connectLibraryOpen, setConnectLibraryOpen] = useState(false);

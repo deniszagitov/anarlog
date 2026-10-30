@@ -130,6 +130,8 @@ export const SegmentRenderer = memo(
           sessionId={sessionId}
           label={speakerLabel}
           selected={selected}
+          offsetMs={offsetMs}
+          seekAndPlay={audioExists ? seekAndPlay : undefined}
         />
 
         {editMode ? (

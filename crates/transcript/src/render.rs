@@ -81,6 +81,22 @@ pub(crate) fn render_transcript_segments_ungrouped(
         preview,
     } = request;
 
+    // Multiple detected mic voices cannot all be attributed to the recording owner.
+    let speaker_context = speaker_context.or_else(|| {
+        transcripts
+            .iter()
+            .any(|transcript| {
+                let mut speakers = transcript
+                    .words
+                    .iter()
+                    .filter(|word| word.channel == 0)
+                    .filter_map(|word| word.speaker_index);
+                let first = speakers.next();
+                first.is_some() && speakers.any(|speaker| Some(speaker) != first)
+            })
+            .then(crate::SpeakerContext::default)
+    });
+
     let base_started_at = earliest_started_at(&transcripts);
     if let Some(mut segments) = preview {
         for segment in &mut segments {
@@ -191,17 +207,23 @@ pub(crate) fn render_transcript_segments_ungrouped(
 
     all_segments.sort_by_key(|seg| seg.words.first().map(|w| w.start_ms).unwrap_or(i64::MAX));
 
+    let mut human_name_by_id: HashMap<_, _> = humans
+        .iter()
+        .filter(|human| !human.name.trim().is_empty())
+        .map(|human| (human.human_id.clone(), human.name.clone()))
+        .collect();
+    if let Some(self_id) = self_human_id.as_ref().filter(|id| !id.is_empty()) {
+        human_name_by_id
+            .entry(self_id.clone())
+            .or_insert_with(|| "You".to_string());
+    }
     let ctx = SpeakerLabelContext {
         self_human_id: if speaker_context.is_none() {
             self_human_id.clone()
         } else {
             None
         },
-        human_name_by_id: humans
-            .iter()
-            .cloned()
-            .map(|human| (human.human_id, human.name))
-            .collect::<HashMap<_, _>>(),
+        human_name_by_id,
     };
     let max_speaker_number = if speaker_context.is_some() {
         None
@@ -527,7 +549,56 @@ mod tests {
     }
 
     #[test]
-    fn labels_diarized_direct_mic_as_self_without_remote_participant() {
+    fn preserves_diarized_microphone_voices_without_recording_context() {
+        let segments = render_transcript_segments(RenderTranscriptRequest {
+            speaker_context: None,
+            preview: None,
+            transcripts: vec![RenderTranscriptInput {
+                started_at: Some(0),
+                words: [
+                    " Review",
+                    " the",
+                    " deployment.",
+                    " Check",
+                    " the",
+                    " logs.",
+                ]
+                .into_iter()
+                .enumerate()
+                .map(|(index, text)| {
+                    let start = index as i64 * 600;
+                    word_si(
+                        &format!("w{index}"),
+                        text,
+                        start,
+                        start + 500,
+                        0,
+                        (index / 3) as i32,
+                    )
+                })
+                .collect(),
+                assignments: vec![],
+            }],
+            participant_human_ids: vec![],
+            self_human_id: Some("unnamed-owner".to_string()),
+            humans: vec![],
+        });
+
+        assert_eq!(segments.len(), 2);
+        assert_eq!(segments[0].speaker_label, "Speaker 1");
+        assert_eq!(segments[1].speaker_label, "Speaker 2");
+        assert_eq!(segments[0].text, "Review the deployment.");
+        assert_eq!(segments[1].text, "Check the logs.");
+        assert_eq!((segments[0].start_ms, segments[1].end_ms), (0, 3500));
+        assert!(
+            segments
+                .iter()
+                .all(|segment| segment.key.speaker_human_id.is_none())
+        );
+    }
+
+    #[test]
+    fn labels_diarized_direct_mic_as_self_without_a_human_name() {
         let segments = render_transcript_segments(RenderTranscriptRequest {
             speaker_context: None,
             preview: None,
@@ -538,14 +609,11 @@ mod tests {
             }],
             participant_human_ids: vec![],
             self_human_id: Some("self".to_string()),
-            humans: vec![RenderTranscriptHuman {
-                human_id: "self".to_string(),
-                name: "Me".to_string(),
-            }],
+            humans: vec![],
         });
 
         assert_eq!(segments.len(), 1);
-        assert_eq!(segments[0].speaker_label, "Me");
+        assert_eq!(segments[0].speaker_label, "You");
         assert_eq!(segments[0].key.speaker_index, Some(2));
         assert_eq!(segments[0].key.speaker_human_id.as_deref(), Some("self"));
     }

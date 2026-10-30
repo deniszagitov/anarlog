@@ -317,9 +317,183 @@ pub async fn import_recording(
     get_recording_import(pool, &result?).await
 }
 
+/// Queue the saved audio of an existing meeting without importing or copying it.
+/// Empty file_path is the in-place protocol: the desktop resolves audioPath and
+/// must never treat the original recording as a disposable import staging file.
+pub async fn transcribe_meeting(pool: &SqlitePool, meeting_id: &str) -> Result<RecordingImport> {
+    let mut tx = pool.begin_with("BEGIN IMMEDIATE").await.map_err(database)?;
+    let exists: bool = sqlx::query_scalar(
+        "SELECT EXISTS(SELECT 1 FROM sessions WHERE id = ? AND deleted_at IS NULL)",
+    )
+    .bind(meeting_id)
+    .fetch_one(&mut *tx)
+    .await
+    .map_err(database)?;
+    if !exists {
+        return Err(Error::NotFound(format!("meeting '{meeting_id}'")));
+    }
+    if let Some(job) = sqlx::query_as::<_, RecordingImport>(
+        "SELECT id AS job_id, meeting_id, processing_status, summary_status, error
+         FROM local_recording_import_jobs WHERE meeting_id = ?
+         AND processing_status IN ('queued', 'importing', 'transcribing', 'summarizing') LIMIT 1",
+    )
+    .bind(meeting_id)
+    .fetch_optional(&mut *tx)
+    .await
+    .map_err(database)?
+    {
+        return Ok(job);
+    }
+    let has_transcript: bool = sqlx::query_scalar(
+        "SELECT EXISTS(SELECT 1 FROM transcripts WHERE session_id = ? AND deleted_at IS NULL
+         AND json_array_length(words_json) > 0)",
+    )
+    .bind(meeting_id)
+    .fetch_one(&mut *tx)
+    .await
+    .map_err(database)?;
+    if has_transcript {
+        return Err(Error::Conflict(
+            "Meeting already has a transcript; no transcription was queued".into(),
+        ));
+    }
+    let busy: bool = sqlx::query_scalar(
+        "SELECT EXISTS(SELECT 1 FROM local_recording_import_jobs
+         WHERE processing_status IN ('queued', 'importing', 'transcribing', 'summarizing'))",
+    )
+    .fetch_one(&mut *tx)
+    .await
+    .map_err(database)?;
+    if busy {
+        return Err(Error::Conflict("Another recording job is active; wait for its terminal status before transcribing the next meeting".into()));
+    }
+    let disabled: bool = sqlx::query_scalar(
+        "SELECT EXISTS(SELECT 1 FROM managed_app_settings WHERE id = 'intelligence_disabled' AND value_json = 'true')",
+    ).fetch_one(&mut *tx).await.map_err(database)?;
+    if disabled {
+        return Err(Error::Invalid(
+            "Transcription is disabled by managed policy".into(),
+        ));
+    }
+    // Older desktop workers cannot interpret the in-place protocol. Require a
+    // fresh versioned heartbeat rather than submitting work they would misread.
+    let ready: bool = sqlx::query_scalar(
+        "SELECT EXISTS(SELECT 1 FROM local_recording_import_worker
+         WHERE id LIKE 'transcribe-v1:%' AND updated_at > unixepoch() - 15 AND vault_path != '')",
+    )
+    .fetch_one(&mut *tx)
+    .await
+    .map_err(database)?;
+    if !ready {
+        return Err(Error::Invalid("Open an updated Anarlog desktop app with existing-meeting transcription support on this database first".into()));
+    }
+    let id = uuid::Uuid::new_v4().to_string();
+    sqlx::query(
+        "INSERT INTO local_recording_import_jobs (id, meeting_id, file_path, updated_at)
+         VALUES (?, ?, '', unixepoch())",
+    )
+    .bind(&id)
+    .bind(meeting_id)
+    .execute(&mut *tx)
+    .await
+    .map_err(database)?;
+    tx.commit().await.map_err(database)?;
+    get_recording_import(pool, &id).await
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[tokio::test]
+    async fn existing_meeting_retries_are_serial_and_preserve_identity_and_original_audio() {
+        let dir = tempfile::tempdir().unwrap();
+        let db = anlg_db_core::Db::connect_local_plain(dir.path().join("app.db"))
+            .await
+            .unwrap();
+        anlg_db_app::prepare_schema(&db).await.unwrap();
+        sqlx::query("INSERT INTO sessions (id, title) VALUES ('first', 'Saved meeting'), ('second', 'Next meeting')")
+            .execute(db.pool()).await.unwrap();
+        sqlx::query("INSERT INTO local_recording_import_worker (id, vault_path, updated_at) VALUES ('old-worker', ?, unixepoch())")
+            .bind(dir.path().to_string_lossy().as_ref()).execute(db.pool()).await.unwrap();
+        assert!(
+            transcribe_meeting(db.pool(), "first")
+                .await
+                .unwrap_err()
+                .to_string()
+                .contains("updated Anarlog")
+        );
+        sqlx::query("UPDATE local_recording_import_worker SET id = 'transcribe-v1:test'")
+            .execute(db.pool())
+            .await
+            .unwrap();
+        let audio = dir.path().join("audio.mp3");
+        std::fs::write(&audio, b"original recording").unwrap();
+        let (a, b) = tokio::join!(
+            transcribe_meeting(db.pool(), "first"),
+            transcribe_meeting(db.pool(), "first")
+        );
+        let a = a.unwrap();
+        assert_eq!(a.job_id, b.unwrap().job_id);
+        assert_eq!(a.meeting_id, "first");
+        assert_eq!(a.processing_status, "queued");
+        assert!(
+            transcribe_meeting(db.pool(), "second")
+                .await
+                .unwrap_err()
+                .to_string()
+                .contains("Another recording job")
+        );
+        let staged: String =
+            sqlx::query_scalar("SELECT file_path FROM local_recording_import_jobs WHERE id = ?")
+                .bind(&a.job_id)
+                .fetch_one(db.pool())
+                .await
+                .unwrap();
+        assert!(staged.is_empty());
+        assert_eq!(
+            sqlx::query_scalar::<_, i64>("SELECT count(*) FROM sessions")
+                .fetch_one(db.pool())
+                .await
+                .unwrap(),
+            2
+        );
+        sqlx::query(
+            "UPDATE local_recording_import_jobs SET processing_status = 'done' WHERE id = ?",
+        )
+        .bind(&a.job_id)
+        .execute(db.pool())
+        .await
+        .unwrap();
+        sqlx::query("INSERT INTO transcripts (id, session_id, words_json) VALUES ('text', 'first', '[{\"text\":\"Saved transcript\"}]')")
+            .execute(db.pool()).await.unwrap();
+        assert!(
+            transcribe_meeting(db.pool(), "first")
+                .await
+                .unwrap_err()
+                .to_string()
+                .contains("already has a transcript")
+        );
+        assert_eq!(
+            sqlx::query_scalar::<_, i64>("SELECT count(*) FROM local_recording_import_jobs")
+                .fetch_one(db.pool())
+                .await
+                .unwrap(),
+            1
+        );
+        assert_eq!(
+            transcribe_meeting(db.pool(), "second")
+                .await
+                .unwrap()
+                .meeting_id,
+            "second"
+        );
+        cleanup_recording_imports(db.pool(), dir.path().to_str().unwrap())
+            .await
+            .unwrap();
+        assert_eq!(std::fs::read(audio).unwrap(), b"original recording");
+        db.pool().close().await;
+    }
 
     #[tokio::test]
     async fn concurrent_retries_create_one_meeting_and_keep_a_private_copy() {

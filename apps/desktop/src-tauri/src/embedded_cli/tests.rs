@@ -19,6 +19,10 @@ fn maps_bundle_id_to_command_name() {
         "anarlog-nightly"
     );
     assert_eq!(command_name_from_identifier(DEV_BUNDLE_ID), "anarlog-dev");
+    assert_eq!(
+        command_name_from_identifier(LOCAL_AI_BUNDLE_ID),
+        "anarlog-local"
+    );
     assert_eq!(command_name_from_identifier("unknown"), "anarlog");
 }
 

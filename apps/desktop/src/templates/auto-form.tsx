@@ -25,7 +25,7 @@ import { cn } from "@anlg/utils";
 
 import { AutoFormatExamplesDialog } from "./auto-format-examples-dialog";
 
-import { useBillingAccess } from "~/auth/billing-context";
+import { useLocalFeatureAccess } from "~/local-ai";
 import { PlanGate, useNotifyPlanRequired } from "~/settings/plan-gate";
 import { setSettingValue } from "~/settings/queries";
 import { useConfigValue } from "~/shared/config";
@@ -75,7 +75,7 @@ export function AutoFormatForm({
   formatOverride: string;
 }) {
   const { t } = useLingui();
-  const billing = useBillingAccess();
+  const { allowed } = useLocalFeatureAccess();
   const notifyPlanRequired = useNotifyPlanRequired();
   const editorRef = useRef<PromptEditorHandle>(null);
   const [showExamplesDialog, setShowExamplesDialog] = useState(false);
@@ -113,7 +113,7 @@ export function AutoFormatForm({
   const form = useForm({
     defaultValues: { format: initialFormat },
     onSubmit: async ({ value }) => {
-      if (!billing.isPro) {
+      if (!allowed) {
         notifyPlanRequired("pro");
         return;
       }
@@ -126,7 +126,7 @@ export function AutoFormatForm({
   });
 
   const resetToDefault = async () => {
-    if (!billing.isPro) {
+    if (!allowed) {
       notifyPlanRequired("pro");
       return;
     }
@@ -238,7 +238,7 @@ export function AutoFormatForm({
               variant="outline"
               className="shrink-0"
               onClick={() => {
-                if (!billing.isPro) {
+                if (!allowed) {
                   notifyPlanRequired("pro");
                   return;
                 }
@@ -250,7 +250,7 @@ export function AutoFormatForm({
             </Button>
           </div>
 
-          <PlanGate plan="pro" allowed={billing.isPro}>
+          <PlanGate plan="pro" allowed={allowed}>
             <div className="flex flex-col gap-5">
               <form.Field name="format">
                 {(field) => (

@@ -58,7 +58,9 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
     tauri::plugin::Builder::new(PLUGIN_NAME)
         .invoke_handler(specta_builder.invoke_handler())
         .setup(|app, _api| {
-            let posthog_key = {
+            let posthog_key = if app.config().identifier == "so.anarlog.local-ai" {
+                None
+            } else {
                 #[cfg(not(debug_assertions))]
                 {
                     let v = env!("POSTHOG_API_KEY");
@@ -90,6 +92,17 @@ pub fn init<R: tauri::Runtime>() -> tauri::plugin::TauriPlugin<R> {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[cfg(not(debug_assertions))]
+    #[test]
+    fn local_release_starts_without_an_analytics_key() {
+        let mut context = tauri::test::mock_context(tauri::test::noop_assets());
+        context.config_mut().identifier = "so.anarlog.local-ai".to_string();
+        let _app = tauri::test::mock_builder()
+            .plugin(init())
+            .build(context)
+            .unwrap();
+    }
 
     #[test]
     fn export_types() {

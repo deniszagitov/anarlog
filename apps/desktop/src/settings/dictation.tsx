@@ -10,8 +10,8 @@ import { Textarea } from "@anlg/ui/components/ui/textarea";
 
 import { DictationShortcut } from "./dictation-shortcut";
 
-import { useBillingAccess } from "~/auth/billing-context";
 import { useDictationStatus } from "~/dictation/state";
+import { useLocalFeatureAccess } from "~/local-ai";
 import { AudioDeviceRow } from "~/settings/general/audio-settings";
 import { SettingsPageTitle } from "~/settings/page-title";
 import { PlanGate } from "~/settings/plan-gate";
@@ -22,7 +22,7 @@ import { useTabs } from "~/store/zustand/tabs";
 
 export function SettingsDictation() {
   const { t } = useLingui();
-  const { isPro } = useBillingAccess();
+  const { allowed } = useLocalFeatureAccess();
   const enabled = useConfigValue("dictation_enabled");
   const shortcut = useConfigValue("dictation_shortcut");
   const handsFree = useConfigValue("dictation_hands_free");
@@ -39,7 +39,7 @@ export function SettingsDictation() {
       if (result.status === "error") throw new Error(result.error);
       return result.data;
     },
-    enabled: isPro,
+    enabled: allowed,
     refetchInterval: 3_000,
   });
   const status = useDictationStatus(
@@ -60,7 +60,7 @@ export function SettingsDictation() {
   return (
     <div className="flex flex-col gap-8">
       <SettingsPageTitle title={<Trans>Dictation</Trans>} />
-      <PlanGate plan="pro" allowed={isPro}>
+      <PlanGate plan="pro" allowed={allowed}>
         <div className="flex flex-col gap-6">
           <p className="text-muted-foreground text-sm">
             <Trans>
