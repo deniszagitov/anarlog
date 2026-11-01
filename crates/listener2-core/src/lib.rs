@@ -286,7 +286,7 @@ mod tests {
     }
 
     #[test]
-    fn apple_speech_language_support_reflects_installed_framework() {
+    fn apple_speech_language_support_respects_system_preferences() {
         // Drives the settings warning that names unsupported spoken languages.
         let available = anlg_transcribe_speechanalyzer::availability()
             .is_ok_and(|value| value.status == "available");
@@ -294,20 +294,40 @@ mod tests {
             return;
         }
 
-        let korean = vec!["ko".parse().unwrap()];
-        let hindi = vec!["hi".parse().unwrap()];
+        let preferred = anlg_transcribe_speechanalyzer::preferred_locales().unwrap();
+        let assert_support = |code: &str, expected: bool| {
+            let languages = vec![code.parse().unwrap()];
+            assert_eq!(
+                is_supported_languages_live("apple-speech", Some("apple-speech"), &languages)
+                    .unwrap(),
+                expected,
+                "apple-speech/live: {code}"
+            );
+            // Local models are also surfaced under the Anarlog provider in settings.
+            assert_eq!(
+                is_supported_languages_live("anarlog", Some("apple-speech"), &languages).unwrap(),
+                expected,
+                "anarlog/live: {code}"
+            );
+            assert_eq!(
+                is_supported_languages_batch("anarlog", Some("apple-speech"), &languages).unwrap(),
+                expected,
+                "anarlog/batch: {code}"
+            );
+        };
 
-        assert!(
-            is_supported_languages_live("apple-speech", Some("apple-speech"), &korean).unwrap()
-        );
-        assert!(
-            !is_supported_languages_live("apple-speech", Some("apple-speech"), &hindi).unwrap()
-        );
-
-        // Local models are surfaced under the Anarlog provider in settings.
-        assert!(is_supported_languages_live("anarlog", Some("apple-speech"), &korean).unwrap());
-        assert!(!is_supported_languages_live("anarlog", Some("apple-speech"), &hindi).unwrap());
-        assert!(is_supported_languages_batch("anarlog", Some("apple-speech"), &korean).unwrap());
-        assert!(!is_supported_languages_batch("anarlog", Some("apple-speech"), &hindi).unwrap());
+        // Availability alone does not add Korean to the user's System Settings.
+        for code in ["ko", "hi"] {
+            let configured = preferred.iter().any(|locale| {
+                locale
+                    .split('-')
+                    .next()
+                    .is_some_and(|primary| primary.eq_ignore_ascii_case(code))
+            });
+            assert_support(code, configured);
+        }
+        if let Some(locale) = preferred.first() {
+            assert_support(locale.split('-').next().unwrap(), true);
+        }
     }
 }
