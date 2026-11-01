@@ -130,7 +130,17 @@ if (failures.length) {
   if (startupCheck.status !== 0) process.exit(startupCheck.status ?? 1);
   const binaries = spawnSync(
     cargo,
-    ["run", "--locked", "--package", "xtask", "--", "prepare-binaries"],
+    [
+      // The workspace's wildcard dev profile takes precedence over build-override.
+      "--config",
+      'profile.dev.package."*".strip="none"',
+      "run",
+      "--locked",
+      "--package",
+      "xtask",
+      "--",
+      "prepare-binaries",
+    ],
     { cwd: root, env: environment, stdio: "inherit" },
   );
   if (binaries.error) throw binaries.error;
