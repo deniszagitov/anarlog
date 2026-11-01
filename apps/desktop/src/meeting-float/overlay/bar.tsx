@@ -149,6 +149,8 @@ function FloatingControls({
   onStop: () => void;
   onToggleExpanded: (expanded: boolean) => void;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   return (
     <div
       className="flex items-center"
@@ -160,7 +162,9 @@ function FloatingControls({
           type="button"
           data-tauri-drag-region="false"
           aria-label={
-            isExpanded ? "Collapse live transcript" : "Expand live transcript"
+            isExpanded
+              ? translate`Collapse live transcript`
+              : translate`Expand live transcript`
           }
           onClick={() => onToggleExpanded(!isExpanded)}
           className="flex items-center justify-center"
@@ -193,6 +197,8 @@ function StopControl({
 }) {
   const { t: translate } = useLocalizedUi();
 
+  const notice = state.transcriptNotice ?? translate`Recording needs attention`;
+  const stopLabel = translate`Stop listening`;
   const [hovered, setHovered] = useState(false);
   const width = state.liveCaptionToggleVisible
     ? FLOATING_BAR_COMPACT_STOP_WIDTH
@@ -204,14 +210,14 @@ function StopControl({
       data-tauri-drag-region="false"
       aria-label={
         state.dictation
-          ? "Finish dictation"
+          ? translate`Finish dictation`
           : state.status === "error"
-            ? `${state.transcriptNotice ?? "Recording needs attention"}; stop listening`
-            : "Stop listening"
+            ? `${notice}; ${stopLabel}`
+            : stopLabel
       }
       title={
         state.status === "error"
-          ? `${state.transcriptNotice ?? "Recording needs attention"}. Open Anarlog to retry or change devices.`
+          ? translate`${notice}. Open Anarlog to retry or change devices.`
           : undefined
       }
       disabled={state.dictation?.phase === "transcribing"}

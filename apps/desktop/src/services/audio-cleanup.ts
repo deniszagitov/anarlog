@@ -17,16 +17,16 @@ export async function handleCaptureCleanupStatus(payload: CaptureStatusEvent) {
   if (payload.error.startsWith("audio_deletion_failed:")) {
     toast.error(
       payload.session_id
-        ? "Audio could not be deleted"
-        : "Audio cleanup could not finish",
+        ? translate`Audio could not be deleted`
+        : translate`Audio cleanup could not finish`,
       {
         id: payload.session_id
           ? `audio-deletion-${payload.session_id}`
           : "audio-cleanup",
         duration: Infinity,
         description: payload.session_id
-          ? "Anarlog could not remove temporary audio and will retry cleanup automatically."
-          : "Anarlog could not finish audio cleanup or recovery and will retry automatically.",
+          ? translate`Anarlog could not remove temporary audio and will retry cleanup automatically.`
+          : translate`Anarlog could not finish audio cleanup or recovery and will retry automatically.`,
       },
     );
     if (payload.session_id) {

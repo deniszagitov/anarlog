@@ -1,7 +1,37 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { setupI18n } from "@lingui/core";
+import { msg } from "@lingui/core/macro";
+import { I18nProvider } from "@lingui/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render as renderView,
+  screen,
+} from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Listening } from "./listening";
+
+vi.unmock("@lingui/react");
+
+const displayI18n = setupI18n({
+  locale: "en",
+  messages: {
+    en: {},
+    ru: {
+      [msg`Start listening`.id]: "Начать запись",
+      [msg`Resume listening`.id]: "Возобновить запись",
+    },
+  },
+});
+
+function render(ui: React.ReactNode) {
+  return renderView(ui, {
+    wrapper: ({ children }) => (
+      <I18nProvider i18n={displayI18n}>{children}</I18nProvider>
+    ),
+  });
+}
 
 const {
   isMainWebviewWindowMock,
@@ -44,6 +74,7 @@ vi.mock("~/stt/window-control", () => ({
 describe("Listening", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    displayI18n.activate("en");
     isMainWebviewWindowMock.mockReturnValue(true);
     useListenerMock.mockImplementation((selector) =>
       selector({
@@ -55,6 +86,23 @@ describe("Listening", () => {
 
   afterEach(() => {
     cleanup();
+  });
+
+  it("updates idle listening actions when the display locale changes", () => {
+    const view = render(<Listening sessionId="session-1" resume={false} />);
+
+    act(() => displayI18n.activate("ru"));
+    expect(screen.getByRole("button", { name: "Начать запись" })).toBeTruthy();
+
+    view.rerender(<Listening sessionId="session-1" resume />);
+    expect(
+      screen.getByRole("button", { name: "Возобновить запись" }),
+    ).toBeTruthy();
+
+    act(() => displayI18n.activate("en"));
+    expect(
+      screen.getByRole("button", { name: "Resume listening" }),
+    ).toBeTruthy();
   });
 
   it("resumes listening when the session already has content", () => {

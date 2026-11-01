@@ -221,6 +221,10 @@ msgstr "Модель {model} не может распознавать все в�
 msgid "{months} months ago"
 msgstr "{months, plural, one {# месяц назад} few {# месяца назад} many {# месяцев назад} other {# месяца назад}}"
 
+#: src/meeting-float/overlay/bar.tsx
+msgid "{notice}. Open Anarlog to retry or change devices."
+msgstr "{notice}. Откройте Anarlog, чтобы повторить попытку или сменить аудиоустройства."
+
 #: src/settings/stats/insights.tsx
 msgid "{peakCount} of {total} conversations ({share}) started on this weekday in the selected period."
 msgstr "В выбранном периоде {peakCount} из {total} разговоров ({share}) начались в этот день недели."
@@ -800,6 +804,10 @@ msgstr "Anarlog не может подключиться к сервису {prov
 msgid "Anarlog CLI"
 msgstr "Anarlog CLI"
 
+#: src/services/audio-cleanup.ts
+msgid "Anarlog could not finish audio cleanup or recovery and will retry automatically."
+msgstr "Anarlog не удалось завершить очистку или восстановление аудио. Попытка будет повторена автоматически."
+
 #: src/session/components/note-input/enhanced/enhance-error.tsx
 msgid "Anarlog could not generate this summary because you were not signed in. Sign in, then try again."
 msgstr "Anarlog не смог создать конспект, потому что вы не вошли в учётную запись. Войдите и повторите попытку."
@@ -807,6 +815,10 @@ msgstr "Anarlog не смог создать конспект, потому чт
 #: src/shared-notes/index.tsx
 msgid "Anarlog could not read the local shared-note cache."
 msgstr "Anarlog не удалось прочитать локальный кеш общей заметки."
+
+#: src/services/audio-cleanup.ts
+msgid "Anarlog could not remove temporary audio and will retry cleanup automatically."
+msgstr "Anarlog не удалось удалить временное аудио. Попытка очистки будет повторена автоматически."
 
 #: src/session/components/note-input/transcript/index.tsx
 #: src/stt/capture-lifecycle.ts
@@ -1100,6 +1112,11 @@ msgstr "Аудио"
 msgid "Audio available"
 msgstr "Аудио доступно"
 
+#: src/services/audio-cleanup.ts
+msgid "Audio cleanup could not finish"
+msgstr "Не удалось завершить очистку аудио"
+
+#: src/services/audio-cleanup.ts
 #: src/stt/capture-lifecycle.ts
 msgid "Audio could not be deleted"
 msgstr "Не удалось удалить аудио"
@@ -1910,6 +1927,10 @@ msgstr "Соавтор"
 #: src/devtools-bar/index.tsx
 msgid "Collapse developer bar"
 msgstr "Свернуть панель разработчика"
+
+#: src/meeting-float/overlay/bar.tsx
+msgid "Collapse live transcript"
+msgstr "Свернуть расшифровку"
 
 #: src/devtools-bar/index.tsx
 msgid "Collapse the developer bar"
@@ -3401,6 +3422,10 @@ msgstr "Раскройте компонент, чтобы увидеть при�
 msgid "Expand developer bar"
 msgstr "Развернуть панель разработчика"
 
+#: src/meeting-float/overlay/bar.tsx
+msgid "Expand live transcript"
+msgstr "Развернуть расшифровку"
+
 #: src/settings/automations/index.tsx
 msgid "Expected output"
 msgstr "Ожидаемый результат"
@@ -3553,6 +3578,10 @@ msgstr "В своём ритме"
 #: src/instruction/index.tsx
 msgid "Finish checkout in your browser to unlock more, then return to Anarlog."
 msgstr "Завершите оплату в браузере, чтобы открыть дополнительные возможности, затем вернитесь в Anarlog."
+
+#: src/meeting-float/overlay/bar.tsx
+msgid "Finish dictation"
+msgstr "Завершить диктовку"
 
 #: src/settings/general/account.tsx
 #: src/settings/referrals.tsx
@@ -5052,6 +5081,7 @@ msgid "New template"
 msgstr "Новый шаблон"
 
 #: src/session/components/note-input/raw.tsx
+#: src/session/components/note-input/template-picker.tsx
 #: src/templates/utils.ts
 msgid "New Template"
 msgstr "Новый шаблон"
@@ -6268,6 +6298,10 @@ msgstr "Запись продолжается. Транскрипция буде
 msgid "Recording couldn't start"
 msgstr "Не удалось начать запись"
 
+#: src/meeting-float/overlay/bar.tsx
+msgid "Recording needs attention"
+msgstr "Требуется проверить запись"
+
 #: src/session/components/note-input/transcript/actions.ts
 #: src/session/components/outer-header/overflow/index.tsx
 msgid "Recording not found. It may have been deleted."
@@ -6622,6 +6656,7 @@ msgid "Resume"
 msgstr "Возобновить"
 
 #: src/session/components/note-input/header-transcript.tsx
+#: src/session/components/outer-header/overflow/listening.tsx
 #: src/stt/saved-capture-audio.tsx
 msgid "Resume listening"
 msgstr "Возобновить запись"
@@ -7721,6 +7756,10 @@ msgstr "Запускать Anarlog при входе в систему"
 msgid "Start free trial"
 msgstr "Начать бесплатный пробный период"
 
+#: src/session/components/outer-header/overflow/listening.tsx
+msgid "Start listening"
+msgstr "Начать запись"
+
 #: src/settings/general/meeting-settings.tsx
 msgid "Start listening when a scheduled meeting begins."
 msgstr "Начинать слушать при начале запланированной встречи."
@@ -7836,6 +7875,7 @@ msgstr "Остановить"
 msgid "Stop auto-add"
 msgstr "Остановить автодобавление"
 
+#: src/meeting-float/overlay/bar.tsx
 #: src/session/components/outer-header/index.tsx
 #: src/session/components/outer-header/overflow/listening.tsx
 #: src/sidebar/timeline/item.tsx
@@ -8629,6 +8669,7 @@ msgstr "До {endsOn}"
 #: src/calendar/components/oauth/calendar-selection.tsx
 #: src/chat/components/message/tool/search-meetings.tsx
 #: src/session/components/note-input/raw.tsx
+#: src/session/components/note-input/template-picker.tsx
 #: src/session/components/outer-header/overflow/export-modal.tsx
 #: src/session/components/title-input.tsx
 #: src/shared-notes/index.tsx

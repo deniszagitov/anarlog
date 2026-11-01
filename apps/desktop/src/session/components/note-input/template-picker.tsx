@@ -107,16 +107,16 @@ export function TemplatePickerPopover({
 
         onSelectTemplate({
           templateId,
-          title: template.title || "Untitled",
+          title: template.title || t`Untitled`,
         });
       })();
     },
-    [createTemplate, onSelectTemplate],
+    [createTemplate, onSelectTemplate, t],
   );
 
   const handleCreateTemplate = useCallback(
     (title?: string) => {
-      const nextTitle = title?.trim() || "New Template";
+      const nextTitle = title?.trim() || t`New Template`;
 
       setOpen(false);
       setSearch("");
@@ -140,7 +140,7 @@ export function TemplatePickerPopover({
         });
       })();
     },
-    [createTemplate, openTemplatesTab],
+    [createTemplate, openTemplatesTab, t],
   );
   const handleSeeAllTemplates = useCallback(() => {
     setOpen(false);

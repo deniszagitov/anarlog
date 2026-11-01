@@ -45,7 +45,9 @@ export function Listening({
   };
 
   const startLabel =
-    resume || isBatching ? "Resume listening" : "Start listening";
+    resume || isBatching
+      ? translate`Resume listening`
+      : translate`Start listening`;
 
   return (
     <DropdownMenuItem

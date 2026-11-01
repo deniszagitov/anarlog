@@ -211,6 +211,10 @@ msgstr ""
 msgid "{months} months ago"
 msgstr ""
 
+#: src/meeting-float/overlay/bar.tsx
+msgid "{notice}. Open Anarlog to retry or change devices."
+msgstr ""
+
 #: src/settings/stats/insights.tsx
 msgid "{peakCount} of {total} conversations ({share}) started on this weekday in the selected period."
 msgstr ""
@@ -790,12 +794,20 @@ msgstr ""
 msgid "Anarlog CLI"
 msgstr ""
 
+#: src/services/audio-cleanup.ts
+msgid "Anarlog could not finish audio cleanup or recovery and will retry automatically."
+msgstr ""
+
 #: src/session/components/note-input/enhanced/enhance-error.tsx
 msgid "Anarlog could not generate this summary because you were not signed in. Sign in, then try again."
 msgstr ""
 
 #: src/shared-notes/index.tsx
 msgid "Anarlog could not read the local shared-note cache."
+msgstr ""
+
+#: src/services/audio-cleanup.ts
+msgid "Anarlog could not remove temporary audio and will retry cleanup automatically."
 msgstr ""
 
 #: src/session/components/note-input/transcript/index.tsx
@@ -1087,6 +1099,11 @@ msgstr ""
 msgid "Audio available"
 msgstr ""
 
+#: src/services/audio-cleanup.ts
+msgid "Audio cleanup could not finish"
+msgstr ""
+
+#: src/services/audio-cleanup.ts
 #: src/stt/capture-lifecycle.ts
 msgid "Audio could not be deleted"
 msgstr ""
@@ -1896,6 +1913,10 @@ msgstr ""
 
 #: src/devtools-bar/index.tsx
 msgid "Collapse developer bar"
+msgstr ""
+
+#: src/meeting-float/overlay/bar.tsx
+msgid "Collapse live transcript"
 msgstr ""
 
 #: src/devtools-bar/index.tsx
@@ -3388,6 +3409,10 @@ msgstr ""
 msgid "Expand developer bar"
 msgstr ""
 
+#: src/meeting-float/overlay/bar.tsx
+msgid "Expand live transcript"
+msgstr ""
+
 #: src/settings/automations/index.tsx
 msgid "Expected output"
 msgstr ""
@@ -3539,6 +3564,10 @@ msgstr ""
 
 #: src/instruction/index.tsx
 msgid "Finish checkout in your browser to unlock more, then return to Anarlog."
+msgstr ""
+
+#: src/meeting-float/overlay/bar.tsx
+msgid "Finish dictation"
 msgstr ""
 
 #: src/settings/general/account.tsx
@@ -5039,6 +5068,7 @@ msgid "New template"
 msgstr ""
 
 #: src/session/components/note-input/raw.tsx
+#: src/session/components/note-input/template-picker.tsx
 #: src/templates/utils.ts
 msgid "New Template"
 msgstr ""
@@ -6255,6 +6285,10 @@ msgstr ""
 msgid "Recording couldn't start"
 msgstr ""
 
+#: src/meeting-float/overlay/bar.tsx
+msgid "Recording needs attention"
+msgstr ""
+
 #: src/session/components/note-input/transcript/actions.ts
 #: src/session/components/outer-header/overflow/index.tsx
 msgid "Recording not found. It may have been deleted."
@@ -6609,6 +6643,7 @@ msgid "Resume"
 msgstr ""
 
 #: src/session/components/note-input/header-transcript.tsx
+#: src/session/components/outer-header/overflow/listening.tsx
 #: src/stt/saved-capture-audio.tsx
 msgid "Resume listening"
 msgstr ""
@@ -7708,6 +7743,10 @@ msgstr "Yambitsani Anarlog polowera"
 msgid "Start free trial"
 msgstr ""
 
+#: src/session/components/outer-header/overflow/listening.tsx
+msgid "Start listening"
+msgstr ""
+
 #: src/settings/general/meeting-settings.tsx
 msgid "Start listening when a scheduled meeting begins."
 msgstr ""
@@ -7823,6 +7862,7 @@ msgstr ""
 msgid "Stop auto-add"
 msgstr ""
 
+#: src/meeting-float/overlay/bar.tsx
 #: src/session/components/outer-header/index.tsx
 #: src/session/components/outer-header/overflow/listening.tsx
 #: src/sidebar/timeline/item.tsx
@@ -8616,6 +8656,7 @@ msgstr ""
 #: src/calendar/components/oauth/calendar-selection.tsx
 #: src/chat/components/message/tool/search-meetings.tsx
 #: src/session/components/note-input/raw.tsx
+#: src/session/components/note-input/template-picker.tsx
 #: src/session/components/outer-header/overflow/export-modal.tsx
 #: src/session/components/title-input.tsx
 #: src/shared-notes/index.tsx
