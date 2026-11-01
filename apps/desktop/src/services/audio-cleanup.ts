@@ -1,3 +1,5 @@
+import { t as translate } from "@lingui/core/macro";
+
 import {
   commands,
   events,
@@ -36,11 +38,10 @@ export async function handleCaptureCleanupStatus(payload: CaptureStatusEvent) {
       );
     }
   } else if (payload.error.startsWith("audio_recovery_failed:")) {
-    toast.error("Audio could not be recovered", {
+    toast.error(translate`Audio could not be recovered`, {
       id: `audio-recovery-${payload.session_id}`,
       duration: Infinity,
-      description:
-        "Anarlog could not restore interrupted audio and will retry recovery automatically.",
+      description: translate`Anarlog could not restore interrupted audio and will retry recovery automatically.`,
     });
     if (payload.session_id) {
       await saveIncompleteCapture(payload.session_id, "audio-recovery", false);

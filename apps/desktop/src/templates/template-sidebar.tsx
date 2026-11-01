@@ -1,3 +1,4 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -42,6 +43,8 @@ export function TemplatesSidebarContent({
 }: {
   tab: Extract<Tab, { type: "templates" }>;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const { t } = useLingui();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const searchRef = useSquircleRef<HTMLDivElement>();
@@ -432,14 +435,16 @@ export function TemplatesSidebarContent({
               className="text-muted-foreground/70 mx-auto mb-2"
             />
             <p className="text-sm">
-              {search ? "No templates found" : "No templates yet"}
+              {search
+                ? translate`No templates found`
+                : translate`No templates yet`}
             </p>
             {!search && (
               <button
                 onClick={createDefaultTemplate}
                 className="text-muted-foreground hover:text-foreground mt-3 text-sm underline"
               >
-                Create my first template
+                <Trans>Create my first template</Trans>
               </button>
             )}
           </div>
@@ -557,26 +562,28 @@ function TemplateListItem({
   onDuplicate: (template: UserTemplate) => void;
   onDelete: (id: string) => void;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const contextMenu = useMemo(
     () => [
       {
         id: `favorite-template-${template.id}`,
-        text: template.pinned ? "Unfavorite" : "Favorite",
+        text: template.pinned ? translate`Unfavorite` : translate`Favorite`,
         action: () => onToggleFavorite(template.id),
       },
       { separator: true as const },
       {
         id: `duplicate-template-${template.id}`,
-        text: "Duplicate",
+        text: translate`Duplicate`,
         action: () => onDuplicate(template),
       },
       {
         id: `delete-template-${template.id}`,
-        text: "Delete",
+        text: translate`Delete`,
         action: () => onDelete(template.id),
       },
     ],
-    [onDelete, onDuplicate, onToggleFavorite, template],
+    [onDelete, onDuplicate, onToggleFavorite, template, translate],
   );
   const showContextMenu = useNativeContextMenu(contextMenu);
 
@@ -597,7 +604,7 @@ function TemplateListItem({
         <TemplateIconGlyph icon={template.icon} className="size-4 text-sm" />
         <div className="min-w-0 flex-1">
           <div className="truncate font-medium">
-            {template.title?.trim() || "Untitled"}
+            {template.title?.trim() || translate`Untitled`}
           </div>
         </div>
       </div>

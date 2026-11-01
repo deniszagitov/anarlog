@@ -62,11 +62,17 @@ pub fn build_app_menu(app: &AppHandle<tauri::Wry>) -> Result<Menu<tauri::Wry>> {
                 &TrayCheckUpdate::build(app)?,
                 &TraySettings::build(app)?,
                 &PredefinedMenuItem::separator(app)?,
-                &PredefinedMenuItem::services(app, None)?,
+                &PredefinedMenuItem::services(app, Some(&crate::locale::tr("Services")))?,
                 &PredefinedMenuItem::separator(app)?,
-                &PredefinedMenuItem::hide(app, None)?,
-                &PredefinedMenuItem::hide_others(app, None)?,
-                &PredefinedMenuItem::show_all(app, None)?,
+                &PredefinedMenuItem::hide(
+                    app,
+                    Some(&crate::locale::message(
+                        "Hide {app}",
+                        &[("app", &app.package_info().name)],
+                    )),
+                )?,
+                &PredefinedMenuItem::hide_others(app, Some(&crate::locale::tr("Hide Others")))?,
+                &PredefinedMenuItem::show_all(app, Some(&crate::locale::tr("Show All")))?,
                 &PredefinedMenuItem::separator(app)?,
                 &TrayQuit::build(app)?,
             ],
@@ -80,11 +86,17 @@ pub fn build_app_menu(app: &AppHandle<tauri::Wry>) -> Result<Menu<tauri::Wry>> {
                 &AppInfo::build(app)?,
                 &TraySettings::build(app)?,
                 &PredefinedMenuItem::separator(app)?,
-                &PredefinedMenuItem::services(app, None)?,
+                &PredefinedMenuItem::services(app, Some(&crate::locale::tr("Services")))?,
                 &PredefinedMenuItem::separator(app)?,
-                &PredefinedMenuItem::hide(app, None)?,
-                &PredefinedMenuItem::hide_others(app, None)?,
-                &PredefinedMenuItem::show_all(app, None)?,
+                &PredefinedMenuItem::hide(
+                    app,
+                    Some(&crate::locale::message(
+                        "Hide {app}",
+                        &[("app", &app.package_info().name)],
+                    )),
+                )?,
+                &PredefinedMenuItem::hide_others(app, Some(&crate::locale::tr("Hide Others")))?,
+                &PredefinedMenuItem::show_all(app, Some(&crate::locale::tr("Show All")))?,
                 &PredefinedMenuItem::separator(app)?,
                 &TrayQuit::build(app)?,
             ],
@@ -92,49 +104,52 @@ pub fn build_app_menu(app: &AppHandle<tauri::Wry>) -> Result<Menu<tauri::Wry>> {
     };
     let file_submenu = Submenu::with_items(
         app,
-        "File",
+        crate::locale::tr("File"),
         true,
         &[
             &AppNew::build(app)?,
-            &PredefinedMenuItem::close_window(app, None)?,
+            &PredefinedMenuItem::close_window(app, Some(&crate::locale::tr("Close Window")))?,
         ],
     )?;
     let edit_submenu = Submenu::with_items(
         app,
-        "Edit",
+        crate::locale::tr("Edit"),
         true,
         &[
-            &PredefinedMenuItem::undo(app, None)?,
-            &PredefinedMenuItem::redo(app, None)?,
+            &PredefinedMenuItem::undo(app, Some(&crate::locale::tr("Undo")))?,
+            &PredefinedMenuItem::redo(app, Some(&crate::locale::tr("Redo")))?,
             &PredefinedMenuItem::separator(app)?,
-            &PredefinedMenuItem::cut(app, None)?,
-            &PredefinedMenuItem::copy(app, None)?,
-            &PredefinedMenuItem::paste(app, None)?,
-            &PredefinedMenuItem::select_all(app, None)?,
+            &PredefinedMenuItem::cut(app, Some(&crate::locale::tr("Cut")))?,
+            &PredefinedMenuItem::copy(app, Some(&crate::locale::tr("Copy")))?,
+            &PredefinedMenuItem::paste(app, Some(&crate::locale::tr("Paste")))?,
+            &PredefinedMenuItem::select_all(app, Some(&crate::locale::tr("Select All")))?,
         ],
     )?;
     let view_submenu = Submenu::with_items(
         app,
-        "View",
+        crate::locale::tr("View"),
         true,
-        &[&PredefinedMenuItem::fullscreen(app, None)?],
+        &[&PredefinedMenuItem::fullscreen(
+            app,
+            Some(&crate::locale::tr("Full Screen")),
+        )?],
     )?;
     let window_submenu = Submenu::with_id_and_items(
         app,
         WINDOW_SUBMENU_ID,
-        "Window",
+        crate::locale::tr("Window"),
         true,
         &[
-            &PredefinedMenuItem::minimize(app, None)?,
-            &PredefinedMenuItem::maximize(app, None)?,
+            &PredefinedMenuItem::minimize(app, Some(&crate::locale::tr("Minimize")))?,
+            &PredefinedMenuItem::maximize(app, Some(&crate::locale::tr("Maximize")))?,
             &PredefinedMenuItem::separator(app)?,
-            &PredefinedMenuItem::close_window(app, None)?,
+            &PredefinedMenuItem::close_window(app, Some(&crate::locale::tr("Close Window")))?,
         ],
     )?;
     let help_submenu = Submenu::with_id_and_items(
         app,
         HELP_SUBMENU_ID,
-        "Help",
+        crate::locale::tr("Help"),
         true,
         &[
             &HelpReportBug::build(app)?,
@@ -291,6 +306,21 @@ impl<'a, M: tauri::Manager<tauri::Wry>> Tray<'a, tauri::Wry, M> {
         Self::restart_schedule_task(app);
 
         Ok(())
+    }
+
+    pub fn set_translations(
+        &self,
+        translations: std::collections::HashMap<String, String>,
+    ) -> Result<()> {
+        if !crate::locale::replace(translations) {
+            return Ok(());
+        }
+        on_main_thread(self.manager.app_handle(), |app| {
+            #[cfg(target_os = "macos")]
+            app.set_menu(build_app_menu(app)?)?;
+            Self::rebuild_menu(app)?;
+            Self::refresh_menu_bar_title(app)
+        })
     }
 
     pub fn shows_events(&self) -> bool {

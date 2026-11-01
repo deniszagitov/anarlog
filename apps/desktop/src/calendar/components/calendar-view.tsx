@@ -1,3 +1,4 @@
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addDays,
@@ -5,7 +6,6 @@ import {
   eachDayOfInterval,
   endOfMonth,
   endOfWeek,
-  format,
   isSameMonth,
   startOfMonth,
   startOfDay,
@@ -47,6 +47,7 @@ import {
   useSyncWhenCalendarConnectionsChange,
   useWeekStartsOn,
 } from "~/calendar/hooks";
+import { format } from "~/i18n/format";
 import type { CalendarSyncRange } from "~/services/calendar";
 
 const WEEKDAY_HEADERS_SUN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -278,7 +279,7 @@ export function CalendarView() {
             ])}
             onClick={goToToday}
           >
-            Today
+            <Trans>Today</Trans>
           </Button>
           <ButtonGroupSeparator className="bg-accent" />
           <Button
@@ -402,6 +403,7 @@ function useVisibleRangeSync(
 }
 
 function CalendarSyncHeaderControls() {
+  const { t } = useLingui();
   const queryClient = useQueryClient();
   const { status, cancelDebouncedSync, scheduleSync } = useSync();
   const refreshFeedbackTimeoutRef = useRef<ReturnType<
@@ -437,9 +439,9 @@ function CalendarSyncHeaderControls() {
   const showSyncIndicator = showManualRefreshFeedback || status !== "idle";
   const statusText =
     status === "scheduled"
-      ? "Sync scheduled"
+      ? t`Sync scheduled`
       : showSyncIndicator
-        ? "Syncing"
+        ? t`Syncing`
         : null;
 
   return (

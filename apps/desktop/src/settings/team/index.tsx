@@ -1,4 +1,8 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import {
+  Trans,
+  useLingui,
+  useLingui as useLocalizedUi,
+} from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useDebounceValue } from "usehooks-ts";
@@ -15,13 +19,6 @@ import {
   Trash,
 } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
-import {
-  Dialog,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -102,6 +99,13 @@ import { SettingsPageTitle } from "~/settings/page-title";
 import { PlanGate } from "~/settings/plan-gate";
 import { SettingSwitchRow } from "~/settings/setting-row";
 import { DestructiveConfirmationDialog } from "~/shared/ui/destructive-confirmation-dialog";
+import {
+  Dialog,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/shared/ui/dialog";
 import {
   GlassDialogCancelButton,
   GlassDialogContent,
@@ -1317,6 +1321,7 @@ function WorkspacePanel({
 }
 
 function UpcomingCaptureBots({ workspaceId }: { workspaceId: string }) {
+  const { i18n } = useLingui();
   const auth = useAuth();
   const queryClient = useQueryClient();
   const serverUrl = env.VITE_ENTERPRISE_API_URL;
@@ -1384,7 +1389,7 @@ function UpcomingCaptureBots({ workspaceId }: { workspaceId: string }) {
               <div className="min-w-0">
                 <p className="truncate text-sm">{capture.title}</p>
                 <p className="text-muted-foreground text-xs">
-                  {new Date(capture.startsAt).toLocaleString()}
+                  {new Date(capture.startsAt).toLocaleString(i18n.locale)}
                 </p>
               </div>
               <Button
@@ -1418,6 +1423,8 @@ function WorkspacePolicyForm({
   canConfigureRetention: boolean;
   onSaved: () => void;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const auth = useAuth();
   const { t } = useLingui();
   const [retention, setRetention] = useState(
@@ -1538,7 +1545,7 @@ function WorkspacePolicyForm({
                 <Input
                   value={domain}
                   onChange={(event) => setDomain(event.target.value)}
-                  placeholder="company.com"
+                  placeholder={translate`company.com`}
                   className="bg-card h-9 shadow-none"
                 />
               </label>
@@ -1616,6 +1623,8 @@ function WorkspaceShareDomainForm({
   workspaceShareSlug: string | null;
   onSaved: () => void;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const auth = useAuth();
   const inputId = `workspace-share-slug-${workspaceId}`;
   const statusId = `${inputId}-status`;
@@ -1711,7 +1720,7 @@ function WorkspaceShareDomainForm({
                 : undefined
             }
             aria-describedby={availabilityStatus ? statusId : undefined}
-            placeholder="company"
+            placeholder={translate`company`}
             minLength={3}
             maxLength={63}
             pattern="[a-z0-9][a-z0-9-]{1,61}[a-z0-9]"
@@ -1724,7 +1733,7 @@ function WorkspaceShareDomainForm({
             align="inline-end"
             className="border-input bg-muted h-full shrink-0 border-l px-3 py-0 text-xs font-normal"
           >
-            .anarlog.so
+            <Trans>.anarlog.so</Trans>
           </InputGroupAddon>
         </InputGroup>
       </div>

@@ -17,6 +17,7 @@ import {
   Warning,
 } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
+
 import {
   Dialog,
   DialogContent,
@@ -24,7 +25,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
+} from "~/shared/ui/dialog";
 
 const QUERY_KEY = ["legacy-migration"] as const;
 

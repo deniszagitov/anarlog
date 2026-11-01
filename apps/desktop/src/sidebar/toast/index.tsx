@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import {
@@ -28,6 +29,7 @@ import {
 import { useListener } from "~/stt/contexts";
 
 export function ToastNotifications() {
+  const { i18n } = useLingui();
   const auth = useAuth();
   const { dismissToast, isDismissed } = useDismissedToasts();
   const [sessionDismissedToastIds, setSessionDismissedToastIds] = useState(
@@ -194,6 +196,7 @@ export function ToastNotifications() {
       handleSignIn,
       handleOpenLLMSettings,
       handleOpenSTTSettings,
+      i18n.locale,
     ],
   );
 
@@ -237,6 +240,7 @@ export function ToastNotifications() {
       handleSignIn,
       handleOpenLLMSettings,
       handleOpenSTTSettings,
+      i18n.locale,
     ],
   );
 

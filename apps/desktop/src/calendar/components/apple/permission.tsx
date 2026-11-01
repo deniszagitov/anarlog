@@ -9,15 +9,15 @@ import {
   WarningCircle,
 } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
+import { cn } from "@anlg/utils";
+
 import {
   Dialog,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
-import { cn } from "@anlg/utils";
-
+} from "~/shared/ui/dialog";
 import {
   GlassDialogCancelButton,
   GlassDialogContent,

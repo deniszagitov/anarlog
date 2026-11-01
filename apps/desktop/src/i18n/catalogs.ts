@@ -1,11 +1,15 @@
 import { i18n, type I18n, type Messages } from "@lingui/core";
 
 import { SOURCE_LOCALE, type DisplayLocale } from "./locales";
+import { messages as sourceMessages } from "./locales/en/messages";
 
-const catalogModules = import.meta.glob<{ messages: Messages }>(
+const catalogModules = import.meta.glob<{ messages: Messages }>([
   "./locales/*/messages.ts",
-);
-const catalogCache = new Map<DisplayLocale, Promise<Messages>>();
+  "!./locales/en/messages.ts",
+]);
+const catalogCache = new Map<DisplayLocale, Promise<Messages>>([
+  [SOURCE_LOCALE, Promise.resolve(sourceMessages)],
+]);
 let createI18nGeneration = 0;
 
 export function getCatalogLocalesForDisplayLocale(

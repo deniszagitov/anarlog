@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { useCallback, useMemo } from "react";
 
 import { parseWebTemplates, type WebTemplate } from "./codec";
@@ -85,8 +86,8 @@ export function getTemplateCreatorLabel({
   creatorName?: string | null;
   format?: "full" | "short";
 }) {
-  const name = isUserTemplate ? creatorName?.trim() || "user" : "Anarlog";
-  return format === "short" ? `by ${name}` : `Created by ${name}`;
+  const name = isUserTemplate ? creatorName?.trim() || t`user` : "Anarlog";
+  return format === "short" ? t`by ${name}` : t`Created by ${name}`;
 }
 
 export function filterWebTemplatesAgainstUserTemplates({
@@ -165,7 +166,7 @@ export function useTemplateTab(tab: Extract<Tab, { type: "templates" }>) {
 
   const createDefaultTemplate = useCallback(async () => {
     const id = await createTemplate({
-      title: "New Template",
+      title: t`New Template`,
       description: "",
       sections: [],
     });

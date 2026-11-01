@@ -1,4 +1,4 @@
-import { Trans, useLingui } from "@lingui/react/macro";
+import { Plural, Trans, useLingui } from "@lingui/react/macro";
 import React, { useCallback, useRef, useState } from "react";
 
 import {
@@ -209,16 +209,18 @@ export function DetailsColumn({
             {!readOnly && duplicatesWithData.length > 0 && (
               <div className="border-border border-b bg-red-50 px-6 py-4">
                 <h4 className="mb-1 text-sm font-semibold text-red-900">
-                  Duplicate Contact
-                  {duplicatesWithData.length > 1 ? "s" : ""} Found
+                  <Plural
+                    value={duplicatesWithData.length}
+                    one="Duplicate contact found"
+                    other="Duplicate contacts found"
+                  />
                 </h4>
                 <p className="mb-3 text-sm text-red-800">
-                  {duplicatesWithData.length > 1
-                    ? `${duplicatesWithData.length} contacts`
-                    : "Another contact"}{" "}
-                  with the same name or email{" "}
-                  {duplicatesWithData.length > 1 ? "exist" : "exists"}. Merge to
-                  consolidate all related notes and information.
+                  <Plural
+                    value={duplicatesWithData.length}
+                    one="Another contact has the same name or email. Merge to consolidate all related notes and information."
+                    other="# contacts have the same name or email. Merge to consolidate all related notes and information."
+                  />
                 </p>
                 <div className="flex flex-col gap-2">
                   {duplicatesWithData.map((dup) => (
@@ -237,7 +239,7 @@ export function DetailsColumn({
                         )}
                         <div>
                           <div className="text-foreground text-sm font-medium">
-                            {dup.name || "Unnamed Contact"}
+                            {dup.name || t`Unnamed contact`}
                           </div>
                           <div className="text-muted-foreground text-xs">
                             {dup.email}
@@ -249,7 +251,7 @@ export function DetailsColumn({
                         size="sm"
                         variant="default"
                       >
-                        Merge
+                        <Trans>Merge</Trans>
                       </Button>
                     </div>
                   ))}
@@ -924,10 +926,12 @@ function OrganizationControl({
                     <span className="text-xs">+</span>
                   </span>
                   <span className="text-muted-foreground flex items-center gap-1 font-medium">
-                    Create
-                    <span className="text-foreground max-w-[140px] truncate">
-                      &quot;{searchTerm.trim()}&quot;
-                    </span>
+                    <Trans>
+                      Create{" "}
+                      <span className="text-foreground max-w-[140px] truncate">
+                        “{searchTerm.trim()}”
+                      </span>
+                    </Trans>
                   </span>
                 </button>
               )}

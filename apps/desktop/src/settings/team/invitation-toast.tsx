@@ -1,12 +1,12 @@
 import { useLingui } from "@lingui/react/macro";
 
-import { commands as notificationCommands } from "@anlg/plugin-notification";
 import { toast } from "@anlg/ui/components/ui/toast";
 import { useMountEffect } from "@anlg/ui/hooks/use-mount-effect";
 
 import type { MyWorkspaceInvitation } from "./client";
 import { useMyWorkspaceInvitations } from "./my-invitations";
 
+import { showLocalizedNotification } from "~/services/notification";
 import { useConfigValue } from "~/shared/config";
 import { isAppWindowInactive } from "~/shared/window-activity";
 import { useTabs } from "~/store/zustand/tabs";
@@ -60,7 +60,7 @@ function WorkspaceInvitationToast({
       ) {
         return;
       }
-      const result = await notificationCommands.showNotification({
+      const result = await showLocalizedNotification({
         key: toastId,
         title,
         message: description ?? "",

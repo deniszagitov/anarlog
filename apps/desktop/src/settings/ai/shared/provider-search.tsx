@@ -1,10 +1,15 @@
+import { i18n, type MessageDescriptor } from "@lingui/core";
 import { useLingui } from "@lingui/react/macro";
 
 import { MagnifyingGlass, X } from "@anlg/ui/components/icons";
 import { useSquircleRef } from "@anlg/ui/hooks/use-squircle";
 
 export function filterProviders<
-  T extends { id: string; displayName: string; description?: string },
+  T extends {
+    id: string;
+    displayName: string;
+    description?: string | MessageDescriptor;
+  },
 >(providers: readonly T[], query: string): T[] {
   const normalizedQuery = query.trim().toLocaleLowerCase();
   if (!normalizedQuery) {
@@ -12,7 +17,7 @@ export function filterProviders<
   }
 
   return providers.filter((provider) =>
-    `${provider.displayName} ${provider.id} ${provider.description ?? ""}`
+    `${provider.displayName} ${provider.id} ${provider.description ? (typeof provider.description === "string" ? provider.description : i18n._(provider.description)) : ""}`
       .toLocaleLowerCase()
       .includes(normalizedQuery),
   );

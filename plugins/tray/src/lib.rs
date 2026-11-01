@@ -1,5 +1,6 @@
 mod commands;
 mod ext;
+mod locale;
 mod macos_position;
 mod menu_items;
 mod schedule;

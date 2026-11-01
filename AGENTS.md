@@ -1,5 +1,7 @@
 # Overview
 
+For Denis's fork, also follow [FORK_DEVELOPMENT.md](FORK_DEVELOPMENT.md). Keep fork policy and personal configuration out of upstream pull requests.
+
 For Anarlog work, read and follow [.agents/skills/anarlog-workflow/SKILL.md](.agents/skills/anarlog-workflow/SKILL.md). Start requested work immediately; record useful decisions and non-obvious lessons in Linear, not routine execution logs.
 
 Anarlog is a pnpm and Rust workspace. Read the nearest `AGENTS.md` before changing a component.
@@ -120,9 +122,21 @@ This map is a starting point; execute the relevant workflow's full locally repro
 
 Fix failures caused by the change before committing. If an existing unrelated failure or unavailable platform, secrets, hardware, or infrastructure prevents a check, record the exact command, result, and reason in the handoff. Keep focused passes separate from full-suite failures; do not report full validation or release readiness with unresolved gates.
 
+## Accessibility после локальной пересборки macOS
+
+Ad hoc подпись новой сборки может изменить требование macOS к идентичности приложения. Старый переключатель Accessibility при этом может оставаться включённым, хотя новый процесс не получает доступ. Для локального форка соблюдай следующий порядок:
+
+1. Заверши сборку и все операции подписи до выдачи разрешения. Полностью останови предыдущий процесс, установи итоговую сборку в `/Applications` и запусти её оттуда. Закрытие окна и обычный Quit могут оставлять Anarlog в фоне; проверь завершение процесса. Предпочитай штатный полный выход; принудительное завершение допустимо только после сохранения данных и остановки записи.
+2. Mac должен быть разблокирован, экран — активен. Если macOS требует Touch ID или пароль для изменения Privacy & Security, пользователь подтверждает системный запрос самостоятельно. Не пытайся обходить блокировку или авторизацию.
+3. Если приложение не видит доступ, открой System Settings → Privacy & Security → Accessibility (в некоторых версиях macOS — Device Control and Data Access). Удали только устаревшую запись обновляемого приложения, затем через Add добавь точный установленный `.app` из `/Applications` и включи доступ. Простого переключения off/on может быть недостаточно. Не выбирай сборку из `target`, резервную копию или другой вариант Anarlog; разрешения остальных приложений не меняй.
+4. Проверь Settings → Permissions в самой установленной новой сборке: Accessibility должен показывать зелёный статус. Включённый переключатель System Settings сам по себе не подтверждает доступ текущего процесса. Если статус ещё красный, полностью перезапусти приложение и проверь снова. Отдельно проверь прежние разрешения микрофона, системного звука и календаря; новые области доступа без запроса пользователя не добавляй.
+5. Если доступ всё ещё не восстановлен, продолжай диагностику идентификатора приложения и подписи. Не редактируй TCC.db и не сбрасывай разрешения глобально. При необходимости сброса используй только `tccutil reset Accessibility <проверенный-bundle-id>` для обновляемого приложения, затем повтори добавление точной установленной копии и проверку в ней.
+
+После выдачи разрешения повторная подпись или замена приложения требует новой проверки. Различай подтверждённое разрешение Accessibility и полную проверку диктовки: зелёный статус не доказывает захват речи и вставку текста.
+
 ## Release verification
 
-- For an explicitly requested stable desktop release, follow `.agents/skills/release-new-version/SKILL.md` and inspect the current workflows. The explicit version must have an accurate, validated changelog merged into `main`; record that exact candidate SHA.
+- For an explicitly requested stable desktop release, follow `.agents/skills/release-new-version/SKILL.md` and inspect the current workflows. Honor a supplied version; otherwise select the next patch after the latest published stable desktop release using the skill's version policy, without asking for confirmation. The selected version must have an accurate, validated changelog merged into `main`; record that exact candidate SHA.
 - Before freezing each release candidate, complete the release skill's surface review: check product changes against CLI, local and hosted MCP, API/generated clients, agent skills/plugins, and documentation. Merge required updates and verify their publication through each surface's own channel. Record reasons for unchanged surfaces and explicit deferrals; a desktop build or changelog alone does not prove these surfaces are current.
 - Desktop native CI (macOS, Windows, Linux x86_64/ARM64, and Swift) runs only on the daily schedule and `workflow_dispatch`, including release-candidate verification. PRs and pushes to `main` run desktop JS and i18n checks. Mobile iOS, Android, and watchOS native jobs also skip PRs. Check each required job and SHA, not only the aggregate green result.
 - Follow the release skill's candidate `desktop_ci.yaml` dispatch: CloudSync source rebuilds run on `workflow_dispatch` or a reusable caller with `rebuild_cloudsync=true`. Verify the platform artifacts and tests from that candidate before approving the desktop lanes. Mobile has its own native-build and release requirements.

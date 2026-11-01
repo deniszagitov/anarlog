@@ -1,12 +1,16 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
+
 import { cn } from "@anlg/utils";
 
 import { AnarlogMark } from "./anarlog-mark";
 
 export function BrandLoadingView({ detail }: { detail?: string }) {
+  const { t: translate } = useLocalizedUi();
+
   return (
     <div
       role="status"
-      aria-label="Loading"
+      aria-label={translate`Loading`}
       data-tauri-drag-region
       className={cn([
         "bg-background flex h-screen w-screen items-center justify-center",

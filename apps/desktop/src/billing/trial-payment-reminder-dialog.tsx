@@ -2,17 +2,17 @@ import { t } from "@lingui/core/macro";
 
 import { commands as analyticsCommands } from "@anlg/plugin-analytics";
 import { Button } from "@anlg/ui/components/ui/button";
+import { useMountEffect } from "@anlg/ui/hooks/use-mount-effect";
+
+import { TrialDialogIcon } from "./trial-dialog-icon";
+
 import {
   Dialog,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
-import { useMountEffect } from "@anlg/ui/hooks/use-mount-effect";
-
-import { TrialDialogIcon } from "./trial-dialog-icon";
-
+} from "~/shared/ui/dialog";
 import {
   GlassDialogCancelButton,
   GlassDialogContent,

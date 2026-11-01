@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo } from "react";
 
@@ -36,6 +37,7 @@ export function OAuthCalendarSelection({
 }
 
 export function useOAuthCalendarSelection(config: CalendarProvider) {
+  const { t } = useLingui();
   const queryClient = useQueryClient();
   const calendars = useCalendarRows(config.id);
   const { cancelDebouncedSync, status, scheduleDebouncedSync, scheduleSync } =
@@ -87,7 +89,7 @@ export function useOAuthCalendarSelection(config: CalendarProvider) {
       }
       group.calendars.push({
         id: cal.id,
-        title: cal.name ?? "Untitled",
+        title: cal.name ?? t`Untitled`,
         color: cal.color ?? "#4285f4",
         enabled: cal.enabled ?? false,
       });
@@ -101,7 +103,7 @@ export function useOAuthCalendarSelection(config: CalendarProvider) {
       })),
       connectionSourceMap: sourceMap,
     };
-  }, [calendars, config.displayName]);
+  }, [calendars, config.displayName, t]);
 
   const handleToggle = useCallback(
     (calendar: CalendarItem, enabled: boolean) =>

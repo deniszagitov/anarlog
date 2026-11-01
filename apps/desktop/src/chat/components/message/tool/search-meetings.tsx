@@ -1,3 +1,7 @@
+import type { I18n } from "@lingui/core";
+import { plural, t } from "@lingui/core/macro";
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import { useCallback, useMemo } from "react";
 
 import { MagnifyingGlass } from "@anlg/ui/components/icons";
@@ -27,7 +31,10 @@ type MeetingSearchResult = {
   created_at: number | string;
 };
 
-function parseMeetingSearchResults(output: unknown): MeetingSearchResult[] {
+function parseMeetingSearchResults(
+  output: unknown,
+  i18n: I18n,
+): MeetingSearchResult[] {
   if (!output || typeof output !== "object") {
     return [];
   }
@@ -62,7 +69,7 @@ function parseMeetingSearchResults(output: unknown): MeetingSearchResult[] {
     return [
       {
         id,
-        title: typeof title === "string" ? title : "Untitled",
+        title: typeof title === "string" ? title : t(i18n)`Untitled`,
         excerpt: typeof excerpt === "string" ? excerpt : "",
         score: typeof score === "number" ? score : 0,
         created_at:
@@ -76,67 +83,72 @@ function parseMeetingSearchResults(output: unknown): MeetingSearchResult[] {
   });
 }
 
-function formatSearchInput(input: Part["input"] | undefined): {
+function formatSearchInput(
+  input: Part["input"] | undefined,
+  i18n: I18n,
+): {
   titleQuery: string;
   details: string[];
 } {
   if (!input) {
-    return { titleQuery: "meetings", details: [] };
+    return { titleQuery: t(i18n)`meetings`, details: [] };
   }
 
   const details: string[] = [];
   const rawQuery = typeof input.query === "string" ? input.query.trim() : "";
-  const titleQuery = rawQuery || "meetings";
+  const titleQuery = rawQuery || t(i18n)`meetings`;
 
   if (!rawQuery) {
-    details.push("Query: none");
+    details.push(t(i18n)`Query: none`);
   } else {
-    details.push(`Query: ${rawQuery}`);
+    details.push(t(i18n)`Query: ${rawQuery}`);
   }
 
   const createdAt = input.filters?.created_at;
   if (createdAt?.kind === "relative") {
+    const days = createdAt.recent_days ?? 0;
     details.push(
-      `Date: recent ${createdAt.recent_days} day(s), including today`,
+      t(
+        i18n,
+      )`Date: ${plural(days, { one: "recent # day", other: "recent # days" })}, including today`,
     );
   } else if (createdAt?.kind === "absolute") {
+    const date = (value: number) =>
+      i18n.date(new Date(value), { dateStyle: "medium", timeStyle: "short" });
     const bounds = [
       createdAt.gte != null
-        ? `gte ${new Date(createdAt.gte).toLocaleString()}`
+        ? t(i18n)`On or after ${date(createdAt.gte)}`
         : null,
       createdAt.lte != null
-        ? `lte ${new Date(createdAt.lte).toLocaleString()}`
+        ? t(i18n)`On or before ${date(createdAt.lte)}`
         : null,
-      createdAt.gt != null
-        ? `gt ${new Date(createdAt.gt).toLocaleString()}`
-        : null,
-      createdAt.lt != null
-        ? `lt ${new Date(createdAt.lt).toLocaleString()}`
-        : null,
-      createdAt.eq != null
-        ? `eq ${new Date(createdAt.eq).toLocaleString()}`
-        : null,
+      createdAt.gt != null ? t(i18n)`After ${date(createdAt.gt)}` : null,
+      createdAt.lt != null ? t(i18n)`Before ${date(createdAt.lt)}` : null,
+      createdAt.eq != null ? t(i18n)`At ${date(createdAt.eq)}` : null,
     ].filter(Boolean);
 
     if (bounds.length > 0) {
-      details.push(`Date: ${bounds.join(", ")}`);
+      const range = bounds.join(", ");
+      details.push(t(i18n)`Date: ${range}`);
     }
   }
 
   if (typeof input.limit === "number") {
-    details.push(`Limit: ${input.limit}`);
+    const limit = i18n.number(input.limit);
+    details.push(t(i18n)`Limit: ${limit}`);
   }
 
   return { titleQuery, details };
 }
 
 export const ToolSearchMeetings: Renderer = ({ part }) => {
+  const { i18n } = useLocalizedUi();
   const { running: disabled } = useToolState(part);
 
   return (
     <Disclosure
       icon={<MagnifyingGlass className="h-3 w-3" />}
-      title={getTitle(part)}
+      title={getTitle(part, i18n)}
       disabled={disabled}
     >
       <RenderContent part={part} />
@@ -144,29 +156,32 @@ export const ToolSearchMeetings: Renderer = ({ part }) => {
   );
 };
 
-const getTitle = (part: Part) => {
-  const { titleQuery } = formatSearchInput(part.input);
+const getTitle = (part: Part, i18n: I18n) => {
+  const { titleQuery } = formatSearchInput(part.input, i18n);
 
   if (part.state === "input-streaming") {
-    return "Preparing search...";
+    return t(i18n)`Preparing search...`;
   }
   if (part.state === "input-available") {
-    return `Searching for: ${titleQuery}`;
+    return t(i18n)`Searching for: ${titleQuery}`;
   }
   if (part.state === "output-available") {
-    return `Searched for: ${titleQuery}`;
+    return t(i18n)`Searched for: ${titleQuery}`;
   }
   if (part.state === "output-error") {
-    return part.input ? `Search failed: ${titleQuery}` : "Search failed";
+    return part.input
+      ? t(i18n)`Search failed: ${titleQuery}`
+      : t(i18n)`Search failed`;
   }
-  return "Search";
+  return t(i18n)`Search`;
 };
 
 function RenderContent({ part }: { part: Part }) {
-  const { details } = formatSearchInput(part.input);
+  const { i18n } = useLocalizedUi();
+  const { details } = formatSearchInput(part.input, i18n);
 
   if (part.state === "output-available") {
-    const results = parseMeetingSearchResults(part.output);
+    const results = parseMeetingSearchResults(part.output, i18n);
 
     if (!results || results.length === 0) {
       return (
@@ -179,7 +194,7 @@ function RenderContent({ part }: { part: Part }) {
             </div>
           )}
           <div className="text-muted-foreground flex items-center justify-center py-2 text-xs">
-            No results found
+            <Trans>No results found</Trans>
           </div>
         </div>
       );
@@ -210,8 +225,14 @@ function RenderContent({ part }: { part: Part }) {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="bg-muted hover:bg-accent -left-4 h-6 w-6" />
-            <CarouselNext className="bg-muted hover:bg-accent -right-4 h-6 w-6" />
+            <CarouselPrevious
+              aria-label={t(i18n)`Previous result`}
+              className="bg-muted hover:bg-accent -left-4 h-6 w-6"
+            />
+            <CarouselNext
+              aria-label={t(i18n)`Next result`}
+              className="bg-muted hover:bg-accent -right-4 h-6 w-6"
+            />
           </Carousel>
         </div>
       </div>
@@ -219,7 +240,12 @@ function RenderContent({ part }: { part: Part }) {
   }
 
   if (part.state === "output-error") {
-    return <div className="text-sm text-red-500">Error: {part.errorText}</div>;
+    return (
+      <div className="text-sm text-red-500">
+        <Trans>Error:</Trans>
+        {part.errorText}
+      </div>
+    );
   }
 
   return details.length > 0 ? (
@@ -232,6 +258,9 @@ function RenderContent({ part }: { part: Part }) {
 }
 
 function RenderMeeting({ result }: { result: MeetingSearchResult }) {
+  const { t: translate } = useLocalizedUi();
+
+  const { i18n } = useLocalizedUi();
   const { id: sessionId } = result;
   const openNew = useTabs((state) => state.openNew);
 
@@ -245,8 +274,8 @@ function RenderMeeting({ result }: { result: MeetingSearchResult }) {
 
   const dateLabel = useMemo(() => {
     if (!result.created_at) return null;
-    return new Date(result.created_at).toLocaleString();
-  }, [result.created_at]);
+    return new Date(result.created_at).toLocaleString(i18n.locale);
+  }, [result.created_at, i18n.locale]);
 
   return (
     <button
@@ -254,14 +283,16 @@ function RenderMeeting({ result }: { result: MeetingSearchResult }) {
       onClick={handleClick}
       className="flex w-full flex-col gap-1 text-left text-xs"
     >
-      <span className="truncate font-medium">{result.title || "Untitled"}</span>
+      <span className="truncate font-medium">
+        {result.title || translate`Untitled`}
+      </span>
       {dateLabel && (
         <span className="text-muted-foreground text-[11px] tabular-nums">
           {dateLabel}
         </span>
       )}
       <span className="text-muted-foreground line-clamp-3 break-words">
-        {result.excerpt || "No excerpt available"}
+        {result.excerpt || translate`No excerpt available`}
       </span>
     </button>
   );

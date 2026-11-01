@@ -1,10 +1,11 @@
 import { forwardRef, useEffect, useMemo, useState } from "react";
 
 import { useMountEffect } from "@anlg/ui/hooks/use-mount-effect";
-import { TZDate, format, safeParseDate } from "@anlg/utils";
+import { TZDate, safeParseDate } from "@anlg/utils";
 
 import type { TimelineEventsTable, TimelineSessionsTable } from "./utils";
 
+import { format } from "~/i18n/format";
 import { getSessionEvent } from "~/session/utils";
 import { useTimeFormat } from "~/shared/hooks/useTimeFormat";
 

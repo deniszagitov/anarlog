@@ -1,3 +1,6 @@
+import { t as translate } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
+
 import type { SessionEvent } from "@anlg/store";
 import { toast } from "@anlg/ui/components/ui/toast";
 
@@ -190,8 +193,7 @@ export function startPrimaryDeviceCoordination({
     listenerStore.getState().stop();
     toast.info(`Recording on ${name}`, {
       id: `${toastId}:yielded`,
-      description:
-        "This device stopped recording the meeting and discarded its copy.",
+      description: translate`This device stopped recording the meeting and discarded its copy.`,
     });
   };
 
@@ -293,11 +295,15 @@ export function startPrimaryDeviceCoordination({
       duration: Infinity,
       dismissible: false,
       action: {
-        label: <span data-primary-device-prompt>Yes</span>,
+        label: (
+          <span data-primary-device-prompt>
+            <Trans>Yes</Trans>
+          </span>
+        ),
         onClick: claim,
       },
       secondaryAction: {
-        label: "No",
+        label: translate`No`,
         onClick: () => yieldTo(otherName),
       },
     });

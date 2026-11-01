@@ -242,10 +242,13 @@ function findSlashCommand(state: EditorState): SlashCommandState | null {
   return { query, from, to };
 }
 
-function filterCommands(query: string): SlashCommandItem[] {
-  if (!query) return SLASH_COMMANDS;
+function filterCommands(
+  query: string,
+  commands: SlashCommandItem[],
+): SlashCommandItem[] {
+  if (!query) return commands;
   const q = query.toLowerCase();
-  return SLASH_COMMANDS.filter(
+  return commands.filter(
     (cmd) =>
       cmd.label.toLowerCase().includes(q) ||
       cmd.keywords.some((kw) => kw.includes(q)),
@@ -255,7 +258,14 @@ function filterCommands(query: string): SlashCommandItem[] {
 // ---------------------------------------------------------------------------
 // React component
 // ---------------------------------------------------------------------------
-export function SlashCommandMenu() {
+export function SlashCommandMenu({
+  labels,
+}: {
+  labels?: {
+    title?: string;
+    commands?: Record<string, { label: string; description?: string }>;
+  };
+}) {
   const popupRef = useRef<HTMLDivElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -266,7 +276,11 @@ export function SlashCommandMenu() {
 
   const dismissed = slashState !== null && dismissedFrom === slashState.from;
   const active = slashState !== null && !dismissed;
-  const items = active ? filterCommands(slashState.query) : [];
+  const commands = SLASH_COMMANDS.map((command) => ({
+    ...command,
+    ...labels?.commands?.[command.id],
+  }));
+  const items = active ? filterCommands(slashState.query, commands) : [];
 
   if (!active && selectedIndex !== 0) {
     setSelectedIndex(0);
@@ -364,7 +378,7 @@ export function SlashCommandMenu() {
       style={{ top: 0, left: 0 }}
     >
       <div className="text-muted-foreground px-2 pb-0.5 text-[10px] font-semibold tracking-wide uppercase select-none">
-        Commands
+        {labels?.title ?? "Commands"}
       </div>
       <div className="space-y-0.5">
         {items.map((item, index) => (

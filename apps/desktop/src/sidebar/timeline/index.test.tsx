@@ -105,6 +105,12 @@ vi.mock("~/shared/config", () => ({
   useConfigValue: () => mocks.configValue,
 }));
 
+vi.mock("~/session/components/rename-dialog", () => ({
+  SessionRenameProvider: ({ children }: { children: ReactNode }) => (
+    <>{children}</>
+  ),
+}));
+
 vi.mock("~/auth", () => ({
   useAuth: () => ({ session: { user: { id: "owner-1" } } }),
 }));

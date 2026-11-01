@@ -80,7 +80,7 @@ export function useSettingsNavGroups(): SettingsNavGroup[] {
       ],
     },
     {
-      label: "AI",
+      label: t`AI`,
       items: [
         { id: "transcription", label: t`Transcription`, icon: Waveform },
         {

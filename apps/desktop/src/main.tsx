@@ -25,7 +25,7 @@ import {
   initializeErrorReporting,
   reportCaughtReactError,
 } from "./error-reporting";
-import { AppI18nProvider } from "./i18n/provider";
+import { AppI18nProvider, SourceI18nProvider } from "./i18n/provider";
 import { AppLockGate } from "./lock/gate";
 import { FloatingMeetingWindowHost } from "./meeting-float/host";
 import { routeTree } from "./routeTree.gen";
@@ -99,11 +99,13 @@ initializeErrorReporting();
 
 function AppRoot() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <LongLoadGate>
-        <ReadyApp />
-      </LongLoadGate>
-    </QueryClientProvider>
+    <SourceI18nProvider>
+      <QueryClientProvider client={queryClient}>
+        <LongLoadGate>
+          <ReadyApp />
+        </LongLoadGate>
+      </QueryClientProvider>
+    </SourceI18nProvider>
   );
 }
 

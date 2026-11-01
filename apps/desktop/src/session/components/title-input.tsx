@@ -1,11 +1,9 @@
 import { Trans, useLingui } from "@lingui/react/macro";
-import { usePrevious } from "@uidotdev/usehooks";
 import {
   type CSSProperties,
   forwardRef,
   memo,
   useCallback,
-  useEffect,
   useImperativeHandle,
   useLayoutEffect,
   useRef,
@@ -13,11 +11,12 @@ import {
 } from "react";
 import { useResizeObserver } from "usehooks-ts";
 
+import { useMountEffect } from "@anlg/ui/hooks/use-mount-effect";
 import { cn } from "@anlg/utils";
 
 import { useTitleGenerating } from "~/ai/hooks";
-import { useSession, useUpdateSession } from "~/session/queries";
-import { useLiveTitle } from "~/store/zustand/live-title";
+import { useSession } from "~/session/queries";
+import { createSessionTitleEditor } from "~/session/title-edit";
 import { type Tab } from "~/store/zustand/tabs";
 
 export interface TitleInputHandle {
@@ -51,26 +50,10 @@ export const TitleInput = forwardRef<
       state: { view },
     } = tab;
     const isGenerating = useTitleGenerating(sessionId);
-    const wasGenerating = usePrevious(isGenerating);
-    const [showRevealAnimation, setShowRevealAnimation] = useState(false);
-    const [generatedTitle, setGeneratedTitle] = useState<string | null>(null);
-    const storeTitle = useSession(sessionId)?.title;
-
     const editorId = view ? "active" : "inactive";
     const inputRef = useRef<TitleInputHandle>(null);
 
     useImperativeHandle(ref, () => inputRef.current!, []);
-
-    useEffect(() => {
-      if (wasGenerating && !isGenerating) {
-        setGeneratedTitle(storeTitle ?? null);
-        setShowRevealAnimation(true);
-        const timer = setTimeout(() => {
-          setShowRevealAnimation(false);
-        }, 1000);
-        return () => clearTimeout(timer);
-      }
-    }, [wasGenerating, isGenerating, storeTitle]);
 
     if (isGenerating) {
       return (
@@ -90,29 +73,6 @@ export const TitleInput = forwardRef<
             ])}
           >
             <Trans>Generating title...</Trans>
-          </span>
-        </div>
-      );
-    }
-
-    if (showRevealAnimation && generatedTitle) {
-      return (
-        <div
-          data-tauri-drag-region="false"
-          className={cn([
-            "flex w-full items-center justify-start overflow-hidden",
-            variant === "breadcrumb" ? "h-5" : "h-8",
-          ])}
-        >
-          <span
-            className={cn([
-              "animate-reveal-left whitespace-nowrap",
-              variant === "breadcrumb"
-                ? "text-sm leading-5"
-                : "text-xl font-semibold",
-            ])}
-          >
-            {generatedTitle}
           </span>
         </div>
       );
@@ -161,7 +121,7 @@ const TitleInputInner = memo(
       const { t } = useLingui();
       const untitled = placeholder ?? t`Untitled`;
       const storeTitle = useSession(sessionId)?.title;
-      const updateSession = useUpdateSession(sessionId);
+      const [titleEditor] = useState(() => createSessionTitleEditor(sessionId));
       const [draftTitle, setDraftTitle] = useState<string | null>(null);
       const [isOverflowing, setIsOverflowing] = useState(false);
       const [overflowDistance, setOverflowDistance] = useState(0);
@@ -170,10 +130,8 @@ const TitleInputInner = memo(
       const [isTitleFocused, setIsTitleFocused] = useState(false);
       const internalRef = useRef<HTMLInputElement>(null);
       const editRevisionRef = useRef(0);
-      const setLiveTitle = useLiveTitle((s) => s.setTitle);
-      const markLiveTitlePersisted = useLiveTitle((s) => s.markTitlePersisted);
-      const clearLiveTitle = useLiveTitle((s) => s.clearTitle);
       const title = draftTitle ?? storeTitle ?? "";
+      useMountEffect(() => () => titleEditor.cancel());
 
       const updateOverflowState = useCallback(
         (node?: HTMLInputElement | null) => {
@@ -287,37 +245,20 @@ const TitleInputInner = memo(
         requestAnimationFrame(() => updateOverflowState());
       }, [title, updateOverflowState]);
 
-      const setStoreTitle = useCallback(
-        (title: string) => updateSession({ title }),
-        [updateSession],
-      );
-
       const persistTitle = useCallback(
         (value: string) => {
           const editRevision = editRevisionRef.current;
-          const previousTitle = storeTitle;
-          return setStoreTitle(value)
-            .then(() => {
-              if (editRevisionRef.current !== editRevision) return;
-              markLiveTitlePersisted(sessionId, value, previousTitle);
-            })
+          return titleEditor
+            .save(value, storeTitle)
             .catch((error) => {
               console.error("[title-input] failed to persist title", error);
-              if (editRevisionRef.current !== editRevision) return;
-              clearLiveTitle(sessionId);
             })
             .finally(() => {
               if (editRevisionRef.current !== editRevision) return;
               setDraftTitle(null);
             });
         },
-        [
-          clearLiveTitle,
-          markLiveTitlePersisted,
-          sessionId,
-          setStoreTitle,
-          storeTitle,
-        ],
+        [titleEditor, storeTitle],
       );
 
       const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -347,7 +288,7 @@ const TitleInputInner = memo(
 
           editRevisionRef.current += 1;
           setDraftTitle(beforeCursor);
-          setLiveTitle(sessionId, beforeCursor);
+          titleEditor.preview(beforeCursor, storeTitle);
           void persistTitle(beforeCursor);
 
           if (afterCursor) {
@@ -423,7 +364,7 @@ const TitleInputInner = memo(
               const value = e.target.value;
               editRevisionRef.current += 1;
               setDraftTitle(value);
-              setLiveTitle(sessionId, value);
+              titleEditor.preview(value, storeTitle);
               updateOverflowState(e.target);
             }}
             onClick={(e) => updateOverflowState(e.currentTarget)}

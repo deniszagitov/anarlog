@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { motion, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 
@@ -44,7 +45,7 @@ function DayCount({ days, from }: { days: number; from?: number }) {
         )}
       </div>
       <span className="mt-1 pl-[0.22em] text-[10px] font-semibold tracking-[0.22em] text-amber-800/70 uppercase">
-        days
+        <Trans>days</Trans>
       </span>
     </div>
   );

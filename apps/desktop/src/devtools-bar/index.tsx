@@ -1,3 +1,4 @@
+import { Trans, useLingui as useLocalizedUi } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { getIdentifier, getVersion } from "@tauri-apps/api/app";
 import { useReducer, useState } from "react";
@@ -107,6 +108,8 @@ export function DevtoolsStatusBar(props: Record<never, never>) {
 }
 
 function DevtoolsStatusBarContent(props: Record<never, never>) {
+  const { t: translate } = useLocalizedUi();
+
   ignoreRenderTracking(props);
 
   const build = useBuildInfo();
@@ -132,8 +135,8 @@ function DevtoolsStatusBarContent(props: Record<never, never>) {
       <>
         <button
           type="button"
-          aria-label="Expand developer bar"
-          title="Expand developer bar"
+          aria-label={translate`Expand developer bar`}
+          title={translate`Expand developer bar`}
           data-testid="devtools-status-bar-collapsed"
           className={cn([
             "h-1.5 w-full shrink-0 border-t border-neutral-800 bg-neutral-900",
@@ -156,7 +159,7 @@ function DevtoolsStatusBarContent(props: Record<never, never>) {
   return (
     <>
       <footer
-        aria-label="Developer status bar"
+        aria-label={translate`Developer status bar`}
         data-testid="devtools-status-bar"
         data-devbar=""
         className={cn([
@@ -168,7 +171,7 @@ function DevtoolsStatusBarContent(props: Record<never, never>) {
         <DevtoolsMenu onAction={run}>
           <button
             type="button"
-            title="Devtools actions"
+            title={translate`Devtools actions`}
             className={cn([BUTTON_CLASS, "pl-2.5"])}
           >
             <span
@@ -198,20 +201,22 @@ function DevtoolsStatusBarContent(props: Record<never, never>) {
         </div>
 
         <ReactScanControls />
-        <Hint content="Copy a diagnostics snapshot (build, device, metrics, top commands and components, sync) as JSON">
+        <Hint
+          content={translate`Copy a diagnostics snapshot (build, device, metrics, top commands and components, sync) as JSON`}
+        >
           <button
             type="button"
-            aria-label="Copy diagnostics"
+            aria-label={translate`Copy diagnostics`}
             className={BUTTON_CLASS}
             onClick={() => void copyDiagnostics()}
           >
             <Copy size={12} aria-hidden="true" />
           </button>
         </Hint>
-        <Hint content="Collapse the developer bar">
+        <Hint content={translate`Collapse the developer bar`}>
           <button
             type="button"
-            aria-label="Collapse developer bar"
+            aria-label={translate`Collapse developer bar`}
             className={cn([BUTTON_CLASS, "pr-2.5"])}
             onClick={toggleCollapsed}
           >
@@ -238,7 +243,9 @@ function PlanBadge() {
 
   if (!session) {
     return (
-      <div className={cn([ITEM_CLASS, "text-neutral-500"])}>signed out</div>
+      <div className={cn([ITEM_CLASS, "text-neutral-500"])}>
+        <Trans>signed out</Trans>
+      </div>
     );
   }
 
@@ -274,6 +281,8 @@ function PlanBadge() {
 // Isolated so the once-per-second metrics tick only re-renders the metrics,
 // not the menu and dialogs above.
 function LiveMetrics() {
+  const { t: translate } = useLocalizedUi();
+
   useMountEffect(() => startDevtoolsMetrics());
 
   const metrics = useDevtoolsMetrics();
@@ -305,7 +314,7 @@ function LiveMetrics() {
         chart={<Sparkline values={metrics.fps} floor={60} />}
         tooltip={
           <Rows
-            title="Frames per second"
+            title={translate`Frames per second`}
             rows={[
               ["avg", `${average(metrics.fps)}`],
               ["min", `${Math.min(...metrics.fps, fps ?? 0)}`],
@@ -321,7 +330,7 @@ function LiveMetrics() {
         chart={<Bars values={metrics.jank} ceiling={20} />}
         tooltip={
           <Rows
-            title="Frames over 34ms (a dropped frame at 60Hz)"
+            title={translate`Frames over 34ms (a dropped frame at 60Hz)`}
             rows={[
               ["avg", `${average(metrics.jank)}%`],
               ["max", `${Math.max(...metrics.jank, 0)}%`],
@@ -330,12 +339,12 @@ function LiveMetrics() {
         }
       />
       <Metric
-        label="Delay"
+        label={translate`Delay`}
         value={`${delay}ms`}
         tone={toneAbove(delay, 60, 200)}
         tooltip={
           <Rows
-            title="Worst main-thread stall in the last second"
+            title={translate`Worst main-thread stall in the last second`}
             rows={[
               ["avg", `${average(metrics.delay)}ms`],
               ["max", `${Math.max(...metrics.delay, 0)}ms`],
@@ -345,7 +354,7 @@ function LiveMetrics() {
       />
       <Metric
         as="button"
-        label="Renders"
+        label={translate`Renders`}
         value={renders}
         chart={<Sparkline values={metrics.renders} />}
         trailing={
@@ -362,12 +371,16 @@ function LiveMetrics() {
         }}
         tooltip={
           <Rows
-            title={`React renders per second · outlines ${outlinesEnabled ? "on" : "off"} (click to toggle)`}
+            title={
+              outlinesEnabled
+                ? translate`React renders per second · outlines on (click to toggle)`
+                : translate`React renders per second · outlines off (click to toggle)`
+            }
             rows={getTopRenderedComponents().map(({ name, count }) => [
               name,
               `×${count}`,
             ])}
-            empty="No renders in the last 10s"
+            empty={translate`No renders in the last 10s`}
           />
         }
       />
@@ -383,12 +396,12 @@ function LiveMetrics() {
         }
         tooltip={
           <Rows
-            title="Tauri IPC per second · ↑ invokes · ↓ callbacks (responses, events, channels)"
+            title={translate`Tauri IPC per second · ↑ invokes · ↓ callbacks (responses, events, channels)`}
             rows={getTopIpcCommands().map(({ command, count }) => [
               command,
               `×${count}`,
             ])}
-            empty="No invokes in the last 10s"
+            empty={translate`No invokes in the last 10s`}
           />
         }
       />
@@ -397,7 +410,7 @@ function LiveMetrics() {
         value={metrics.requestsInFlight}
         tooltip={
           <Rows
-            title="HTTP requests in flight (IPC excluded)"
+            title={translate`HTTP requests in flight (IPC excluded)`}
             rows={[
               ["last second", `${last(metrics.requests) ?? 0}`],
               [
@@ -414,7 +427,7 @@ function LiveMetrics() {
         chart={<Sparkline values={metrics.memoryBytes} relative />}
         tooltip={
           <Rows
-            title="Host process resident memory (WebKit renders in a separate process on macOS)"
+            title={translate`Host process resident memory (WebKit renders in a separate process on macOS)`}
             rows={[
               [
                 "min",
@@ -513,6 +526,7 @@ function DevtoolsMenu(props: {
   children: React.ReactNode;
   onAction: (action: DevtoolsAction) => void;
 }) {
+  const { i18n } = useLocalizedUi();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{props.children}</DropdownMenuTrigger>
@@ -521,17 +535,20 @@ function DevtoolsMenu(props: {
         <DropdownMenuSeparator />
         {DEVTOOLS_MENU.map((group) => (
           <MenuGroup
-            key={group.label}
-            label={group.label}
-            description={group.description}
+            key={i18n._(group.label)}
+            label={i18n._(group.label)}
+            description={i18n._(group.description)}
           >
             {group.items.map((item) => (
-              <MenuHint key={item.action} description={item.description}>
+              <MenuHint
+                key={item.action}
+                description={i18n._(item.description)}
+              >
                 <DropdownMenuItem
                   className={cn([item.destructive && "text-destructive"])}
                   onSelect={() => props.onAction(item.action)}
                 >
-                  {item.label}
+                  {i18n._(item.label)}
                 </DropdownMenuItem>
               </MenuHint>
             ))}

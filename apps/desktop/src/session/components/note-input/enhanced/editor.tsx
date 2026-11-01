@@ -3,7 +3,6 @@ import { forwardRef, memo, useCallback, useMemo } from "react";
 
 import { parseJsonContent } from "@anlg/editor/markdown";
 import {
-  NoteEditor,
   type JSONContent,
   type NoteEditorRef,
   normalizePortableAttachmentUrls,
@@ -14,6 +13,7 @@ import { useNoteFileHandlerConfig } from "../file-handler";
 
 import { AppLinkView } from "~/editor-bridge/app-link-view";
 import { useMentionConfig } from "~/editor-bridge/mention-config";
+import { NoteEditor } from "~/editor-bridge/note-editor";
 import { openEditorLink } from "~/editor-bridge/open-editor-link";
 import { sessionMentionDropConfig } from "~/editor-bridge/session-mention-drop";
 import { SessionNodeView } from "~/editor-bridge/session-view";

@@ -1,3 +1,4 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
 import type { RefObject } from "react";
 import { useCallback } from "react";
 
@@ -46,6 +47,8 @@ function TranscriptContent({
   editMode: boolean;
   onEditModeChange?: (editMode: boolean) => void;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const screen = useTranscriptScreen({ sessionId });
   const incompleteCapture = useIncompleteCapture(sessionId);
   const { uploadAudio, uploadTranscript } = useUploadFile(sessionId);
@@ -64,16 +67,16 @@ function TranscriptContent({
         >
           <span className="font-medium">
             {incompleteCapture.audioDeletionFailed
-              ? "Audio could not be deleted."
-              : "This transcript is incomplete."}
+              ? translate`Audio could not be deleted.`
+              : translate`This transcript is incomplete.`}
           </span>{" "}
           {incompleteCapture.audioDeletionFailed
-            ? "Anarlog could not remove the temporary audio. Cleanup will be retried automatically."
+            ? translate`Anarlog could not remove the temporary audio. Cleanup will be retried automatically.`
             : incompleteCapture.audioKeptForTranscription
-              ? "Some audio has not been transcribed yet, so Anarlog kept it temporarily. It will be deleted automatically once transcription succeeds."
+              ? translate`Some audio has not been transcribed yet, so Anarlog kept it temporarily. It will be deleted automatically once transcription succeeds.`
               : incompleteCapture.audioDeleted
-                ? "Recovery did not finish before the meeting ended. Audio was deleted according to your retention setting."
-                : "Some audio could not be transcribed. Available recordings were kept according to your retention setting."}
+                ? translate`Recovery did not finish before the meeting ended. Audio was deleted according to your retention setting.`
+                : translate`Some audio could not be transcribed. Available recordings were kept according to your retention setting.`}
         </div>
       )}
       {screen.kind === "running_batch" && (

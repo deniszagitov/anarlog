@@ -1,3 +1,4 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
 import { useRef, useState } from "react";
 
 import { useMountEffect } from "@anlg/ui/hooks/use-mount-effect";
@@ -12,6 +13,8 @@ import { setRenderOutlinesEnabled } from "./render-tracker";
 import { ScanPanel } from "./scan-panel";
 
 export function ReactScanControls() {
+  const { t: translate } = useLocalizedUi();
+
   const state = useReactToolsState();
   const [error, setError] = useState(false);
   const canceled = useRef(false);
@@ -66,10 +69,10 @@ export function ReactScanControls() {
         disabled={error}
         title={
           error
-            ? "React Scan could not load. Reload to retry."
-            : "Slowdown history, timings, and optimization prompts"
+            ? translate`React Scan could not load. Reload to retry.`
+            : translate`Slowdown history, timings, and optimization prompts`
         }
-        aria-label="Toggle React Scan panel"
+        aria-label={translate`Toggle React Scan panel`}
         aria-pressed={state.toolbarVisible}
         onClick={() => activate(setReactToolbarVisible, state.toolbarVisible)}
       >
@@ -79,7 +82,7 @@ export function ReactScanControls() {
         type="button"
         className={buttonClass}
         disabled={error}
-        aria-label="Toggle React render outlines"
+        aria-label={translate`Toggle React render outlines`}
         aria-pressed={state.outlinesEnabled}
         onClick={() => activate(setReactOutlinesEnabled, state.outlinesEnabled)}
       >
@@ -89,7 +92,7 @@ export function ReactScanControls() {
         type="button"
         className={buttonClass}
         disabled={error}
-        aria-label="Inspect React component"
+        aria-label={translate`Inspect React component`}
         aria-pressed={state.inspecting}
         onClick={() => activate(setReactInspecting, state.inspecting)}
       >

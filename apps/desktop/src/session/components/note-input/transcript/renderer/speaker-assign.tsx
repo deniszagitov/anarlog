@@ -1,3 +1,5 @@
+import { t as translate } from "@lingui/core/macro";
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useCallback, useMemo, useRef, useState } from "react";
 
@@ -212,7 +214,7 @@ export function buildSpeakerParticipantGroups({
     ...(participantOptions.length > 0
       ? [
           {
-            title: "Participants",
+            title: translate`Participants`,
             options: participantOptions,
           },
         ]
@@ -220,7 +222,7 @@ export function buildSpeakerParticipantGroups({
     ...(matchingContacts.length > 0
       ? [
           {
-            title: "People",
+            title: translate`People`,
             options: matchingContacts,
           },
         ]
@@ -322,6 +324,8 @@ export function SpeakerParticipantPicker({
   onSelect: (humanId: string, mode: AssignmentMode) => void | Promise<void>;
   showAssignmentScope?: boolean;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const { t } = useLingui();
   const session = useSession(sessionId ?? "");
   const participantRecords = useSessionParticipants(sessionId ?? "");
@@ -411,7 +415,7 @@ export function SpeakerParticipantPicker({
         contacts,
         query,
       }),
-    [contacts, eventParticipants, participants, query],
+    [contacts, eventParticipants, participants, query, t],
   );
 
   const createOption = useMemo(
@@ -420,7 +424,7 @@ export function SpeakerParticipantPicker({
         query,
         existingOptions: [...participants, ...eventParticipants, ...contacts],
       }),
-    [contacts, eventParticipants, participants, query],
+    [contacts, eventParticipants, participants, query, t],
   );
   const hasPeopleGroup = groups.some((group) => group.title === "People");
 
@@ -526,7 +530,7 @@ export function SpeakerParticipantPicker({
             {groups.map((group) => (
               <div key={group.title}>
                 <div className="text-muted-foreground px-3 pt-2 pb-1 text-[11px] font-medium uppercase">
-                  {group.title === "Participants" ? (
+                  {group.title === translate`Participants` ? (
                     <Trans>Participants</Trans>
                   ) : (
                     <Trans>People</Trans>

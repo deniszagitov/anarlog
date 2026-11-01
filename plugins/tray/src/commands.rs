@@ -15,7 +15,13 @@ pub async fn set_tray_icon_visible(
 pub async fn set_tray_schedule(
     app: tauri::AppHandle<tauri::Wry>,
     events: Vec<TrayScheduleEvent>,
+    translations: Option<std::collections::HashMap<String, String>>,
 ) -> Result<(), String> {
+    if let Some(translations) = translations {
+        app.tray()
+            .set_translations(translations)
+            .map_err(|error| error.to_string())?;
+    }
     app.tray()
         .set_schedule(events)
         .map_err(|error| error.to_string())

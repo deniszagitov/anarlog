@@ -1,3 +1,4 @@
+import type { MessageDescriptor } from "@lingui/core";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { type AnyFieldApi, useForm } from "@tanstack/react-form";
 import { useMutation, useQueries } from "@tanstack/react-query";
@@ -75,9 +76,9 @@ type ProviderConfig = {
   checkAvailability?: (baseUrl: string, apiKey: string) => Promise<boolean>;
   hideAdvanced?: boolean;
   links?: {
-    download?: { label: string; url: string };
-    models?: { label: string; url: string };
-    setup?: { label: string; url: string };
+    download?: { label: MessageDescriptor; url: string };
+    models?: { label: MessageDescriptor; url: string };
+    setup?: { label: MessageDescriptor; url: string };
   };
 };
 
@@ -344,7 +345,7 @@ export function NonAnarlogProviderCard({
   onConnectSubscription?: () => void;
   subscriptionProviderId?: string;
 }) {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const billing = useBillingAccess();
   const [provider, providerMutation, providerStateReady] = useProvider(
     providerType,
@@ -670,7 +671,7 @@ export function NonAnarlogProviderCard({
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-foreground inline-flex items-center gap-0.5 hover:underline"
                 >
-                  {config.links.download.label}
+                  {i18n._(config.links.download.label)}
                   <ArrowSquareOut size={12} />
                 </a>
               )}
@@ -681,7 +682,7 @@ export function NonAnarlogProviderCard({
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-foreground inline-flex items-center gap-0.5 hover:underline"
                 >
-                  {config.links.models.label}
+                  {i18n._(config.links.models.label)}
                   <ArrowSquareOut size={12} />
                 </a>
               )}
@@ -692,7 +693,7 @@ export function NonAnarlogProviderCard({
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-foreground inline-flex items-center gap-0.5 hover:underline"
                 >
-                  {config.links.setup.label}
+                  {i18n._(config.links.setup.label)}
                   <ArrowSquareOut size={12} />
                 </a>
               )}
@@ -745,6 +746,15 @@ export function NonAnarlogProviderCard({
 }
 
 function ProviderBadge({ badge }: { badge: string }) {
+  const { t } = useLingui();
+  const labels: Record<string, string> = {
+    "After recording": t`After recording`,
+    Recommended: t`Recommended`,
+    Subscription: t`Subscription`,
+    "On device": t`On device`,
+    "Self-hosted": t`Self-hosted`,
+    Gateway: t`Gateway`,
+  };
   const isAfterRecording = badge === "After recording";
   const badgeNode = (
     <span
@@ -755,7 +765,7 @@ function ProviderBadge({ badge }: { badge: string }) {
           : "border-border rounded-full border px-2 text-xs font-light",
       ])}
     >
-      {badge}
+      {labels[badge] ?? badge}
     </span>
   );
 

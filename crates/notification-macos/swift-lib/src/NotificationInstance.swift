@@ -95,8 +95,8 @@ class NotificationInstance {
     let remaining = startTime.timeIntervalSinceNow
 
     if remaining <= 0 {
-      compactMessageLabel?.stringValue = "Started"
-      timerLabel?.stringValue = "Started"
+      compactMessageLabel?.stringValue = payload.localized("Started")
+      timerLabel?.stringValue = payload.localized("Started")
       countdownTimer?.invalidate()
       countdownTimer = nil
       scheduleStartedDismiss()
@@ -124,13 +124,14 @@ class NotificationInstance {
 
   private func compactScheduleText(_ remaining: TimeInterval) -> String {
     let minutes = max(1, Int(ceil(remaining / 60)))
-    return "Starting in \(minutes) minute\(minutes == 1 ? "" : "s")"
+    return payload.localized("Starting in {minutes} min", values: ["minutes": String(minutes)])
   }
 
   private func expandedScheduleText(_ remaining: TimeInterval) -> String {
     let minutes = Int(remaining) / 60
     let seconds = Int(remaining) % 60
-    return "Begins in \(minutes):\(String(format: "%02d", seconds))"
+    return payload.localized(
+      "Begins in {time}", values: ["time": "\(minutes):\(String(format: "%02d", seconds))"])
   }
 
   func startDismissTimer(timeoutSeconds: Double) {
@@ -231,7 +232,8 @@ class NotificationInstance {
 
   func stopCountdownText(_ remainingSeconds: Double) -> String {
     let seconds = max(0, Int(ceil(remainingSeconds)))
-    return "Anarlog will stop listening in \(seconds) seconds."
+    return payload.localized(
+      "Anarlog will stop listening in {seconds} s.", values: ["seconds": String(seconds)])
   }
 
   private func startStopCountdownUpdates() {

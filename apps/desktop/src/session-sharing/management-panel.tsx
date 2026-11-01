@@ -339,7 +339,7 @@ export function SessionSharePopoverContent({
       ? ownerMetadata.full_name
       : typeof ownerMetadata?.name === "string" && ownerMetadata.name
         ? ownerMetadata.name
-        : ownerEmail || "You";
+        : ownerEmail || t`You`;
   const invite = useShareInvite({
     sessionId,
     ownerEmail,
@@ -483,7 +483,9 @@ export function SessionSharePopoverContent({
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-xs font-medium">
                           {ownerName}{" "}
-                          <span className="text-muted-foreground">(You)</span>
+                          <span className="text-muted-foreground">
+                            <Trans>(You)</Trans>
+                          </span>
                         </p>
                         {ownerEmail ? (
                           <p className="text-muted-foreground truncate text-[10px]">

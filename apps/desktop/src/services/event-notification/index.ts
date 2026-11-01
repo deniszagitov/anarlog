@@ -1,10 +1,10 @@
 import { t } from "@lingui/core/macro";
 
-import { commands as notificationCommands } from "@anlg/plugin-notification";
 import { parseEventInstant } from "@anlg/utils";
 
 import { getIgnoredEventSets } from "~/calendar/ignored-events";
 import { liveQueryClient } from "~/db";
+import { showLocalizedNotification } from "~/services/notification";
 
 export const EVENT_NOTIFICATION_TASK_ID = "eventNotification";
 export const EVENT_NOTIFICATION_INTERVAL = 30 * 1000;
@@ -79,7 +79,7 @@ export async function checkEventNotifications(
       const minutesUntil = Math.ceil(timeUntilStart / 60_000);
 
       const hasMeetingLink = Boolean(event.meeting_link.trim());
-      void notificationCommands.showNotification({
+      void showLocalizedNotification({
         key: notificationKey,
         title: event.title || t`Upcoming Event`,
         message:

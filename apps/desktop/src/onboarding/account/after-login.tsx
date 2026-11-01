@@ -1,3 +1,4 @@
+import { i18n } from "@lingui/core";
 import { Trans } from "@lingui/react/macro";
 
 import { PRO_TRIAL_DAYS, WORK_EMAIL_PRO_TRIAL_DAYS } from "@anlg/pricing";
@@ -9,7 +10,7 @@ import { type TrialPhase, useTrialFlow } from "./trial";
 
 function formatTrialEnd(days: number) {
   return new Date(Date.now() + days * 24 * 60 * 60 * 1000).toLocaleDateString(
-    undefined,
+    i18n.locale,
     { month: "short", day: "numeric" },
   );
 }

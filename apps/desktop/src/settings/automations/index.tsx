@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@anlg/ui/components/ui/dropdown-menu";
 import { toast } from "@anlg/ui/components/ui/toast";
-import { cn, formatDistanceToNow } from "@anlg/utils";
+import { cn } from "@anlg/utils";
 
 import { GoogleDriveConfig, DriveExportResult } from "./google-drive-config";
 import {
@@ -62,6 +62,7 @@ import {
   useAutomationWorkflows,
 } from "~/automations/workflows";
 import { useChatGroup } from "~/chat/store/queries";
+import { formatDistanceToNow } from "~/i18n/format";
 import { useLocalFeatureAccess } from "~/local-ai";
 import {
   ResourceShareButton,

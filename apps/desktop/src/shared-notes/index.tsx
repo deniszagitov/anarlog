@@ -1,7 +1,7 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation } from "@tanstack/react-query";
 
-import { NoteEditor } from "@anlg/editor/note";
 import { commands as openerCommands } from "@anlg/plugin-opener2";
 import {
   Link,
@@ -15,6 +15,7 @@ import { useMountEffect } from "@anlg/ui/hooks/use-mount-effect";
 
 import { trackAnalyticsEvent } from "~/analytics";
 import { useAuth } from "~/auth";
+import { NoteEditor } from "~/editor-bridge/note-editor";
 import { openEditorLink } from "~/editor-bridge/open-editor-link";
 import {
   SessionCommentsLayer,
@@ -420,6 +421,8 @@ function SharedAttachmentList({
     typeof NoteEditor
   >["resolveAttachment"];
 }) {
+  const { t: translate } = useLocalizedUi();
+
   if (!resolveAttachment) return null;
   const referenced = collectSharedAttachmentIds(body);
   const unreferenced = attachments.filter(
@@ -428,7 +431,9 @@ function SharedAttachmentList({
   if (unreferenced.length === 0) return null;
   return (
     <section className="border-border/60 mt-8 border-t pt-5">
-      <h2 className="mb-2 text-sm font-medium">Attachments</h2>
+      <h2 className="mb-2 text-sm font-medium">
+        <Trans>Attachments</Trans>
+      </h2>
       <div className="space-y-2">
         {unreferenced.map((attachment) => {
           const resolution = resolveAttachment(attachment.id);
@@ -472,7 +477,7 @@ function SharedAttachmentList({
               <span className="text-muted-foreground shrink-0 text-xs">
                 {resolution
                   ? formatFileSize(attachment.sizeBytes)
-                  : "Unavailable"}
+                  : translate`Unavailable`}
               </span>
             </button>
           );

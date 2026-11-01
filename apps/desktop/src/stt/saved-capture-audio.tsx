@@ -1,3 +1,5 @@
+import { t as translate } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { useEffect } from "react";
 
 import { toast } from "@anlg/ui/components/ui/toast";
@@ -85,27 +87,29 @@ export function SavedCaptureAudioPrompt({ sessionId }: { sessionId: string }) {
         console.error("[listener] failed to resume listening", error);
       });
     };
-    toast.warning("Anarlog saved this meeting's audio", {
+    toast.warning(translate`Anarlog saved this meeting's audio`, {
       id,
       duration: Infinity,
       description: (
         <div className="space-y-2">
           <p>
-            Recording stopped unexpectedly, so the audio was kept on purpose.
-            Create the meeting note to transcribe and summarize it, or resume
-            listening. The audio is deleted once it is transcribed.
+            <Trans>
+              Recording stopped unexpectedly, so the audio was kept on purpose.
+              Create the meeting note to transcribe and summarize it, or resume
+              listening. The audio is deleted once it is transcribed.
+            </Trans>
           </p>
           <button
             type="button"
             onClick={resumeListening}
             className="text-foreground font-medium underline-offset-2 hover:underline"
           >
-            Resume listening
+            <Trans>Resume listening</Trans>
           </button>
         </div>
       ),
       action: {
-        label: "Create meeting note",
+        label: translate`Create meeting note`,
         onClick: () => {
           rememberDismissal = false;
           void requestCaptureRecovery(sessionId).catch((error) => {

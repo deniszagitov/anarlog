@@ -1,3 +1,4 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
 import React, { useCallback } from "react";
 
 import { Buildings, PushPin } from "@anlg/ui/components/icons";
@@ -20,6 +21,8 @@ export function OrganizationItem({
   onClick: () => void;
   onDelete?: (id: string) => void;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const isPinned = readOnly || Boolean(organization.pinned);
 
   const togglePin = useCallback(() => {
@@ -31,12 +34,14 @@ export function OrganizationItem({
   const showContextMenu = useNativeContextMenu([
     {
       id: "toggle-pin-org",
-      text: isPinned ? "Unpin Organization" : "Pin Organization",
+      text: isPinned
+        ? translate`Unpin Organization`
+        : translate`Pin Organization`,
       action: togglePin,
     },
     {
       id: "delete-org",
-      text: "Delete Organization",
+      text: translate`Delete Organization`,
       action: () => onDelete?.(organization.id),
     },
   ]);
@@ -79,7 +84,7 @@ export function OrganizationItem({
       {readOnly ? (
         <span
           role="img"
-          aria-label="Pinned organization"
+          aria-label={translate`Pinned organization`}
           className="shrink-0 p-1 text-blue-600"
         >
           <PushPin className="size-3.5" weight="bold" />
@@ -93,7 +98,11 @@ export function OrganizationItem({
               ? "text-blue-600 hover:text-blue-700"
               : "text-muted-foreground/70 hover:text-muted-foreground opacity-0 group-hover:opacity-100",
           ])}
-          aria-label={isPinned ? "Unpin organization" : "Pin organization"}
+          aria-label={
+            isPinned
+              ? translate`Unpin organization`
+              : translate`Pin organization`
+          }
         >
           <PushPin
             className="size-3.5"

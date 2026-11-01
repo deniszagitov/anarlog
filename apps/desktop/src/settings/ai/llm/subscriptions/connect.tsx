@@ -11,14 +11,6 @@ import {
 import { commands as openerCommands } from "@anlg/plugin-opener2";
 import { CircleNotch, Copy } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
 import { Input } from "@anlg/ui/components/ui/input";
 
 import { type Provider } from "../shared";
@@ -37,6 +29,14 @@ import {
 import { useProviderSelectionPrompt } from "~/settings/ai/shared/provider-selection-prompt";
 import { useSetAiProvider } from "~/settings/providers";
 import { useConfigValue } from "~/shared/config";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/shared/ui/dialog";
 import { getScheme } from "~/shared/utils";
 
 export function ConnectSubscriptionDialog({

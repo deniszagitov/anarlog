@@ -1,3 +1,4 @@
+import { Trans } from "@lingui/react/macro";
 import { format } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 
@@ -142,7 +143,7 @@ export function DayCell({
           <Popover>
             <PopoverTrigger asChild>
               <button className="text-muted-foreground hover:text-muted-foreground shrink-0 cursor-pointer pl-1 text-left text-xs">
-                +{overflow} more
+                <Trans>+{overflow} more</Trans>
               </button>
             </PopoverTrigger>
             <PopoverContent

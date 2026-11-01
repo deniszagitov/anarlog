@@ -5,14 +5,6 @@ import { useCallback, useRef, useState } from "react";
 import { DotsThree, File, Plus, X } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
-import {
   AppFloatingPanel,
   appFloatingMenuPanelClassName,
   DropdownMenu,
@@ -70,6 +62,14 @@ import { folderDisplayName, normalizeFolderPath } from "~/session/folders";
 import { useFolderIcons } from "~/session/queries";
 import { useFolderMaterialUpload } from "~/shared/hooks/useFileUpload";
 import { DestructiveConfirmationDialog } from "~/shared/ui/destructive-confirmation-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/shared/ui/dialog";
 import { TemplateIconPicker } from "~/templates/template-icon-picker";
 
 const ONLY_ME_VALUE = "me";

@@ -1,4 +1,6 @@
-import { Trans } from "@lingui/react/macro";
+import { t as translateMessage } from "@lingui/core/macro";
+import { plural, t as translate } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 
@@ -9,13 +11,6 @@ import {
   Lightning,
 } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
-import {
-  Dialog,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
 import { toast } from "@anlg/ui/components/ui/toast";
 import { cn } from "@anlg/utils";
 
@@ -23,6 +18,13 @@ import type { SharedResource, SharedResourceType } from "./client";
 import { useSharedResources } from "./hooks";
 
 import { useOptionalAuth } from "~/auth";
+import {
+  Dialog,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/shared/ui/dialog";
 import {
   GlassDialogCancelButton,
   GlassDialogContent,
@@ -47,6 +49,7 @@ function AuthenticatedSharedResourceLibrarySection({
   search?: string;
   onImport: (resource: SharedResource) => Promise<void>;
 }) {
+  const { t: translate } = useLingui();
   const resources = useSharedResources(resourceType);
   const [selected, setSelected] = useState<SharedResource | null>(null);
   const available = useMemo(() => {
@@ -59,16 +62,18 @@ function AuthenticatedSharedResourceLibrarySection({
   }, [resources.data, search]);
   const importResource = useMutation({
     mutationFn: async () => {
-      if (!selected) throw new Error("Choose an item to add");
+      if (!selected) throw new Error(translate`Choose an item to add`);
       await onImport(selected);
     },
     onSuccess: () => {
-      toast.success("Added a copy to your library");
+      toast.success(translate`Added a copy to your library`);
       setSelected(null);
     },
     onError: (error) => {
       toast.error(
-        error instanceof Error ? error.message : "Could not add this item",
+        error instanceof Error
+          ? error.message
+          : translateMessage`Could not add this item`,
       );
     },
   });
@@ -157,9 +162,10 @@ function ResourceIcon({ resourceType }: { resourceType: SharedResourceType }) {
 
 function resourceDescription(resource: SharedResource): string {
   const payload = resource.payload;
+  const ownerEmail = resource.ownerEmail;
   if (resource.resourceType === "folder") {
     const count = Array.isArray(payload.notes) ? payload.notes.length : 0;
-    return `${count} ${count === 1 ? "note" : "notes"} shared by ${resource.ownerEmail}`;
+    return translate`${plural(count, { one: "# note", other: "# notes" })} shared by ${ownerEmail}`;
   }
   if (resource.resourceType === "template") {
     const template = payload.template;
@@ -182,7 +188,7 @@ function resourceDescription(resource: SharedResource): string {
       Array.isArray(workflow.steps)
         ? workflow.steps.length
         : 0;
-    return `${count} ${count === 1 ? "step" : "steps"} shared by ${resource.ownerEmail}`;
+    return translate`${plural(count, { one: "# step", other: "# steps" })} shared by ${ownerEmail}`;
   }
-  return `Shared by ${resource.ownerEmail}`;
+  return translate`Shared by ${ownerEmail}`;
 }

@@ -1,3 +1,4 @@
+import { t as translate } from "@lingui/core/macro";
 import { useCallback, useRef } from "react";
 
 import { beginCloudsyncActivity } from "@anlg/plugin-db";
@@ -460,10 +461,9 @@ export function useCaptureLifecycle(sessionId: string) {
         onError: (error) => {
           transcriptWriteError = error;
           audioRecovery.persistenceFailed();
-          toast.error("Your transcript could not be saved", {
+          toast.error(translate`Your transcript could not be saved`, {
             id: `transcript-storage-${sessionId}`,
-            description:
-              "Free up disk space. Anarlog will try to recover the missing text while this meeting is still recording.",
+            description: translate`Free up disk space. Anarlog will try to recover the missing text while this meeting is still recording.`,
           });
           console.error("[listener] failed to persist transcript", error);
         },
@@ -1353,18 +1353,16 @@ export function useCaptureLifecycle(sessionId: string) {
             );
           }
           if (details.audioDeletionFailed) {
-            toast.error("Audio could not be deleted", {
+            toast.error(translate`Audio could not be deleted`, {
               id: `audio-deletion-${sessionId}`,
               duration: Infinity,
-              description:
-                "Anarlog could not remove the temporary audio. Cleanup will be retried automatically.",
+              description: translate`Anarlog could not remove the temporary audio. Cleanup will be retried automatically.`,
             });
           } else if (audioKeptForTranscription) {
-            toast.warning("Audio kept to finish your transcript", {
+            toast.warning(translate`Audio kept to finish your transcript`, {
               id: `capture-incomplete-${sessionId}`,
               duration: Infinity,
-              description:
-                "Part of this meeting could not be transcribed yet, so Anarlog kept its temporary audio on purpose. It will be deleted automatically once transcription succeeds.",
+              description: translate`Part of this meeting could not be transcribed yet, so Anarlog kept its temporary audio on purpose. It will be deleted automatically once transcription succeeds.`,
             });
           }
         } else {

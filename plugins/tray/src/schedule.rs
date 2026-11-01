@@ -52,7 +52,7 @@ pub fn agenda_sections(
     {
         if sections.last().is_none_or(|section| section.label != label) {
             sections.push(TrayAgendaSection {
-                label: label.to_string(),
+                label: crate::locale::tr(label),
                 events: Vec::new(),
             });
         }
@@ -103,16 +103,21 @@ pub fn menu_bar_title(
     let active = active_event(events, now_ms);
 
     if let Some(event) = active {
+        let duration = duration_label(event.ends_at_ms.unwrap_or(now_ms) - now_ms);
         let suffix = format!(
-            " • {} left",
-            duration_label(event.ends_at_ms.unwrap_or(now_ms) - now_ms)
+            " • {}",
+            crate::locale::message("{duration} left", &[("duration", &duration)])
         );
         return Some(menu_bar_label(&event.title, &suffix));
     }
 
     let event = upcoming_event(events, now_ms)?;
 
-    let suffix = format!(" • in {}", duration_label(event.starts_at_ms - now_ms));
+    let duration = duration_label(event.starts_at_ms - now_ms);
+    let suffix = format!(
+        " • {}",
+        crate::locale::message("in {duration}", &[("duration", &duration)])
+    );
     Some(menu_bar_label(&event.title, &suffix))
 }
 
@@ -245,20 +250,26 @@ fn duration_label(diff_ms: f64) -> String {
     let total_seconds = (diff_ms / 1000.0).floor().max(1.0) as u64;
 
     if total_seconds < 60 {
-        return format!("{total_seconds}s");
+        return crate::locale::message("{count}s", &[("count", &total_seconds.to_string())]);
     }
 
     let total_minutes = total_seconds / 60;
     if total_minutes < 60 {
-        return format!("{total_minutes}m");
+        return crate::locale::message("{count}m", &[("count", &total_minutes.to_string())]);
     }
 
     let hours = total_minutes / 60;
     let minutes = total_minutes % 60;
     if minutes == 0 {
-        format!("{hours}h")
+        crate::locale::message("{count}h", &[("count", &hours.to_string())])
     } else {
-        format!("{hours}h {minutes}m")
+        crate::locale::message(
+            "{hours}h {minutes}m",
+            &[
+                ("hours", &hours.to_string()),
+                ("minutes", &minutes.to_string()),
+            ],
+        )
     }
 }
 

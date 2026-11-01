@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { Lightning, MagnifyingGlass, Plus, X } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
 import { useSquircleRef } from "@anlg/ui/hooks/use-squircle";
-import { cn, formatDistanceToNow } from "@anlg/utils";
+import { cn } from "@anlg/utils";
 
 import { CustomSidebarHeader } from "./custom-sidebar-header";
 
@@ -29,6 +29,7 @@ import {
   useAutomationWorkflows,
 } from "~/automations/workflows";
 import { type ChatGroupRecord, useChatGroups } from "~/chat/store/queries";
+import { formatDistanceToNow } from "~/i18n/format";
 import {
   importSharedAutomation,
   parseSharedAutomationPayload,

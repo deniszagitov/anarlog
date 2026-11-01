@@ -16,6 +16,7 @@ struct NotificationFooter: Codable {
   let text: String
   let actionLabel: String
   let icon: NotificationIcon?
+
 }
 
 enum NotificationIconAsset: Codable {
@@ -231,6 +232,15 @@ struct NotificationPayload: Codable {
   let options: [String]?
   let footer: NotificationFooter?
   let icon: NotificationIcon?
+  var uiLabels: [String: String]? = nil
+
+  func localized(_ source: String, values: [String: String] = [:]) -> String {
+    var text = uiLabels?[source] ?? source
+    for (key, value) in values {
+      text = text.replacingOccurrences(of: "{\(key)}", with: value)
+    }
+    return text
+  }
 
   var isPersistent: Bool {
     return timeoutSeconds <= 0
@@ -241,7 +251,7 @@ struct NotificationPayload: Codable {
   }
 
   var showsStopCountdown: Bool {
-    return isDestructiveAction && actionLabel == "Stop" && timeoutSeconds > 0
+    return isDestructiveAction && actionLabel == localized("Stop") && timeoutSeconds > 0
   }
 
   var hasOptions: Bool {

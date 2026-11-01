@@ -1,3 +1,4 @@
+import { t as translateMessage } from "@lingui/core/macro";
 import { t } from "@lingui/core/macro";
 import { useMutation } from "@tanstack/react-query";
 
@@ -234,7 +235,7 @@ export function useSessionInvitationManagement({
       toast.error(
         input.emails.length > 1
           ? "Could not create these invitations."
-          : "Could not create this invitation.",
+          : translateMessage`Could not create this invitation.`,
       );
     },
     onSettled: onChanged,

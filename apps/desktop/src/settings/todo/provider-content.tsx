@@ -36,7 +36,7 @@ export function TodoProviderContent({ config }: { config: TodoProvider }) {
 }
 
 function OAuthTodoProviderContent({ config }: { config: TodoProvider }) {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
 
   if (!config.nangoIntegrationId) {
     return null;
@@ -142,9 +142,17 @@ function OAuthTodoProviderContent({ config }: { config: TodoProvider }) {
       {filterSettingKey ? (
         <TodoFilterField
           settingKey={filterSettingKey}
-          label={config.filterLabel ?? "Repository"}
-          description={t`Only sync items from this ${(config.filterLabel ?? "repository").toLowerCase()}.`}
-          placeholder={config.filterPlaceholder ?? ""}
+          label={
+            config.filterLabel ? i18n._(config.filterLabel) : t`Repository`
+          }
+          description={
+            config.filterDescription
+              ? i18n._(config.filterDescription)
+              : t`Only sync items from this repository.`
+          }
+          placeholder={
+            config.filterPlaceholder ? i18n._(config.filterPlaceholder) : ""
+          }
         />
       ) : null}
     </div>

@@ -1,3 +1,5 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
+
 import { Microphone, MicrophoneSlash } from "@anlg/ui/components/icons";
 import { DropdownMenuItem } from "@anlg/ui/components/ui/dropdown-menu";
 
@@ -15,6 +17,8 @@ export function Listening({
   sessionId: string;
   resume: boolean;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const { mode, stop } = useListener((state) => ({
     mode: state.getSessionMode(sessionId),
     stop: state.stop,
@@ -50,7 +54,7 @@ export function Listening({
       disabled={isFinalizing}
     >
       {isListening ? <MicrophoneSlash /> : <Microphone />}
-      <span>{isListening ? "Stop listening" : startLabel}</span>
+      <span>{isListening ? translate`Stop listening` : startLabel}</span>
     </DropdownMenuItem>
   );
 }

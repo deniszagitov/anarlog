@@ -221,6 +221,7 @@ function HeaderViewTranscriptActive({
     onClick?.();
   }, [canEdit, editMode, onClick, onEditModeChange]);
   const canCopyTranscript = transcriptMetadata.some((t) => t.hasWords);
+  const { t: translate } = useLingui();
   const handleCopyTranscript = useCallback(async () => {
     try {
       const transcriptExportRequest =
@@ -238,14 +239,14 @@ function HeaderViewTranscriptActive({
       }
 
       await copyTextToClipboard(transcriptText, {
-        success: "Transcript copied to clipboard",
-        error: "Failed to copy transcript",
+        success: translate`Transcript copied to clipboard`,
+        error: translate`Failed to copy transcript`,
       });
     } catch (error) {
       console.error("Failed to copy transcript", error);
-      toast.error("Failed to copy transcript");
+      toast.error(translate`Failed to copy transcript`);
     }
-  }, [sessionId]);
+  }, [sessionId, translate]);
   const handleDeleteRecording = useCallback(() => {
     void deleteRecording();
   }, [deleteRecording]);
@@ -261,7 +262,7 @@ function HeaderViewTranscriptActive({
     const items: MenuItemDef[] = [
       {
         id: `copy-transcript-${sessionId}`,
-        text: "Copy",
+        text: translate`Copy`,
         action: () => {
           void handleCopyTranscript();
         },
@@ -272,7 +273,7 @@ function HeaderViewTranscriptActive({
     if (sessionMode === "inactive" || sessionMode === "running_batch") {
       items.push({
         id: `resume-listening-${sessionId}`,
-        text: "Resume listening",
+        text: translate`Resume listening`,
         action: handleResumeListening,
       });
     }
@@ -280,7 +281,7 @@ function HeaderViewTranscriptActive({
     if (audioExistsResolved && sessionMode === "inactive" && audioExists) {
       items.push({
         id: `regenerate-transcript-${sessionId}`,
-        text: "Re-transcribe",
+        text: translate`Re-transcribe`,
         action: () => {
           void regenerate();
         },
@@ -290,7 +291,7 @@ function HeaderViewTranscriptActive({
     if (audioExists) {
       items.push({
         id: `delete-recording-${sessionId}`,
-        text: "Delete recording",
+        text: translate`Delete recording`,
         action: handleDeleteRecording,
         disabled: isDeletingRecording,
       });
@@ -308,6 +309,7 @@ function HeaderViewTranscriptActive({
     regenerate,
     sessionMode,
     sessionId,
+    translate,
   ]);
   const showContextMenu = useNativeContextMenu(contextMenu);
 

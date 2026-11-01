@@ -19,7 +19,9 @@ extension TrackableButton where Self: NSView {
 }
 
 class CloseButton: NSButton, TrackableButton {
-  weak var notification: NotificationInstance?
+  weak var notification: NotificationInstance? {
+    didSet { setAccessibilityLabel(notification?.payload.localized("Close") ?? "Close") }
+  }
   weak var backdropView: CloseButtonBackdropView?
   var trackingArea: NSTrackingArea?
 
@@ -238,7 +240,7 @@ class NotificationButton: NSButton {
 
     if #available(macOS 11.0, *) {
       let cfg = NSImage.SymbolConfiguration(pointSize: Fonts.buttonSize, weight: .semibold)
-      image = NSImage(systemSymbolName: "square.fill", accessibilityDescription: "Stop")?
+      image = NSImage(systemSymbolName: "square.fill", accessibilityDescription: label)?
         .withSymbolConfiguration(cfg)
     } else {
       image = nil

@@ -1,4 +1,5 @@
-import { commands as notificationCommands } from "@anlg/plugin-notification";
+import { t as translate } from "@lingui/core/macro";
+
 import { parseEventInstant } from "@anlg/utils";
 
 import {
@@ -14,6 +15,7 @@ import {
   type MicApp,
 } from "./meeting-apps";
 
+import { showLocalizedNotification } from "~/services/notification";
 import { loadSessionEvent } from "~/session/queries";
 
 export const AUTO_STOP_CONFIRM_DELAY_MS = 5_000;
@@ -186,16 +188,16 @@ export async function showMeetingEndedPrompt({
   }
 
   try {
-    await notificationCommands.showNotification({
+    await showLocalizedNotification({
       key,
-      title: "Did your meeting end?",
+      title: translate`Did your meeting end?`,
       message: `Anarlog will stop listening in ${AUTO_STOP_CONFIRM_TIMEOUT_SECONDS} seconds.`,
       timeout: { secs: AUTO_STOP_CONFIRM_TIMEOUT_SECONDS, nanos: 0 },
       source: null,
       start_time: null,
       participants: null,
       event_details: null,
-      action_label: "Stop",
+      action_label: translate`Stop`,
       action: null,
       action_menu: null,
       action_variant: "destructive",

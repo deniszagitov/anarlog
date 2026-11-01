@@ -1,3 +1,4 @@
+import { i18n } from "@lingui/core";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { open as selectFile } from "@tauri-apps/plugin-dialog";
@@ -135,7 +136,7 @@ function formatModelSize(sizeBytes: number) {
   const unit = sizeBytes >= 1024 * 1024 * 1024 ? "GB" : "MB";
   const value =
     unit === "GB" ? sizeBytes / 1024 / 1024 / 1024 : sizeBytes / 1024 / 1024;
-  return `${value.toLocaleString(undefined, {
+  return `${value.toLocaleString(i18n.locale, {
     maximumFractionDigits: value >= 10 ? 0 : 1,
   })} ${unit}`;
 }

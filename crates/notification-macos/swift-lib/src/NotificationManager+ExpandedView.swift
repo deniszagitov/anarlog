@@ -56,6 +56,7 @@ extension NotificationManager {
 
     let collapseButton = CollapseButton()
     collapseButton.notification = notification
+    collapseButton.title = notification.payload.localized("Show less")
     collapseButton.setContentHuggingPriority(.required, for: .horizontal)
 
     headerStack.addArrangedSubview(titleLabel)
@@ -192,7 +193,7 @@ extension NotificationManager {
     stack.spacing = 8
 
     let actionButton = ActionButton()
-    let actionLabel = notification.payload.actionLabel ?? "Accept"
+    let actionLabel = notification.payload.actionLabel ?? notification.payload.localized("Accept")
     if notification.payload.isDestructiveAction {
       actionButton.configureDestructiveAction(label: actionLabel)
     } else {

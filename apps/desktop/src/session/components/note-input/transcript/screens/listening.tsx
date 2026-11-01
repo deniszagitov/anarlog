@@ -1,3 +1,5 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
+
 import { Waveform } from "@anlg/ui/components/icons";
 import { Spinner } from "@anlg/ui/components/ui/spinner";
 
@@ -6,6 +8,8 @@ export function TranscriptListeningState({
 }: {
   status: "listening" | "finalizing";
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const isFinalizing = status === "finalizing";
 
   return (
@@ -25,12 +29,14 @@ export function TranscriptListeningState({
       )}
       <div className="flex max-w-md flex-col gap-2">
         <p className="text-base font-medium">
-          {isFinalizing ? "Finalizing transcript..." : "Listening..."}
+          {isFinalizing
+            ? translate`Finalizing transcript...`
+            : translate`Listening...`}
         </p>
         <p className="text-muted-foreground text-sm leading-relaxed">
           {isFinalizing
-            ? "Transcript is still being written."
-            : "Transcript will appear here when the first segment arrives."}
+            ? translate`Transcript is still being written.`
+            : translate`Transcript will appear here when the first segment arrives.`}
         </p>
       </div>
     </div>

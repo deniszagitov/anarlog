@@ -7,6 +7,8 @@ import {
   size,
   useFloating,
 } from "@floating-ui/react";
+import { t as translateMessage } from "@lingui/core/macro";
+import { t as translate } from "@lingui/core/macro";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
 
@@ -417,7 +419,7 @@ function useEventContactEnhancement(sessionId: string) {
     mutationKey: ["event-contact-enhancement", sessionId],
     mutationFn: async (humanId: string) => {
       if (!sessionEvent || !userId) {
-        throw new Error("Event unavailable");
+        throw new Error(translateMessage`Event unavailable`);
       }
 
       const context = buildEventContactExtractionContextFromRecords({
@@ -457,27 +459,27 @@ function useEventContactEnhancement(sessionId: string) {
       const toastId = `event-contact-enhancement-${humanId}`;
 
       if (applied.created > 0) {
-        toast.success("Contact created", { id: toastId });
+        toast.success(translate`Contact created`, { id: toastId });
         return;
       }
 
       if (!applied.matched) {
-        toast.info("No contact detail found", { id: toastId });
+        toast.info(translate`No contact detail found`, { id: toastId });
         return;
       }
 
       if (changed === 0) {
-        toast.info("Contact already up to date", { id: toastId });
+        toast.info(translate`Contact already up to date`, { id: toastId });
         return;
       }
 
-      toast.success("Contact enhanced", { id: toastId });
+      toast.success(translate`Contact enhanced`, { id: toastId });
     },
     onError: (error) => {
       const message =
         error instanceof Error && error.message === "Language model needed"
           ? "Language model needed"
-          : "Could not enhance contact";
+          : translateMessage`Could not enhance contact`;
 
       toast.error(message, {
         id: "event-contact-enhancement",

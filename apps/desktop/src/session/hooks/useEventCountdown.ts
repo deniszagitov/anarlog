@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react";
 import { useMemo, useSyncExternalStore } from "react";
 
 import { useSessionEvent } from "~/session/hooks/useSessionEvent";
@@ -5,9 +7,13 @@ import { useSessionEvent } from "~/session/hooks/useSessionEvent";
 const FIVE_MINUTES = 5 * 60 * 1000;
 
 export function useEventCountdown(sessionId: string) {
+  const { i18n } = useLingui();
   const sessionEvent = useSessionEvent(sessionId);
   const startedAt = sessionEvent?.started_at;
-  const store = useMemo(() => createCountdownStore(startedAt), [startedAt]);
+  const store = useMemo(
+    () => createCountdownStore(startedAt),
+    [startedAt, i18n.locale],
+  );
   const label = useSyncExternalStore(
     store.subscribe,
     store.getSnapshot,
@@ -25,7 +31,7 @@ function getCountdownLabel(startedAt: string | undefined, nowMs: number) {
   const totalSeconds = Math.floor(diff / 1000);
   const mins = Math.floor(totalSeconds / 60);
   const secs = totalSeconds % 60;
-  return mins > 0 ? `starts in ${mins}m ${secs}s` : `starts in ${secs}s`;
+  return mins > 0 ? t`starts in ${mins}m ${secs}s` : t`starts in ${secs}s`;
 }
 
 function createCountdownStore(startedAt: string | undefined) {

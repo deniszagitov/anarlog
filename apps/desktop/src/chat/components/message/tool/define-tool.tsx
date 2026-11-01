@@ -1,3 +1,5 @@
+import type { I18n } from "@lingui/core";
+import { useLingui } from "@lingui/react";
 import type { ReactNode } from "react";
 
 import {
@@ -24,6 +26,7 @@ type ToolConfig<TParsed> = {
   icon: ReactNode;
   parseFn: (output: unknown) => TParsed | null;
   label: (ctx: {
+    i18n: I18n;
     running: boolean;
     failed: boolean;
     parsed: TParsed | null;
@@ -33,6 +36,7 @@ type ToolConfig<TParsed> = {
   renderBody?: (input: Input, parsed: TParsed | null) => ReactNode;
   renderSuccess?: (parsed: TParsed) => ReactNode;
   renderFooter?: (ctx: {
+    i18n: I18n;
     failed: boolean;
     errorText: unknown;
     rawText: string | null;
@@ -43,6 +47,7 @@ type ToolConfig<TParsed> = {
 
 export function defineTool<TParsed>(config: ToolConfig<TParsed>) {
   return ({ part }: { part: ToolPart }) => {
+    const { i18n } = useLingui();
     const { running, failed, done } = useToolState(part);
     const { parsed, rawText } = useMcpOutput(done, part.output, config.parseFn);
     const headerDone = config.isDone ? config.isDone(parsed) : !!parsed;
@@ -55,6 +60,7 @@ export function defineTool<TParsed>(config: ToolConfig<TParsed>) {
           failed={failed}
           done={headerDone}
           label={config.label({
+            i18n,
             running,
             failed,
             parsed,
@@ -64,6 +70,7 @@ export function defineTool<TParsed>(config: ToolConfig<TParsed>) {
         {config.renderBody?.(part.input, parsed)}
         {config.renderFooter ? (
           config.renderFooter({
+            i18n,
             failed,
             errorText: part.errorText,
             rawText,

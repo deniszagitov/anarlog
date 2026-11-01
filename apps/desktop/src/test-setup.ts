@@ -185,8 +185,9 @@ vi.mock("@lingui/react/macro", () => ({
     i18n: {
       _: translate,
       locale: "en",
+      number: (value: number) => new Intl.NumberFormat("en").format(value),
       date: (value: string | Date, format?: Intl.DateTimeFormatOptions) =>
-        new Date(value).toLocaleDateString("en", format ?? {}),
+        new Intl.DateTimeFormat("en", format ?? {}).format(new Date(value)),
     },
   }),
 }));
@@ -216,8 +217,9 @@ vi.mock("@lingui/react", () => ({
     i18n: {
       _: translate,
       locale: "en",
+      number: (value: number) => new Intl.NumberFormat("en").format(value),
       date: (value: string | Date, format?: Intl.DateTimeFormatOptions) =>
-        new Date(value).toLocaleDateString("en", format ?? {}),
+        new Intl.DateTimeFormat("en", format ?? {}).format(new Date(value)),
     },
   }),
 }));

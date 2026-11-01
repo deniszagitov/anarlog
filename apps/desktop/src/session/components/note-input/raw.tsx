@@ -4,7 +4,6 @@ import { forwardRef, useCallback, useMemo, useRef, useState } from "react";
 
 import { parseJsonContent } from "@anlg/editor/markdown";
 import {
-  NoteEditor,
   type JSONContent,
   type NoteEditorRef,
   normalizePortableAttachmentUrls,
@@ -24,6 +23,7 @@ import { useAudioPlayer } from "~/audio-player";
 import { useSessionEventParticipants } from "~/calendar/queries";
 import { AppLinkView } from "~/editor-bridge/app-link-view";
 import { useMentionConfig } from "~/editor-bridge/mention-config";
+import { NoteEditor } from "~/editor-bridge/note-editor";
 import { openEditorLink } from "~/editor-bridge/open-editor-link";
 import { sessionMentionDropConfig } from "~/editor-bridge/session-mention-drop";
 import { SessionNodeView } from "~/editor-bridge/session-view";
@@ -465,7 +465,7 @@ function TemplateEmptyState({
   const handleCreateTemplate = useCallback(() => {
     void (async () => {
       const templateId = await createTemplate({
-        title: "New Template",
+        title: t`New Template`,
         description: "",
         sections: [],
       });

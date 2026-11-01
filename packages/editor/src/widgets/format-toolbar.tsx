@@ -112,9 +112,11 @@ const TOOLBAR_BUTTONS: {
 export function FormatToolbar({
   onComment,
   showFormatting = true,
+  labels,
 }: {
   onComment?: () => void;
   showFormatting?: boolean;
+  labels?: Record<string, string>;
 }) {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const cleanupRef = useRef<(() => void) | null>(null);
@@ -222,7 +224,7 @@ export function FormatToolbar({
     <div
       ref={toolbarRef}
       role="toolbar"
-      aria-label="Format selection"
+      aria-label={labels?.formatSelection ?? "Format selection"}
       className={cn([
         "bg-popover ring-border fixed z-50 flex items-center gap-0.5 rounded-xl p-1 ring-1",
         "shadow-lg",
@@ -237,6 +239,8 @@ export function FormatToolbar({
             <button
               key={button.id}
               aria-pressed={active}
+              aria-label={labels?.[button.id] ?? button.id}
+              title={labels?.[button.id] ?? button.id}
               className={cn([
                 "flex size-7 items-center justify-center rounded-md",
                 "cursor-pointer border-none transition-colors",
@@ -256,7 +260,7 @@ export function FormatToolbar({
       {onComment && (
         <button
           type="button"
-          aria-label="Comment"
+          aria-label={labels?.comment ?? "Comment"}
           className={cn([
             "text-muted-foreground flex size-7 items-center justify-center rounded-md",
             "hover:bg-accent hover:text-accent-foreground cursor-pointer border-none bg-transparent transition-colors",

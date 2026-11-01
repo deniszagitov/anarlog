@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+
 import type {
   ChannelProfile as BoundChannelProfile,
   LiveTranscriptSegment,
@@ -145,7 +147,7 @@ export const SegmentKeyUtils = {
         (assignedHumanId == null || assignedHumanId === selfHumanId)
       ) {
         const selfHuman = ctx.getHumanName(selfHumanId);
-        return selfHuman || "You";
+        return selfHuman || t`You`;
       }
     }
 
@@ -158,7 +160,7 @@ export const SegmentKeyUtils = {
 
     if (manager) {
       const speakerNumber = manager.getUnknownSpeakerNumber(key);
-      return `Speaker ${speakerNumber}`;
+      return t`Speaker ${speakerNumber}`;
     }
 
     const channelLabel =
@@ -169,8 +171,8 @@ export const SegmentKeyUtils = {
           : "C";
 
     return key.speaker_index !== null && key.speaker_index !== undefined
-      ? `Speaker ${key.speaker_index + 1}`
-      : `Speaker ${channelLabel}`;
+      ? t`Speaker ${key.speaker_index + 1}`
+      : t`Speaker ${channelLabel}`;
   },
 };
 
@@ -617,4 +619,27 @@ function createSegmentFragment(
       .trim(),
     words,
   };
+}
+
+export function localizeSpeakerLabel(
+  segment: Pick<Segment, "key" | "speaker_label" | "provisional_speaker">,
+  context?: RenderLabelContext,
+) {
+  const label = segment.speaker_label;
+  if (!segment.key.speaker_human_id && !segment.provisional_speaker) {
+    const match = label?.match(/^Speaker (\d+)$/);
+    if (match) {
+      const number = Number(match[1]);
+      return t`Speaker ${number}`;
+    }
+  }
+  const id = segment.key.speaker_human_id;
+  if (
+    label === "You" &&
+    id &&
+    id === context?.getSelfHumanId() &&
+    !context?.getHumanName(id)
+  )
+    return t`You`;
+  return label;
 }

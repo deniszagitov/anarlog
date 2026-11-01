@@ -22,7 +22,7 @@ import {
 } from "@anlg/ui/components/icons";
 import { DancingSticks } from "@anlg/ui/components/ui/dancing-sticks";
 import { Spinner } from "@anlg/ui/components/ui/spinner";
-import { cn, format, getYear, safeParseDate, TZDate } from "@anlg/utils";
+import { cn, getYear, safeParseDate, TZDate } from "@anlg/utils";
 
 import {
   type EventTimelineItem,
@@ -34,10 +34,12 @@ import {
 
 import { useIgnoredEvents } from "~/calendar/ignored-events";
 import { writeSessionContextDragData } from "~/chat/context/session-drag";
+import { format } from "~/i18n/format";
 import { DEVICE_AUTH_REASON } from "~/lock/auth";
 import { isLockedFlag } from "~/lock/flag";
 import { revealLockedNote, setSessionLocked } from "~/lock/notes";
 import { useAppLock } from "~/lock/store";
+import { useRequestSessionRename } from "~/session/components/rename-dialog";
 import { useDeleteSession } from "~/session/hooks/useDeleteSession";
 import { useIsSessionEnhancing } from "~/session/hooks/useEnhancedNotes";
 import {
@@ -629,6 +631,7 @@ const SessionItem = memo(
     const openCurrent = useTabs((state) => state.openCurrent);
     const deleteSession = useDeleteSession();
     const managedSharedSessionIds = useContext(ManagedSharedSessionIdsContext);
+    const requestRename = useRequestSessionRename();
 
     const sessionId = item.id;
     const title = useSessionTitle(sessionId, item.data.title ?? undefined);
@@ -776,6 +779,13 @@ const SessionItem = memo(
           action: handleShowInFolder,
         },
       ];
+      if (requestRename) {
+        menu.push({
+          id: "rename",
+          text: t`Rename…`,
+          action: () => requestRename(sessionId),
+        });
+      }
       if (authAvailable) {
         menu.push({
           id: noteLocked ? "unlock" : "lock",
@@ -799,6 +809,8 @@ const SessionItem = memo(
       handleShowInFolder,
       handleToggleLock,
       noteLocked,
+      requestRename,
+      sessionId,
       t,
     ]);
 

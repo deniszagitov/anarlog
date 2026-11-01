@@ -22,18 +22,10 @@ import {
 } from "@anlg/ui/components/icons";
 import { Badge } from "@anlg/ui/components/ui/badge";
 import { Button } from "@anlg/ui/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
 import { Input } from "@anlg/ui/components/ui/input";
 import { Switch } from "@anlg/ui/components/ui/switch";
 import { toast } from "@anlg/ui/components/ui/toast";
-import { cn, formatDistanceToNow } from "@anlg/utils";
+import { cn } from "@anlg/utils";
 
 import { E2eeSetupDialog } from "../general/e2ee-setup";
 import { SyncHealthSection } from "./health";
@@ -60,6 +52,7 @@ import {
   requestSyncDevices,
 } from "~/auth/sync-devices";
 import { captureOperationalError } from "~/error-reporting";
+import { formatDistanceToNow } from "~/i18n/format";
 import { SettingsPageTitle } from "~/settings/page-title";
 import { PlanGate } from "~/settings/plan-gate";
 import {
@@ -68,6 +61,14 @@ import {
 } from "~/settings/queries";
 import { resolveConfigValue } from "~/shared/config";
 import { isKeychainAccessError, repairKeychainAccess } from "~/shared/keychain";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/shared/ui/dialog";
 import { buildWebAppUrl } from "~/shared/utils";
 import { useTabs } from "~/store/zustand/tabs";
 

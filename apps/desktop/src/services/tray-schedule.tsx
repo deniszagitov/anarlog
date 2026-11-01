@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
 import { useMemo } from "react";
 
 import {
@@ -10,6 +12,7 @@ import { addDays, parseEventInstant, startOfDay, TZDate } from "@anlg/utils";
 
 import { useIgnoredEvents } from "~/calendar/ignored-events";
 import { useTimelineEventsTable } from "~/calendar/queries";
+import { nativeMenuMessages } from "~/i18n/native-menu";
 import { useConfigValue } from "~/shared/config";
 import { useCurrentDay } from "~/shared/hooks/useCurrentDay";
 import type { TimelineEventRow } from "~/sidebar/timeline/utils";
@@ -75,7 +78,7 @@ export function buildTrayScheduleEvents(
       return [
         {
           id: eventId,
-          title: row.title?.trim() || "Untitled event",
+          title: row.title?.trim() || t`Untitled event`,
           meetingLink: row.meeting_link || null,
           startsAtMs,
           endsAtMs,
@@ -93,6 +96,8 @@ export function buildTrayScheduleEvents(
 }
 
 export function TrayScheduleSync() {
+  const { i18n } = useLingui();
+  const translations = nativeMenuMessages();
   const timelineEventsTable = useTimelineEventsTable();
   const { isIgnored } = useIgnoredEvents();
   const timezone = useConfigValue("timezone") || undefined;
@@ -105,27 +110,46 @@ export function TrayScheduleSync() {
         isIgnored,
         Date.now(),
         timezone,
-        undefined,
+        i18n.locale,
         use24HourTime,
       ),
-    [currentDay, isIgnored, timelineEventsTable, timezone, use24HourTime],
+    [
+      currentDay,
+      isIgnored,
+      timelineEventsTable,
+      timezone,
+      use24HourTime,
+      i18n.locale,
+    ],
   );
 
-  return <TraySchedulePublisher key={JSON.stringify(events)} events={events} />;
+  return (
+    <TraySchedulePublisher
+      key={JSON.stringify([events, translations])}
+      events={events}
+      translations={translations}
+    />
+  );
 }
 
 function toTimezone(date: Date, timezone?: string): Date {
   return timezone ? new TZDate(date, timezone) : date;
 }
 
-function TraySchedulePublisher({ events }: { events: TrayScheduleEvent[] }) {
+function TraySchedulePublisher({
+  events,
+  translations,
+}: {
+  events: TrayScheduleEvent[];
+  translations: Record<string, string>;
+}) {
   useMountEffect(() => {
     if (getCurrentWebviewWindowLabel() !== "main") {
       return;
     }
 
     void trayCommands
-      .setTraySchedule(events)
+      .setTraySchedule(events, translations)
       .then((result) => {
         if (result.status === "error") {
           console.error("[tray] failed to publish schedule", result.error);

@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from "@anlg/ui/components/ui/select";
 import { toast } from "@anlg/ui/components/ui/toast";
-import { cn, formatDistanceToNow } from "@anlg/utils";
+import { cn } from "@anlg/utils";
 
 import { useAuth } from "~/auth";
 import { useConnections } from "~/auth/useConnections";
@@ -35,6 +35,7 @@ import {
   parseAutomationTargetRef,
 } from "~/automations/engine";
 import { env } from "~/env";
+import { formatDistanceToNow } from "~/i18n/format";
 import { listSlackChannels } from "~/session-sharing/delivery-client";
 import { setSettingValue, useStoredSettingValue } from "~/settings/queries";
 import { type SettingKey } from "~/settings/schema";

@@ -38,6 +38,7 @@ import {
 import { useAuth } from "~/auth";
 import { useIgnoredEvents } from "~/calendar/ignored-events";
 import { useTimelineTables } from "~/calendar/queries";
+import { SessionRenameProvider } from "~/session/components/rename-dialog";
 import { useDeleteSession } from "~/session/hooks/useDeleteSession";
 import { useActivatedSessionShareIds } from "~/shared-notes/cache";
 import { useConfigValue } from "~/shared/config";
@@ -483,137 +484,139 @@ export const TimelineView = memo(function TimelineView({
   const pendingDeleteCount = pendingDeleteSessionIds.length;
 
   return (
-    <ManagedSharedSessionIdsContext.Provider value={managedSharedSessionIds}>
-      <DestructiveConfirmationDialog
-        open={pendingDeleteCount > 0}
-        onOpenChange={(open) => {
-          if (!open) setPendingDeleteSessionIds([]);
-        }}
-        title={
-          pendingDeleteCount === 1
-            ? t`Delete 1 selected note?`
-            : t`Delete ${pendingDeleteCount} selected notes?`
-        }
-        description={t`You can undo this action for a short time.`}
-        confirmLabel={t`Delete`}
-        onConfirm={handleConfirmDeleteSelected}
-      />
-      <div
-        data-sidebar-timeline-root
-        className="relative h-full"
-        onWheelCapture={handleWheelCapture}
-      >
+    <SessionRenameProvider>
+      <ManagedSharedSessionIdsContext.Provider value={managedSharedSessionIds}>
+        <DestructiveConfirmationDialog
+          open={pendingDeleteCount > 0}
+          onOpenChange={(open) => {
+            if (!open) setPendingDeleteSessionIds([]);
+          }}
+          title={
+            pendingDeleteCount === 1
+              ? t`Delete 1 selected note?`
+              : t`Delete ${pendingDeleteCount} selected notes?`
+          }
+          description={t`You can undo this action for a short time.`}
+          confirmLabel={t`Delete`}
+          onConfirm={handleConfirmDeleteSelected}
+        />
         <div
-          ref={containerRef}
-          data-sidebar-timeline-scroll
-          onContextMenu={showContextMenu}
-          className={cn([
-            "scrollbar-hide flex h-full flex-col overflow-y-auto",
-            "rounded-xl",
-          ])}
+          data-sidebar-timeline-root
+          className="relative h-full"
+          onWheelCapture={handleWheelCapture}
         >
-          {(topChromeInset || hasMoreFutureItems) && (
-            <div
-              aria-hidden
-              data-sidebar-timeline-top-spacer
-              className={cn([topSpacerClassName, "shrink-0"])}
-            />
-          )}
-          <TimelineBuckets
-            bucketHeaderTopClassName={bucketHeaderTopClassName}
-            buckets={buckets}
-            emptyTodayLabel={<Trans>No items today</Trans>}
-            getFlatItemKeys={getFlatItemKeys}
-            hasActiveVisibleSession={hasActiveVisibleSession}
-            hasToday={hasToday}
-            indicatorIndex={indicatorIndex}
-            registerIndicator={setCurrentTimeIndicatorRef}
-            selectedIds={selectedIds}
-            selectedNodeRef={scrollSelectedSessionIntoView}
-            selectedSessionId={selectedSessionId}
-            showCurrentTimeIndicator={isDateTimeline}
-            sortOrder={sortOrder}
-            timezone={timezone}
-            upcomingMeetingStatus={
-              isDateTimeline ? upcomingMeetingStatus : null
-            }
-            upcomingNodeRef={setUpcomingMeetingNodeRef}
-          />
-        </div>
-
-        {!isScrolledToBottom && (
           <div
-            aria-hidden
-            data-sidebar-timeline-bottom-fade
-            className="from-background/0 to-background pointer-events-none absolute inset-x-0 bottom-0 z-30 h-7 bg-linear-to-b"
-          />
-        )}
-
-        {topChromeInset && (
-          <div
-            aria-hidden
-            data-sidebar-timeline-top-occluder
-            className="bg-background pointer-events-none absolute inset-x-0 top-0 z-10 h-12"
-          />
-        )}
-
-        {(showOpenCalendarChip ||
-          showUpcomingMeetingChip ||
-          showTopNowChip) && (
-          <div
-            data-sidebar-timeline-top-chip-stack
+            ref={containerRef}
+            data-sidebar-timeline-scroll
+            onContextMenu={showContextMenu}
             className={cn([
-              "absolute left-1/2 z-20 flex -translate-x-1/2 transform flex-col items-center gap-2",
-              topChipStackTopClassName,
+              "scrollbar-hide flex h-full flex-col overflow-y-auto",
+              "rounded-xl",
             ])}
           >
-            {showOpenCalendarChip && (
-              <TimelineTopChip
-                ariaLabel={t`Open calendar`}
-                icon={<CalendarDots size={12} />}
-                onClick={handleOpenCalendar}
-              >
-                <Trans>Open calendar</Trans>
-              </TimelineTopChip>
-            )}
-            {upcomingMeetingStatus && showUpcomingMeetingChip && (
-              <UpcomingMeetingChip
-                ariaLabel={`${
-                  upcomingMeetingStatus.title || t`Meeting`
-                } ${upcomingMeetingStatus.label.toLowerCase()}`}
-                label={upcomingMeetingStatus.label}
-                onClick={scrollToUpcomingMeeting}
+            {(topChromeInset || hasMoreFutureItems) && (
+              <div
+                aria-hidden
+                data-sidebar-timeline-top-spacer
+                className={cn([topSpacerClassName, "shrink-0"])}
               />
             )}
-            {showTopNowChip && (
+            <TimelineBuckets
+              bucketHeaderTopClassName={bucketHeaderTopClassName}
+              buckets={buckets}
+              emptyTodayLabel={<Trans>No items today</Trans>}
+              getFlatItemKeys={getFlatItemKeys}
+              hasActiveVisibleSession={hasActiveVisibleSession}
+              hasToday={hasToday}
+              indicatorIndex={indicatorIndex}
+              registerIndicator={setCurrentTimeIndicatorRef}
+              selectedIds={selectedIds}
+              selectedNodeRef={scrollSelectedSessionIntoView}
+              selectedSessionId={selectedSessionId}
+              showCurrentTimeIndicator={isDateTimeline}
+              sortOrder={sortOrder}
+              timezone={timezone}
+              upcomingMeetingStatus={
+                isDateTimeline ? upcomingMeetingStatus : null
+              }
+              upcomingNodeRef={setUpcomingMeetingNodeRef}
+            />
+          </div>
+
+          {!isScrolledToBottom && (
+            <div
+              aria-hidden
+              data-sidebar-timeline-bottom-fade
+              className="from-background/0 to-background pointer-events-none absolute inset-x-0 bottom-0 z-30 h-7 bg-linear-to-b"
+            />
+          )}
+
+          {topChromeInset && (
+            <div
+              aria-hidden
+              data-sidebar-timeline-top-occluder
+              className="bg-background pointer-events-none absolute inset-x-0 top-0 z-10 h-12"
+            />
+          )}
+
+          {(showOpenCalendarChip ||
+            showUpcomingMeetingChip ||
+            showTopNowChip) && (
+            <div
+              data-sidebar-timeline-top-chip-stack
+              className={cn([
+                "absolute left-1/2 z-20 flex -translate-x-1/2 transform flex-col items-center gap-2",
+                topChipStackTopClassName,
+              ])}
+            >
+              {showOpenCalendarChip && (
+                <TimelineTopChip
+                  ariaLabel={t`Open calendar`}
+                  icon={<CalendarDots size={12} />}
+                  onClick={handleOpenCalendar}
+                >
+                  <Trans>Open calendar</Trans>
+                </TimelineTopChip>
+              )}
+              {upcomingMeetingStatus && showUpcomingMeetingChip && (
+                <UpcomingMeetingChip
+                  ariaLabel={`${
+                    upcomingMeetingStatus.title || t`Meeting`
+                  } ${upcomingMeetingStatus.label.toLowerCase()}`}
+                  label={upcomingMeetingStatus.label}
+                  onClick={scrollToUpcomingMeeting}
+                />
+              )}
+              {showTopNowChip && (
+                <TimelineNowChip
+                  ariaLabel={t`Go back to now`}
+                  direction="up"
+                  onClick={scrollToToday}
+                >
+                  <Trans>Now</Trans>
+                </TimelineNowChip>
+              )}
+            </div>
+          )}
+
+          {isDateTimeline &&
+            !showUpcomingMeetingChip &&
+            !isTodayVisible &&
+            !isScrolledPastToday && (
               <TimelineNowChip
                 ariaLabel={t`Go back to now`}
-                direction="up"
                 onClick={scrollToToday}
+                direction="down"
+                className={cn([
+                  "absolute bottom-2 left-1/2 -translate-x-1/2 transform",
+                  "z-40",
+                ])}
               >
                 <Trans>Now</Trans>
               </TimelineNowChip>
             )}
-          </div>
-        )}
-
-        {isDateTimeline &&
-          !showUpcomingMeetingChip &&
-          !isTodayVisible &&
-          !isScrolledPastToday && (
-            <TimelineNowChip
-              ariaLabel={t`Go back to now`}
-              onClick={scrollToToday}
-              direction="down"
-              className={cn([
-                "absolute bottom-2 left-1/2 -translate-x-1/2 transform",
-                "z-40",
-              ])}
-            >
-              <Trans>Now</Trans>
-            </TimelineNowChip>
-          )}
-      </div>
-    </ManagedSharedSessionIdsContext.Provider>
+        </div>
+      </ManagedSharedSessionIdsContext.Provider>
+    </SessionRenameProvider>
   );
 });

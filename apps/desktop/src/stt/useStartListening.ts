@@ -1,3 +1,4 @@
+import { t as translate } from "@lingui/core/macro";
 import { useCallback } from "react";
 
 import { commands as analyticsCommands } from "@anlg/plugin-analytics";
@@ -275,18 +276,17 @@ export function useStartListeningState(
         duration: Infinity,
         description: `Live transcription won't include ${omittedLanguageNames}. Audio is still being saved.`,
         action: {
-          label: "Change",
+          label: translate`Change`,
           onClick: openTranscriptionSettings,
         },
       });
     } else if (!conn) {
-      toast.warning("Live transcription is not configured", {
+      toast.warning(translate`Live transcription is not configured`, {
         id: "recording-without-transcription",
         duration: Infinity,
-        description:
-          "Audio is being saved. Choose a transcription provider to ensure this recording can be transcribed.",
+        description: translate`Audio is being saved. Choose a transcription provider to ensure this recording can be transcribed.`,
         action: {
-          label: "Configure",
+          label: translate`Configure`,
           onClick: openTranscriptionSettings,
         },
       });
@@ -305,7 +305,7 @@ export function useStartListeningState(
       excludedTexts: [MEETING_DISCLOSURE_MESSAGE],
       onParticipantDeclined: () => {
         toast.warning(
-          "A participant declined recording. Anarlog stopped listening.",
+          translate`A participant declined recording. Anarlog stopped listening.`,
           { id: "meeting-consent-declined", duration: Infinity },
         );
         stop();

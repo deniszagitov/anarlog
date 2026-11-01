@@ -1,4 +1,5 @@
-import { Trans } from "@lingui/react/macro";
+import { t } from "@lingui/core/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { platform } from "@tauri-apps/plugin-os";
 import { motion } from "motion/react";
 import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
@@ -130,6 +131,7 @@ function GoogleCalendarConnectedContent({
 }: {
   providerConnections: ConnectionItem[];
 }) {
+  const { i18n } = useLingui();
   const auth = useAuth();
   const { scheduleSync } = useSync();
   const {
@@ -155,7 +157,13 @@ function GoogleCalendarConnectedContent({
         provider: GOOGLE_PROVIDER!,
         getHeaders: auth.getHeaders,
       }),
-    [auth.getHeaders, connectionSourceMap, groups, providerConnections],
+    [
+      auth.getHeaders,
+      connectionSourceMap,
+      groups,
+      providerConnections,
+      i18n.locale,
+    ],
   );
 
   useMountEffect(() => {
@@ -170,8 +178,10 @@ function GoogleCalendarConnectedContent({
             <ReconnectRequiredIndicator />
           </span>
           <p>
-            Some Google Calendar accounts need attention. Open the account menu
-            to reconnect or disconnect them.
+            <Trans>
+              Some Google Calendar accounts need attention. Open the account
+              menu to reconnect or disconnect them.
+            </Trans>
           </p>
         </div>
       )}
@@ -216,7 +226,7 @@ function addIntegrationMenus({
       menuItems: [
         {
           id: `reconnect-${connection.connection_id}`,
-          text: "Reconnect",
+          text: t`Reconnect`,
           action: () =>
             void openOnboardingIntegrationUrl(
               provider.nangoIntegrationId,
@@ -227,7 +237,7 @@ function addIntegrationMenus({
         },
         {
           id: `disconnect-${connection.connection_id}`,
-          text: "Disconnect",
+          text: t`Disconnect`,
           action: () =>
             void openOnboardingIntegrationUrl(
               provider.nangoIntegrationId,
@@ -246,6 +256,7 @@ function OutlookCalendarConnectedContent({
 }: {
   providerConnections: ConnectionItem[];
 }) {
+  const { i18n } = useLingui();
   const auth = useAuth();
   const { scheduleSync } = useSync();
   const {
@@ -271,7 +282,13 @@ function OutlookCalendarConnectedContent({
         provider: OUTLOOK_PROVIDER!,
         getHeaders: auth.getHeaders,
       }),
-    [auth.getHeaders, connectionSourceMap, groups, providerConnections],
+    [
+      auth.getHeaders,
+      connectionSourceMap,
+      groups,
+      providerConnections,
+      i18n.locale,
+    ],
   );
 
   useMountEffect(() => {
@@ -286,8 +303,10 @@ function OutlookCalendarConnectedContent({
             <ReconnectRequiredIndicator />
           </span>
           <p>
-            Some Outlook accounts need attention. Open the account menu to
-            reconnect or disconnect them.
+            <Trans>
+              Some Outlook accounts need attention. Open the account menu to
+              reconnect or disconnect them.
+            </Trans>
           </p>
         </div>
       )}

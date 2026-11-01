@@ -213,6 +213,8 @@ pub struct Notification {
     pub options: Option<Vec<String>>,
     pub footer: Option<NotificationFooter>,
     pub icon: Option<NotificationIcon>,
+    #[serde(default)]
+    pub ui_labels: Option<std::collections::HashMap<String, String>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -303,7 +305,7 @@ impl Notification {
 
     pub fn shows_stop_countdown(&self) -> bool {
         self.is_destructive_action()
-            && self.action_label.as_deref() == Some("Stop")
+            && self.action_label.as_deref() == Some(self.ui_label("Stop"))
             && self.timeout.is_some_and(|timeout| !timeout.is_zero())
     }
 
@@ -329,11 +331,23 @@ impl Notification {
     }
 
     pub fn default_action_label(&self) -> &str {
-        self.action_label.as_deref().unwrap_or("Open Anarlog")
+        self.action_label
+            .as_deref()
+            .unwrap_or_else(|| self.ui_label("Open Anarlog"))
     }
 
     pub fn expanded_action_label(&self) -> &str {
-        self.action_label.as_deref().unwrap_or("Accept")
+        self.action_label
+            .as_deref()
+            .unwrap_or_else(|| self.ui_label("Accept"))
+    }
+
+    fn ui_label<'a>(&'a self, source: &'a str) -> &'a str {
+        self.ui_labels
+            .as_ref()
+            .and_then(|labels| labels.get(source))
+            .map(String::as_str)
+            .unwrap_or(source)
     }
 
     pub fn primary_action(&self) -> PrimaryAction<'_> {
@@ -581,6 +595,7 @@ impl NotificationBuilder {
             options: self.options,
             footer: self.footer,
             icon,
+            ui_labels: None,
         }
     }
 }
@@ -785,6 +800,22 @@ mod tests {
             expanded_schedule_text(Duration::from_secs(75)),
             "Begins in 1:15"
         );
+    }
+
+    #[test]
+    fn localized_stop_action_keeps_its_countdown() {
+        let mut notification = Notification::builder()
+            .title("Meeting ended?")
+            .message("Stopping soon")
+            .action_label("Остановить")
+            .action_variant(NotificationActionVariant::Destructive)
+            .timeout(Duration::from_secs(30))
+            .build();
+        notification.ui_labels = Some(std::collections::HashMap::from([(
+            "Stop".to_owned(),
+            "Остановить".to_owned(),
+        )]));
+        assert!(notification.shows_stop_countdown());
     }
 
     #[test]

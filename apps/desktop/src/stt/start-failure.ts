@@ -1,3 +1,4 @@
+import { t as translate } from "@lingui/core/macro";
 import { platform } from "@tauri-apps/plugin-os";
 
 import {
@@ -53,28 +54,25 @@ export function describeStartFailure(kind: StartFailureKind): {
   switch (kind) {
     case "already_running":
       return {
-        title: "Another recording is still running",
-        description:
-          "Stop the current recording, or wait for it to finish saving, then try again.",
+        title: translate`Another recording is still running`,
+        description: translate`Stop the current recording, or wait for it to finish saving, then try again.`,
       };
     case "storage":
       return {
-        title: "Anarlog couldn't prepare storage for this recording",
-        description:
-          "Check that your vault folder is available and your disk has free space, then try again.",
+        title: translate`Anarlog couldn't prepare storage for this recording`,
+        description: translate`Check that your vault folder is available and your disk has free space, then try again.`,
       };
     case "microphone_permission":
       return {
-        title: "Anarlog doesn't have microphone access",
-        description: "Allow microphone access for Anarlog, then try again.",
-        action: { label: "Open permissions", tab: "permissions" },
+        title: translate`Anarlog doesn't have microphone access`,
+        description: translate`Allow microphone access for Anarlog, then try again.`,
+        action: { label: translate`Open permissions`, tab: "permissions" },
       };
     case "recorder":
       return {
-        title: "Recording couldn't start",
-        description:
-          "Anarlog couldn't open your audio input. Check your microphone selection, then try again.",
-        action: { label: "Audio settings", tab: "meetings" },
+        title: translate`Recording couldn't start`,
+        description: translate`Anarlog couldn't open your audio input. Check your microphone selection, then try again.`,
+        action: { label: translate`Audio settings`, tab: "meetings" },
       };
   }
 }

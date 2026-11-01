@@ -1,3 +1,4 @@
+import { t as translateMessage } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -9,13 +10,6 @@ import {
   UserPlus,
 } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
-import {
-  Dialog,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
 import { Input } from "@anlg/ui/components/ui/input";
 import {
   Select,
@@ -42,6 +36,13 @@ import { sharedResourcesQueryKey, useSharedResources } from "./hooks";
 import { useOptionalAuth } from "~/auth";
 import { useBillingAccess } from "~/auth/billing-context";
 import { useAvailableShareWorkspaces } from "~/session-sharing/source";
+import {
+  Dialog,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/shared/ui/dialog";
 import {
   GlassDialogCancelButton,
   GlassDialogContent,
@@ -489,7 +490,7 @@ function AccessRow({
 function requireOwnedShare(
   resource: SharedResource | undefined,
 ): SharedResource {
-  if (!resource) throw new Error("This item is not shared");
+  if (!resource) throw new Error(translateMessage`This item is not shared`);
   return resource;
 }
 

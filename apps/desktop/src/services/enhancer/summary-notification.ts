@@ -1,7 +1,6 @@
 import { t } from "@lingui/core/macro";
 
-import { commands as notificationCommands } from "@anlg/plugin-notification";
-
+import { showLocalizedNotification } from "~/services/notification";
 import { shouldShowNotification } from "~/shared/notification-policy";
 import { isAppWindowInactive } from "~/shared/window-activity";
 
@@ -27,7 +26,7 @@ export async function showSummaryReadyNotification(
   const title = sessionTitle?.trim();
 
   try {
-    const result = await notificationCommands.showNotification({
+    const result = await showLocalizedNotification({
       key: createSummaryReadyNotificationKey(sessionId),
       title: t`Summary ready`,
       message: title

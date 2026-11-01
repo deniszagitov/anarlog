@@ -315,7 +315,9 @@ export function ModelCombobox({
                     ])}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    <span className="truncate">Select "{trimmedQuery}"</span>
+                    <span className="truncate">
+                      <Trans>Select "{trimmedQuery}"</Trans>
+                    </span>
                   </CommandItem>
                 )}
               </CommandGroup>
@@ -337,8 +339,8 @@ export function ModelCombobox({
               {hasIgnoredOptions && (
                 <span>
                   {showIgnored
-                    ? `Showing total of ${options.length} models.`
-                    : `${ignoredOptions.length} items ignored.`}
+                    ? t`Showing total of ${options.length} models.`
+                    : t`${ignoredOptions.length} items ignored.`}
                 </span>
               )}
 

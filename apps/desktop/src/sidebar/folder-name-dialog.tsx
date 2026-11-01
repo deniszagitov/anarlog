@@ -2,16 +2,16 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 
 import { Button } from "@anlg/ui/components/ui/button";
+import { Input } from "@anlg/ui/components/ui/input";
+
+import { normalizeFolderPath } from "~/session/folders";
 import {
   Dialog,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
-import { Input } from "@anlg/ui/components/ui/input";
-
-import { normalizeFolderPath } from "~/session/folders";
+} from "~/shared/ui/dialog";
 import {
   GlassDialogCancelButton,
   GlassDialogContent,

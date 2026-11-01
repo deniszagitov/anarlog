@@ -6,13 +6,13 @@ import { Check, Pencil, X } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
 import { Input } from "@anlg/ui/components/ui/input";
 import { toast } from "@anlg/ui/components/ui/toast";
-import { format, safeFormat, safeParseDate } from "@anlg/utils";
+import { format, safeParseDate } from "@anlg/utils";
 
 import { useSession, useUpdateSession } from "~/session/queries";
 import { useTimeFormat } from "~/shared/hooks/useTimeFormat";
 
 export function DateEditor({ sessionId }: { sessionId: string }) {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const timeFormat = useTimeFormat();
   const [isEditing, setIsEditing] = useState(false);
   // Shown between closing the editor and the live query re-emitting, so the
@@ -25,11 +25,14 @@ export function DateEditor({ sessionId }: { sessionId: string }) {
     pendingCreatedAt !== null && createdAt !== pendingCreatedAt
       ? pendingCreatedAt
       : createdAt;
-  const noteDate = safeFormat(
-    effectiveCreatedAt ?? new Date(),
-    `MMM d, yyyy ${timeFormat}`,
-    t`Unknown date`,
-  );
+  const parsedDate = safeParseDate(effectiveCreatedAt ?? new Date());
+  const noteDate = parsedDate
+    ? i18n.date(parsedDate, {
+        dateStyle: "medium",
+        timeStyle: "short",
+        hour12: timeFormat !== "HH:mm",
+      })
+    : t`Unknown date`;
 
   if (!isEditing) {
     return (

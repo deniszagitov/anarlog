@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+
 import type { FloatingDictationState } from "@anlg/plugin-windows";
 
 import {
@@ -156,7 +158,7 @@ export function getFloatingTranscriptBubbles(
         id: segment.id,
         speakerLabel: resolved
           ? isSelf
-            ? "You"
+            ? t`You`
             : resolved.label
           : getFloatingSpeakerLabel(segment.key, speakerLabelContext),
         text,
@@ -191,7 +193,7 @@ function getFloatingSpeakerLabel(
   ctx?: RenderLabelContext,
 ) {
   if (isFloatingSelfSpeaker(key)) {
-    return "You";
+    return t`You`;
   }
 
   if (ctx) {
@@ -199,14 +201,14 @@ function getFloatingSpeakerLabel(
   }
 
   if (key.speaker_index != null) {
-    return `Speaker ${key.speaker_index + 1}`;
+    return t`Speaker ${key.speaker_index + 1}`;
   }
 
   if (key.channel === "RemoteParty") {
-    return "Speaker";
+    return t`Speaker`;
   }
 
-  return "Audio";
+  return t`Audio`;
 }
 
 function isFloatingSelfSpeaker(

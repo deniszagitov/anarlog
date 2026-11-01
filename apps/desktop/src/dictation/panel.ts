@@ -1,3 +1,5 @@
+import { t as translate } from "@lingui/core/macro";
+
 import { useDictationStatus } from "./state";
 
 import type { FloatingRouteState } from "~/meeting-float/route-state";
@@ -40,7 +42,7 @@ export function getDictationPanelState(): FloatingRouteState | null {
   if (state.phase === "idle" || !state.owner) return null;
   return {
     sessionId: state.owner,
-    title: "Dictation",
+    title: translate`Dictation`,
     amplitude: state.phase === "recording" ? state.amplitude : 0,
     status: "recording",
     colorScheme: "dark",

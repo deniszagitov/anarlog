@@ -1,3 +1,6 @@
+import type { MessageDescriptor } from "@lingui/core";
+import { t as translateMessage } from "@lingui/core/macro";
+import { msg, t } from "@lingui/core/macro";
 import { useCallback, useState } from "react";
 
 import { commands as notificationCommands } from "@anlg/plugin-notification";
@@ -10,6 +13,7 @@ import { useBillingAccess } from "~/auth/billing-context";
 import { TrialEndedDialog } from "~/billing/trial-ended-dialog";
 import { TrialStartedDialog } from "~/billing/trial-started-dialog";
 import { executeTransaction } from "~/db";
+import { showLocalizedNotification } from "~/services/notification";
 import { createSession, updateSession } from "~/session/queries";
 import { useOwnerUserId } from "~/shared/owner-user";
 import {
@@ -51,221 +55,206 @@ export type DevtoolsAction =
   | "error:trigger";
 
 type DevtoolsMenuItem = {
-  label: string;
-  description: string;
+  label: MessageDescriptor;
+  description: MessageDescriptor;
   action: DevtoolsAction;
   destructive?: boolean;
 };
 
 export type DevtoolsMenuGroup = {
-  label: string;
-  description: string;
+  label: MessageDescriptor;
+  description: MessageDescriptor;
   items: DevtoolsMenuItem[];
 };
 
 export const DEVTOOLS_MENU: DevtoolsMenuGroup[] = [
   {
-    label: "Navigation",
-    description: "Reopen flows that are normally only reachable once.",
+    label: msg`Navigation`,
+    description: msg`Reopen flows that are normally only reachable once.`,
     items: [
       {
-        label: "Onboarding",
-        description: "Open the onboarding tab as a first-time user sees it.",
+        label: msg`Onboarding`,
+        description: msg`Open the onboarding tab as a first-time user sees it.`,
         action: "navigation:onboarding",
       },
       {
-        label: "Instruction: sign-in",
-        description:
-          "Show the continue-in-browser instruction screen used for signing in.",
+        label: msg`Instruction: sign-in`,
+        description: msg`Show the continue-in-browser instruction screen used for signing in.`,
         action: "instruction:sign-in",
       },
       {
-        label: "Instruction: billing",
-        description:
-          "Show the continue-in-browser instruction screen used for billing.",
+        label: msg`Instruction: billing`,
+        description: msg`Show the continue-in-browser instruction screen used for billing.`,
         action: "instruction:billing",
       },
       {
-        label: "Instruction: integration",
-        description:
-          "Show the continue-in-browser instruction screen used for integrations.",
+        label: msg`Instruction: integration`,
+        description: msg`Show the continue-in-browser instruction screen used for integrations.`,
         action: "instruction:integration",
       },
     ],
   },
   {
-    label: "Toasts",
-    description:
-      "Preview each sidebar toast without meeting its real trigger condition.",
+    label: msg`Toasts`,
+    description: msg`Preview each sidebar toast without meeting its real trigger condition.`,
     items: [
       {
-        label: "Language model",
-        description: "Preview the toast asking for a language model provider.",
+        label: msg`Language model`,
+        description: msg`Preview the toast asking for a language model provider.`,
         action: "toasts:preview:language-model",
       },
       {
-        label: "Transcription model",
-        description:
-          "Preview the toast asking for a transcription provider or model.",
+        label: msg`Transcription model`,
+        description: msg`Preview the toast asking for a transcription provider or model.`,
         action: "toasts:preview:transcription-model",
       },
       {
-        label: "Transcription error",
-        description: "Preview the toast shown when transcription fails.",
+        label: msg`Transcription error`,
+        description: msg`Preview the toast shown when transcription fails.`,
         action: "toasts:preview:transcription-error",
       },
       {
-        label: "Download",
-        description: "Preview the model download progress toast.",
+        label: msg`Download`,
+        description: msg`Preview the model download progress toast.`,
         action: "toasts:preview:download",
       },
       {
-        label: "Pro",
-        description: "Preview the Pro upsell toast.",
+        label: msg`Pro`,
+        description: msg`Preview the Pro upsell toast.`,
         action: "toasts:preview:pro",
       },
       {
-        label: "Clear all toasts",
-        description: "Dismiss every previewed toast.",
+        label: msg`Clear all toasts`,
+        description: msg`Dismiss every previewed toast.`,
         action: "toasts:clear",
         destructive: true,
       },
     ],
   },
   {
-    label: "OTA",
-    description: "Simulate updater states without publishing a release.",
+    label: msg`OTA`,
+    description: msg`Simulate updater states without publishing a release.`,
     items: [
       {
-        label: "Available",
-        description:
-          "Show the banner for a new version that can be downloaded.",
+        label: msg`Available`,
+        description: msg`Show the banner for a new version that can be downloaded.`,
         action: "ota:available",
       },
       {
-        label: "Downloading",
-        description: "Show the banner with download progress.",
+        label: msg`Downloading`,
+        description: msg`Show the banner with download progress.`,
         action: "ota:downloading",
       },
       {
-        label: "Ready",
-        description: "Show the banner asking to restart and install.",
+        label: msg`Ready`,
+        description: msg`Show the banner asking to restart and install.`,
         action: "ota:ready",
       },
       {
-        label: "Failed",
-        description: "Show the banner for a failed update.",
+        label: msg`Failed`,
+        description: msg`Show the banner for a failed update.`,
         action: "ota:failed",
       },
       {
-        label: "Clear",
-        description: "Remove the simulated update state.",
+        label: msg`Clear`,
+        description: msg`Remove the simulated update state.`,
         action: "ota:clear",
         destructive: true,
       },
     ],
   },
   {
-    label: "Notifications",
-    description: "Fire each native notification with sample data.",
+    label: msg`Notifications`,
+    description: msg`Fire each native notification with sample data.`,
     items: [
       {
-        label: "Calendar",
-        description:
-          "Insert a sample event starting in 5 minutes and show its reminder.",
+        label: msg`Calendar`,
+        description: msg`Insert a sample event starting in 5 minutes and show its reminder.`,
         action: "notifications:calendar",
       },
       {
-        label: "Mic detected",
-        description:
-          'Show the "Are you in a meeting?" notification for a detected app.',
+        label: msg`Mic detected`,
+        description: msg`Show the "Are you in a meeting?" notification for a detected app.`,
         action: "notifications:mic-detected",
       },
       {
-        label: "Mic options",
-        description:
-          "Show the meeting-detected notification with the ignore-these-apps footer.",
+        label: msg`Mic options`,
+        description: msg`Show the meeting-detected notification with the ignore-these-apps footer.`,
         action: "notifications:mic-options",
       },
       {
-        label: "Auto-stop",
-        description:
-          'Show the "Did your meeting end?" countdown for the live session.',
+        label: msg`Auto-stop`,
+        description: msg`Show the "Did your meeting end?" countdown for the live session.`,
         action: "notifications:auto-stop",
       },
       {
-        label: "Clear",
-        description: "Dismiss all native notifications.",
+        label: msg`Clear`,
+        description: msg`Dismiss all native notifications.`,
         action: "notifications:clear",
         destructive: true,
       },
     ],
   },
   {
-    label: "Billing",
-    description: "Open the billing dialogs users see around a trial.",
+    label: msg`Billing`,
+    description: msg`Open the billing dialogs users see around a trial.`,
     items: [
       {
-        label: "Trial started",
-        description: 'Open the "Your Pro trial just started" dialog.',
+        label: msg`Trial started`,
+        description: msg`Open the "Your Pro trial just started" dialog.`,
         action: "billing:trial-started",
       },
       {
-        label: "Trial ended",
-        description: "Open the dialog shown when a trial ends without payment.",
+        label: msg`Trial ended`,
+        description: msg`Open the dialog shown when a trial ends without payment.`,
         action: "billing:trial-ended",
       },
     ],
   },
   {
-    label: "Countdown",
-    description:
-      "Create a note for a meeting that starts soon, to exercise pre-meeting flows.",
+    label: msg`Countdown`,
+    description: msg`Create a note for a meeting that starts soon, to exercise pre-meeting flows.`,
     items: [
       {
-        label: "Note 1m",
-        description: "Create a note whose meeting starts in 1 minute.",
+        label: msg`Note 1m`,
+        description: msg`Create a note whose meeting starts in 1 minute.`,
         action: "countdown:note-60",
       },
       {
-        label: "Note 5m",
-        description: "Create a note whose meeting starts in 5 minutes.",
+        label: msg`Note 5m`,
+        description: msg`Create a note whose meeting starts in 5 minutes.`,
         action: "countdown:note-300",
       },
       {
-        label: "Zoom 1m",
-        description:
-          "Create a note with a Zoom link whose meeting starts in 1 minute.",
+        label: msg`Zoom 1m`,
+        description: msg`Create a note with a Zoom link whose meeting starts in 1 minute.`,
         action: "countdown:zoom-60",
       },
       {
-        label: "Zoom 5m",
-        description:
-          "Create a note with a Zoom link whose meeting starts in 5 minutes.",
+        label: msg`Zoom 5m`,
+        description: msg`Create a note with a Zoom link whose meeting starts in 5 minutes.`,
         action: "countdown:zoom-300",
       },
     ],
   },
   {
-    label: "Data",
-    description: "Seed sample data into the local database.",
+    label: msg`Data`,
+    description: msg`Seed sample data into the local database.`,
     items: [
       {
-        label: "Seed recurring meeting notes",
-        description:
-          "Create a recurring series with three past notes and key facts to exercise the Insights tab. Needs a CloudSync workspace.",
+        label: msg`Seed recurring meeting notes`,
+        description: msg`Create a recurring series with three past notes and key facts to exercise the Insights tab. Needs a CloudSync workspace.`,
         action: "data:recurring-notes",
       },
     ],
   },
   {
-    label: "Error",
-    description: "Break the UI on purpose to check error handling.",
+    label: msg`Error`,
+    description: msg`Break the UI on purpose to check error handling.`,
     items: [
       {
-        label: "Trigger error",
-        description:
-          "Throw from the bar to show the error screen. Reload to recover.",
+        label: msg`Trigger error`,
+        description: msg`Throw from the bar to show the error screen. Reload to recover.`,
         action: "error:trigger",
         destructive: true,
       },
@@ -349,7 +338,7 @@ export function useDevtoolsActions() {
       },
     ]);
 
-    await notificationCommands.showNotification({
+    await showLocalizedNotification({
       key: `devtool-calendar-${eventId}`,
       title: "Devtool design sync",
       message: "Starting in 5 minutes",
@@ -368,7 +357,7 @@ export function useDevtoolsActions() {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         location: "Conference Room",
       },
-      action_label: "Open Anarlog",
+      action_label: t`Open Anarlog`,
       action: null,
       action_menu: null,
       action_variant: null,
@@ -379,7 +368,7 @@ export function useDevtoolsActions() {
   }, []);
 
   const showMicDetectedNotification = useCallback(async () => {
-    await notificationCommands.showNotification({
+    await showLocalizedNotification({
       key: `devtool-mic-${crypto.randomUUID()}`,
       title: "Are you in a meeting?",
       message: "",
@@ -404,7 +393,7 @@ export function useDevtoolsActions() {
   }, []);
 
   const showMicOptionsNotification = useCallback(async () => {
-    await notificationCommands.showNotification({
+    await showLocalizedNotification({
       key: `devtool-mic-options-${crypto.randomUUID()}`,
       title: "Are you in Design sync right now?",
       message: "",
@@ -418,14 +407,14 @@ export function useDevtoolsActions() {
       start_time: null,
       participants: null,
       event_details: null,
-      action_label: "Yes",
+      action_label: t`Yes`,
       action: null,
       action_menu: null,
       action_variant: null,
       options: null,
       footer: {
         text: "Ignore Zoom and Chrome?",
-        actionLabel: "Yes",
+        actionLabel: "Ignore them",
         icon: { type: "bundle_id", bundle_id: "us.zoom.xos" },
       },
       icon: null,
@@ -437,7 +426,7 @@ export function useDevtoolsActions() {
       listenerStore.getState().live.sessionId ??
       `devtool-${crypto.randomUUID()}`;
 
-    await notificationCommands.showNotification({
+    await showLocalizedNotification({
       key: createAutoStopEndedNotificationKey(sessionId),
       title: "Did your meeting end?",
       message: `Anarlog will stop listening in ${AUTO_STOP_CONFIRM_TIMEOUT_SECONDS} seconds.`,
@@ -446,7 +435,7 @@ export function useDevtoolsActions() {
       start_time: null,
       participants: null,
       event_details: null,
-      action_label: "Stop",
+      action_label: t`Stop`,
       action: null,
       action_menu: null,
       action_variant: "destructive",
@@ -496,7 +485,9 @@ export function useDevtoolsActions() {
       openNew({ type: "sessions", id: sessionId });
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to seed notes",
+        error instanceof Error
+          ? error.message
+          : translateMessage`Failed to seed notes`,
       );
     }
   }, [openNew, userId]);

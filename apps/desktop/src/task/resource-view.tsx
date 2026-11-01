@@ -21,7 +21,7 @@ import { type TaskResource } from "~/store/zustand/tabs";
 const rehypePlugins = [defaultRehypePlugins.raw, defaultRehypePlugins.sanitize];
 
 export function ResourceView({ resource }: { resource: TaskResource }) {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const {
     data: issue,
     isLoading,
@@ -114,7 +114,7 @@ export function ResourceView({ resource }: { resource: TaskResource }) {
               <StateBadge isPR={isPR} isMerged={isMerged} isClosed={isClosed} />
               <span>
                 <Trans>{issue.user?.login} opened on</Trans>{" "}
-                {new Date(issue.created_at).toLocaleDateString(undefined, {
+                {new Date(issue.created_at).toLocaleDateString(i18n.locale, {
                   month: "short",
                   day: "numeric",
                   year: "numeric",

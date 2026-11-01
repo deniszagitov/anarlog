@@ -3,17 +3,17 @@ import { arch, platform } from "@tauri-apps/plugin-os";
 import { useEffect } from "react";
 
 import { Button } from "@anlg/ui/components/ui/button";
+
+import { TrialDialogIcon } from "./trial-dialog-icon";
+
+import { trackAnalyticsEvent } from "~/analytics";
 import {
   Dialog,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
-
-import { TrialDialogIcon } from "./trial-dialog-icon";
-
-import { trackAnalyticsEvent } from "~/analytics";
+} from "~/shared/ui/dialog";
 import {
   GlassDialogCancelButton,
   GlassDialogContent,

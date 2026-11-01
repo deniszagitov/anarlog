@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useState, type ReactNode } from "react";
 
@@ -70,7 +71,7 @@ export function SessionShareDraftContent({
       ? ownerMetadata.full_name
       : typeof ownerMetadata?.name === "string" && ownerMetadata.name
         ? ownerMetadata.name
-        : ownerEmail || "You";
+        : ownerEmail || t`You`;
   const invite = useShareInvite({ sessionId, ownerEmail, invitedEmails: [] });
   const actionPending = pendingAction !== null;
   const allowedScopes = useWorkspaceShareScopes(workspaces);
@@ -141,7 +142,9 @@ export function SessionShareDraftContent({
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-xs font-medium">
                           {ownerName}{" "}
-                          <span className="text-muted-foreground">(You)</span>
+                          <span className="text-muted-foreground">
+                            <Trans>(You)</Trans>
+                          </span>
                         </p>
                         {ownerEmail ? (
                           <p className="text-muted-foreground truncate text-[10px]">

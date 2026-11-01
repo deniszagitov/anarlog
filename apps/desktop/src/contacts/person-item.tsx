@@ -1,3 +1,4 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
 import React, { useCallback } from "react";
 
 import { PushPin } from "@anlg/ui/components/icons";
@@ -21,6 +22,8 @@ export function PersonItem({
   onClick: () => void;
   onDelete?: (id: string) => void;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const isPinned = readOnly || Boolean(person.pinned);
   const personName = person.name;
   const personEmail = person.email;
@@ -35,12 +38,12 @@ export function PersonItem({
   const showContextMenu = useNativeContextMenu([
     {
       id: "toggle-pin-person",
-      text: isPinned ? "Unpin Contact" : "Pin Contact",
+      text: isPinned ? translate`Unpin Contact` : translate`Pin Contact`,
       action: togglePin,
     },
     {
       id: "delete-person",
-      text: "Delete Contact",
+      text: translate`Delete Contact`,
       action: () => onDelete?.(person.id),
     },
   ]);
@@ -77,7 +80,7 @@ export function PersonItem({
       )}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1 truncate font-medium">
-          {personName || personEmail || "Unnamed"}
+          {personName || personEmail || translate`Unnamed`}
         </div>
         {personEmail && personName && (
           <div className="text-muted-foreground truncate text-xs">
@@ -88,7 +91,7 @@ export function PersonItem({
       {readOnly ? (
         <span
           role="img"
-          aria-label="Pinned contact"
+          aria-label={translate`Pinned contact`}
           className="shrink-0 p-1 text-blue-600"
         >
           <PushPin className="size-3.5" weight="bold" />
@@ -102,7 +105,9 @@ export function PersonItem({
               ? "text-blue-600 hover:text-blue-700"
               : "text-muted-foreground/70 hover:text-muted-foreground opacity-0 group-hover:opacity-100",
           ])}
-          aria-label={isPinned ? "Unpin contact" : "Pin contact"}
+          aria-label={
+            isPinned ? translate`Unpin contact` : translate`Pin contact`
+          }
         >
           <PushPin
             className="size-3.5"

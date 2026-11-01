@@ -1,3 +1,4 @@
+import { t as translateMessage } from "@lingui/core/macro";
 import { t } from "@lingui/core/macro";
 import { Trans } from "@lingui/react/macro";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -480,14 +481,14 @@ export function SessionShareButton({
         variables.action.type === "invite"
           ? variables.action.emails.length > 1
             ? "Could not create these invitations."
-            : "Could not create this invitation."
+            : translateMessage`Could not create this invitation.`
           : variables.action.type === "email"
             ? "Could not email the meeting notes."
             : variables.action.type === "slack"
               ? "Could not send the meeting notes to Slack."
               : variables.action.type === "scope"
                 ? "Could not update general access."
-                : "Could not copy the share link.",
+                : translateMessage`Could not copy the share link.`,
       );
     },
   });

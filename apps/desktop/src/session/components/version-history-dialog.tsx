@@ -2,21 +2,22 @@ import { Trans, useLingui } from "@lingui/react/macro";
 import { useMutation } from "@tanstack/react-query";
 
 import { Button } from "@anlg/ui/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
-import { cn, formatDistanceToNow, safeParseDate } from "@anlg/utils";
+import { cn, safeParseDate } from "@anlg/utils";
 
+import { formatDistanceToNow } from "~/i18n/format";
 import {
   previewFromBody,
   restoreSessionDocumentBody,
   useSessionConflicts,
   useSessionDocumentVersions,
 } from "~/session/queries";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "~/shared/ui/dialog";
 
 export function VersionHistoryDialog({
   sessionId,

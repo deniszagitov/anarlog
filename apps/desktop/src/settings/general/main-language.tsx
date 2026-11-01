@@ -49,7 +49,9 @@ export function MainLanguageView({
     <SettingRow
       title={<Trans>Main language</Trans>}
       description={
-        <Trans>Default language for transcription and AI responses.</Trans>
+        <Trans>
+          Default language for the interface, transcription, and AI responses.
+        </Trans>
       }
     >
       {(labelProps) => (

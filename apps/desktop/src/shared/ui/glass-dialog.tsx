@@ -1,8 +1,9 @@
 import type { ComponentProps } from "react";
 
 import { Button } from "@anlg/ui/components/ui/button";
-import { DialogContent } from "@anlg/ui/components/ui/dialog";
 import { cn } from "@anlg/utils";
+
+import { DialogContent } from "~/shared/ui/dialog";
 
 export function GlassDialogContent({
   className,

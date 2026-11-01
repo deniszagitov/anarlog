@@ -19,11 +19,6 @@ import {
   X,
   type Icon,
 } from "@anlg/ui/components/icons";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
 import { cn } from "@anlg/utils";
 
 import { trackAnalyticsEvent } from "~/analytics";
@@ -32,6 +27,7 @@ import { useBillingAccess } from "~/auth/billing-context";
 import { useSessionSummaries } from "~/session/queries";
 import { useDurableSharedNotes } from "~/shared-notes/cache";
 import { useMainContentCenterOffset } from "~/shared/main/content-offset";
+import { Dialog, DialogContent, DialogTitle } from "~/shared/ui/dialog";
 import { useSettingsNavGroups } from "~/sidebar/settings-nav-groups";
 import { type TabInput, useTabs } from "~/store/zustand/tabs";
 

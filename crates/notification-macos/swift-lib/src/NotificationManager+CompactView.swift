@@ -4,14 +4,15 @@ extension NotificationManager {
   private func compactPrimaryButton(notification: NotificationInstance) -> NSView {
     if notification.payload.hasOptions {
       let optionsButton = OptionsButton()
-      optionsButton.title = "Options"
+      optionsButton.title = notification.payload.localized("Options")
       optionsButton.options = notification.payload.options ?? []
       optionsButton.notification = notification
       return optionsButton
     }
 
     let actionButton = CompactActionButton()
-    let actionLabel = notification.payload.actionLabel ?? "Open Anarlog"
+    let actionLabel =
+      notification.payload.actionLabel ?? notification.payload.localized("Open Anarlog")
     if notification.payload.isDestructiveAction {
       actionButton.configureDestructiveAction(label: actionLabel)
       actionButton.showsProgress = notification.payload.showsStopCountdown
@@ -128,7 +129,7 @@ extension NotificationManager {
 
     let compactMessage: String
     if notification.meetingStartTime != nil {
-      compactMessage = "Starting soon"
+      compactMessage = notification.payload.localized("Starting soon")
     } else if notification.payload.showsStopCountdown {
       compactMessage = notification.stopCountdownText(notification.payload.timeoutSeconds)
     } else {
@@ -210,17 +211,25 @@ extension NotificationManager {
       footerTextStack.orientation = .horizontal
       footerTextStack.alignment = .centerY
       footerTextStack.distribution = .fill
-      footerTextStack.spacing = 4
+      footerTextStack.spacing = topRow.spacing
       footerTextStack.translatesAutoresizingMaskIntoConstraints = false
       footerTextStack.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
       if let footerIconView = createNotificationIconView(
         for: footer.icon, fallbackToDefault: false
       ) {
-        footerIconView.widthAnchor.constraint(equalToConstant: 14).isActive = true
-        footerIconView.heightAnchor.constraint(equalToConstant: 14).isActive = true
-        footerIconView.setContentHuggingPriority(.required, for: .horizontal)
-        footerTextStack.addArrangedSubview(footerIconView)
+        let iconContainer = NSView()
+        iconContainer.translatesAutoresizingMaskIntoConstraints = false
+        iconContainer.addSubview(footerIconView)
+        NSLayoutConstraint.activate([
+          iconContainer.widthAnchor.constraint(equalToConstant: Layout.compactIconContainerSize),
+          iconContainer.heightAnchor.constraint(equalToConstant: 14),
+          footerIconView.centerXAnchor.constraint(equalTo: iconContainer.centerXAnchor),
+          footerIconView.centerYAnchor.constraint(equalTo: iconContainer.centerYAnchor),
+          footerIconView.widthAnchor.constraint(equalToConstant: 14),
+          footerIconView.heightAnchor.constraint(equalToConstant: 14),
+        ])
+        footerTextStack.addArrangedSubview(iconContainer)
       }
 
       let footerLabel = NSTextField(labelWithString: footer.text)
@@ -250,10 +259,8 @@ extension NotificationManager {
         divider.trailingAnchor.constraint(equalTo: root.trailingAnchor),
         divider.topAnchor.constraint(equalTo: topRow.bottomAnchor, constant: 4),
 
-        footerRow.leadingAnchor.constraint(
-          equalTo: root.leadingAnchor, constant: Layout.contentPaddingHorizontal),
-        footerRow.trailingAnchor.constraint(
-          equalTo: root.trailingAnchor, constant: -Layout.contentPaddingHorizontal),
+        footerRow.leadingAnchor.constraint(equalTo: topRow.leadingAnchor),
+        footerRow.trailingAnchor.constraint(equalTo: topRow.trailingAnchor),
         footerRow.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 3),
         footerRow.bottomAnchor.constraint(equalTo: root.bottomAnchor, constant: -4),
         footerRow.heightAnchor.constraint(equalToConstant: 20),

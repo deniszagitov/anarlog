@@ -1,3 +1,4 @@
+import { t } from "@lingui/core/macro";
 import { useQuery } from "@tanstack/react-query";
 import { generateText } from "ai";
 import { useEffect } from "react";
@@ -52,9 +53,10 @@ export function useConnectionHealth(): LlmHealthStatus {
   }
 
   if (text.status === "error") {
+    const error = llmHealthErrorMessage(text.error);
     return {
       status: "error",
-      message: `Connection failed: ${llmHealthErrorMessage(text.error)}`,
+      message: t`Connection failed: ${error}`,
     };
   }
 
@@ -63,7 +65,7 @@ export function useConnectionHealth(): LlmHealthStatus {
 
 export function llmHealthErrorMessage(error: unknown): string {
   if (!error || typeof error !== "object") {
-    return "Unknown error";
+    return t`Unknown error`;
   }
 
   const api = error as {
@@ -81,10 +83,10 @@ export function llmHealthErrorMessage(error: unknown): string {
     return fromPayload;
   }
   if (typeof api.message === "string" && api.message.trim()) {
-    return firstUsefulLine(api.message) || "Unknown error";
+    return firstUsefulLine(api.message) || t`Unknown error`;
   }
 
-  return "Unknown error";
+  return t`Unknown error`;
 }
 
 function apiErrorFromUnknown(value: unknown): string | undefined {

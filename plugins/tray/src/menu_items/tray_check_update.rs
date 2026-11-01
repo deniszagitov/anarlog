@@ -43,7 +43,7 @@ impl TrayCheckUpdate {
             && let Some(item) = menu.get(Self::ID)
             && let MenuItemKind::MenuItem(menu_item) = item
         {
-            menu_item.set_text(text)?;
+            menu_item.set_text(crate::locale::tr(text))?;
             menu_item.set_enabled(enabled)?;
         }
 
@@ -63,8 +63,11 @@ impl TrayCheckUpdate {
     async fn apply_update(app: AppHandle<tauri::Wry>, version: String) {
         if let Err(e) = app.updater2().install_and_relaunch(&version).await {
             app.dialog()
-                .message(format!("Failed to install update: {}", e))
-                .title("Update Failed")
+                .message(crate::locale::message(
+                    "Failed to install update: {error}",
+                    &[("error", &e.to_string())],
+                ))
+                .title(crate::locale::tr("Update Failed"))
                 .show(|_| {});
         }
     }
@@ -88,7 +91,13 @@ impl MenuItemHandler for TrayCheckUpdate {
             STATE_RESTART_TO_APPLY => ("Restart to Apply Update", true),
             _ => ("Check for Updates", true),
         };
-        let item = MenuItem::with_id(app, Self::ID, text, enabled, None::<&str>)?;
+        let item = MenuItem::with_id(
+            app,
+            Self::ID,
+            crate::locale::tr(text),
+            enabled,
+            None::<&str>,
+        )?;
         Ok(MenuItemKind::MenuItem(item))
     }
 
@@ -124,11 +133,14 @@ impl MenuItemHandler for TrayCheckUpdate {
                     let app_for_dialog = app.clone();
                     let version_for_download = version.clone();
                     app.dialog()
-                        .message(format!("Update v{} is available!", version))
-                        .title("Update Available")
+                        .message(crate::locale::message(
+                            "Update v{version} is available!",
+                            &[("version", &version)],
+                        ))
+                        .title(crate::locale::tr("Update Available"))
                         .buttons(MessageDialogButtons::OkCancelCustom(
-                            "Download".to_string(),
-                            "Later".to_string(),
+                            crate::locale::tr("Download"),
+                            crate::locale::tr("Later"),
                         ))
                         .show(move |accepted| {
                             if accepted {
@@ -141,8 +153,11 @@ impl MenuItemHandler for TrayCheckUpdate {
                                             UpdateMenuState::CheckForUpdate,
                                         );
                                         app.dialog()
-                                            .message(format!("Failed to download update: {}", e))
-                                            .title("Update Failed")
+                                            .message(crate::locale::message(
+                                                "Failed to download update: {error}",
+                                                &[("error", &e.to_string())],
+                                            ))
+                                            .title(crate::locale::tr("Update Failed"))
                                             .show(|_| {});
                                     }
                                 });
@@ -151,14 +166,19 @@ impl MenuItemHandler for TrayCheckUpdate {
                 }
                 Ok(None) => {
                     app.dialog()
-                        .message("There are currently no updates available.")
-                        .title("Check for Updates")
+                        .message(crate::locale::tr(
+                            "There are currently no updates available.",
+                        ))
+                        .title(crate::locale::tr("Check for Updates"))
                         .show(|_| {});
                 }
                 Err(e) => {
                     app.dialog()
-                        .message(format!("Failed to check for updates: {}", e))
-                        .title("Update Check Failed")
+                        .message(crate::locale::message(
+                            "Failed to check for updates: {error}",
+                            &[("error", &e.to_string())],
+                        ))
+                        .title(crate::locale::tr("Update Check Failed"))
                         .show(|_| {});
                 }
             }

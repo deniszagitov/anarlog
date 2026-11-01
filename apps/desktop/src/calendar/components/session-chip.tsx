@@ -1,4 +1,4 @@
-import { useLingui } from "@lingui/react/macro";
+import { useLingui, Trans } from "@lingui/react/macro";
 import { platform } from "@tauri-apps/plugin-os";
 import { format } from "date-fns";
 import { useCallback, useMemo } from "react";
@@ -67,7 +67,7 @@ export function SessionChip({
       { separator: true },
       {
         id: "delete",
-        text: "Delete Note",
+        text: t`Delete Note`,
         action: handleDelete,
       },
     ],
@@ -145,7 +145,7 @@ function SessionPopoverContent({
         className="bg-primary text-primary-foreground hover:bg-primary/90 min-h-8 w-full"
         onClick={handleOpen}
       >
-        Open note
+        <Trans>Open note</Trans>
       </Button>
     </div>
   );

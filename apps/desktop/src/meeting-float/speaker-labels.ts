@@ -1,3 +1,5 @@
+import { t } from "@lingui/core/macro";
+
 import {
   commands,
   type RenderTranscriptRequest,
@@ -90,7 +92,7 @@ function collectLabels(
     const anonymous = !part.key.speaker_human_id && !part.provisional_speaker;
     labels.set(id, {
       label: anonymous
-        ? `Speaker ${numbering.getUnknownSpeakerNumber(part.key)}`
+        ? t`Speaker ${numbering.getUnknownSpeakerNumber(part.key)}`
         : part.speaker_label,
       humanId:
         part.key.speaker_human_id ??

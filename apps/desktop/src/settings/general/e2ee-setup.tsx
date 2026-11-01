@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui as useLocalizedUi } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { downloadDir, join } from "@tauri-apps/api/path";
@@ -18,6 +18,9 @@ import {
   Key,
 } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
+import { Input } from "@anlg/ui/components/ui/input";
+
+import { env } from "~/env";
 import {
   Dialog,
   DialogContent,
@@ -25,10 +28,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
-import { Input } from "@anlg/ui/components/ui/input";
-
-import { env } from "~/env";
+} from "~/shared/ui/dialog";
 
 const RECOVERY_KEY_CLIPBOARD_TTL_MS = 60_000;
 
@@ -81,6 +81,8 @@ export function E2eeSetupDialog({
   accessToken: string;
   onReady: () => void;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const [mode, setMode] = useState<"choose" | "import">("choose");
   const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
   const clipboardClearTimer = useRef<number | null>(null);
@@ -203,7 +205,9 @@ export function E2eeSetupDialog({
                 <Trans>Download recovery key (.txt)</Trans>
               </Button>
               <p className="text-muted-foreground text-center text-[11px] leading-4">
-                Clipboard copies clear after 60 seconds when supported.
+                <Trans>
+                  Clipboard copies clear after 60 seconds when supported.
+                </Trans>
               </p>
             </div>
           ) : mode === "import" ? (
@@ -217,10 +221,10 @@ export function E2eeSetupDialog({
               <importForm.Field name="recoveryKey">
                 {(field) => (
                   <Input
-                    aria-label="Recovery key"
+                    aria-label={translate`Recovery key`}
                     value={field.state.value}
                     onChange={(event) => field.handleChange(event.target.value)}
-                    placeholder="anarlog-e2ee-v1:..."
+                    placeholder={translate`anarlog-e2ee-v1:...`}
                     autoComplete="off"
                     spellCheck={false}
                     className="font-mono text-xs"

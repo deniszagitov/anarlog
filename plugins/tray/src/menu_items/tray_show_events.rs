@@ -15,7 +15,7 @@ impl MenuItemHandler for TrayShowEvents {
         let item = CheckMenuItem::with_id(
             app,
             Self::ID,
-            "Show events in menu bar",
+            crate::locale::tr("Show events in menu bar"),
             true,
             app.tray().shows_events(),
             None::<&str>,

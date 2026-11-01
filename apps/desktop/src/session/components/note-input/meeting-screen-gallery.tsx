@@ -1,4 +1,4 @@
-import { t } from "@lingui/core/macro";
+import { useLingui } from "@lingui/react/macro";
 import { useQuery } from "@tanstack/react-query";
 import { convertFileSrc } from "@tauri-apps/api/core";
 
@@ -12,6 +12,7 @@ import {
 } from "~/stt/meeting-screen-records";
 
 export function MeetingScreenGallery({ sessionId }: { sessionId: string }) {
+  const { t } = useLingui();
   const records = useMeetingScreenRecords(sessionId);
   const attachmentIds = records.map((record) => record.attachmentId).join(",");
   const { data: sources } = useQuery({
@@ -69,7 +70,8 @@ function MeetingScreenTile({
   record: MeetingScreenRecord;
   src: string | undefined;
 }) {
-  const time = new Date(record.capturedAt).toLocaleTimeString([], {
+  const { t, i18n } = useLingui();
+  const time = new Date(record.capturedAt).toLocaleTimeString(i18n.locale, {
     hour: "numeric",
     minute: "2-digit",
   });

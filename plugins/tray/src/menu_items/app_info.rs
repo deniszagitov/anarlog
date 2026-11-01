@@ -14,7 +14,7 @@ impl MenuItemHandler for AppInfo {
     const ID: &'static str = "anlg_app_info";
 
     fn build(app: &AppHandle<tauri::Wry>) -> Result<MenuItemKind<tauri::Wry>> {
-        let title = format!("About {}", app.package_info().name);
+        let title = crate::locale::message("About {app}", &[("app", &app.package_info().name)]);
         let item = MenuItem::with_id(app, Self::ID, title, true, None::<&str>)?;
         Ok(MenuItemKind::MenuItem(item))
     }
@@ -24,19 +24,23 @@ impl MenuItemHandler for AppInfo {
         let app_version = app.package_info().version.to_string();
         let app_commit = app.misc().get_git_hash();
 
-        let message = format!(
-            "- App Name: {}\n- App Version: {}\n- SHA:\n  {}",
-            app_name, app_version, app_commit
+        let message = crate::locale::message(
+            "App Name: {app}\nApp Version: {version}\nSHA: {commit}",
+            &[
+                ("app", &app_name),
+                ("version", &app_version),
+                ("commit", &app_commit),
+            ],
         );
 
         let app_clone = app.clone();
 
         app.dialog()
             .message(&message)
-            .title(format!("About {}", app_name))
+            .title(crate::locale::message("About {app}", &[("app", &app_name)]))
             .buttons(MessageDialogButtons::OkCancelCustom(
-                "Copy".to_string(),
-                "Cancel".to_string(),
+                crate::locale::tr("Copy"),
+                crate::locale::tr("Cancel"),
             ))
             .show(move |result| {
                 if result {

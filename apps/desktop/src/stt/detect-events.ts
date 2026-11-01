@@ -1,3 +1,4 @@
+import { t as translate } from "@lingui/core/macro";
 import { useRef } from "react";
 import { useStore } from "zustand";
 
@@ -38,6 +39,7 @@ import {
   getNearbyCalendarEvents,
   type NearbyCalendarEvent,
 } from "~/calendar/queries";
+import { showLocalizedNotification } from "~/services/notification";
 import { useConfigValue } from "~/shared/config";
 import type { ListenerStore } from "~/store/zustand/listener";
 
@@ -463,7 +465,10 @@ export const useHandleDetectEvents = (store: ListenerStore) => {
                 displayIgnorableApps.length > 0
                   ? {
                       text: getIgnoreAppsFooterText(displayIgnorableApps),
-                      actionLabel: "Yes",
+                      actionLabel:
+                        displayIgnorableApps.length === 1
+                          ? "Ignore it"
+                          : "Ignore them",
                       icon: footerIcon,
                     }
                   : null;
@@ -473,7 +478,7 @@ export const useHandleDetectEvents = (store: ListenerStore) => {
                 return;
               }
 
-              await notificationCommands.showNotification({
+              await showLocalizedNotification({
                 key: payload.key,
                 title: getMicDetectedNotificationTitle(nearbyEvent),
                 message: "",
@@ -489,7 +494,7 @@ export const useHandleDetectEvents = (store: ListenerStore) => {
                 start_time: null,
                 participants: null,
                 event_details: null,
-                action_label: "Yes",
+                action_label: translate`Yes`,
                 action: null,
                 action_menu: null,
                 action_variant: null,

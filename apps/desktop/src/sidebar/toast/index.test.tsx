@@ -1,5 +1,21 @@
-import { act, cleanup, render } from "@testing-library/react";
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
+import { act, cleanup, render as renderView } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { createI18n } from "~/i18n/catalogs";
+import { messages as sourceMessages } from "~/i18n/locales/en/messages";
+
+vi.unmock("@lingui/react");
+
+function render(node: ReactNode) {
+  return renderView(node, {
+    wrapper: ({ children }) => (
+      <I18nProvider i18n={i18n}>{children}</I18nProvider>
+    ),
+  });
+}
 
 const mocks = vi.hoisted(() => ({
   signIn: vi.fn(),
@@ -150,6 +166,8 @@ const localStorageMock = {
 
 describe("ToastNotifications", () => {
   beforeEach(() => {
+    i18n.load("en", sourceMessages);
+    i18n.activate("en");
     vi.useFakeTimers();
     vi.stubGlobal("localStorage", localStorageMock);
     mocks.signIn.mockClear();
@@ -186,8 +204,29 @@ describe("ToastNotifications", () => {
 
   afterEach(() => {
     cleanup();
+    i18n.activate("en");
     vi.unstubAllGlobals();
     vi.useRealTimers();
+  });
+
+  it("updates an already visible provider suggestion when the language changes", async () => {
+    mocks.dismissedToastIds.add("auth-promotion");
+    mocks.config.current_llm_provider = null;
+    mocks.config.current_llm_model = null;
+    render(<ToastNotifications />);
+    act(() => vi.advanceTimersByTime(500));
+
+    for (const [locale, title, action] of [
+      ["ru", "Нужна языковая модель", "Добавить"],
+      ["en", "Language model needed", "Add"],
+      ["ru", "Нужна языковая модель", "Добавить"],
+    ] as const) {
+      await act(async () => {
+        await createI18n(locale);
+      });
+      expect(mocks.message.mock.lastCall?.[0]).toBe(title);
+      expect(mocks.message.mock.lastCall?.[1].action.label).toBe(action);
+    }
   });
 
   it("routes the sign-in suggestion through the shared toaster", () => {

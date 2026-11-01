@@ -1,3 +1,4 @@
+import { useLingui } from "@lingui/react/macro";
 import {
   memo,
   useCallback,
@@ -41,6 +42,7 @@ import {
   mergeAdjacentSpeakerSegments,
   mergeRenderedAndLiveSegments,
   SegmentKeyUtils,
+  localizeSpeakerLabel,
   type RenderLabelContext,
   type Segment,
   type SegmentWord,
@@ -284,12 +286,13 @@ const SegmentsList = memo(
           )
         : new SpeakerLabelManager(resolvedMaxSpeakerNumber);
     }, [labelContext, resolvedMaxSpeakerNumber, segments]);
+    const { t } = useLingui();
     const speakerLabels = useMemo(() => {
       const labels = new Map<Segment, string>();
       for (const segment of segments) {
         labels.set(
           segment,
-          segment.speaker_label ??
+          localizeSpeakerLabel(segment, labelContext) ??
             SegmentKeyUtils.renderLabel(
               segment.key,
               labelContext,
@@ -298,7 +301,7 @@ const SegmentsList = memo(
         );
       }
       return labels;
-    }, [labelContext, segments, speakerLabelManager]);
+    }, [labelContext, segments, speakerLabelManager, t]);
     const transcriptSearch = useMemo<TranscriptSearchRenderState>(() => {
       const query = search?.query.trim() ?? "";
       if (!search?.isVisible || !query) {

@@ -1,3 +1,4 @@
+import { t as translate } from "@lingui/core/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import {
   useMutation,
@@ -105,7 +106,7 @@ import {
 } from "~/stt/model-selection";
 
 export function SelectProviderAndModel() {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const { current_stt_provider, current_stt_model } = useConfigValues([
     "current_stt_provider",
     "current_stt_model",
@@ -325,7 +326,7 @@ export function SelectProviderAndModel() {
                         </span>
                       ) : "description" in provider && provider.description ? (
                         <span className="text-muted-foreground text-[11px]">
-                          {provider.description}
+                          {i18n._(provider.description)}
                         </span>
                       ) : null}
                     </div>
@@ -650,7 +651,7 @@ function formatLanguageList(languages: string[]) {
   const remainingCount = languages.length - visibleLanguages.length;
 
   if (remainingCount > 0) {
-    visibleLanguages.push(`${remainingCount} more`);
+    visibleLanguages.push(translate`${remainingCount} more`);
   }
 
   return visibleLanguages.join(", ");
@@ -669,7 +670,7 @@ type ModelEntry = {
 
 function getModelCategoryLabel(category?: ModelCategory) {
   if (category === "latest") {
-    return "Recommended";
+    return <Trans>Recommended</Trans>;
   }
 
   if (category === "hardware") {

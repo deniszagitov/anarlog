@@ -1,4 +1,4 @@
-import { t } from "@lingui/core/macro";
+import { t, t as translate } from "@lingui/core/macro";
 import { emitTo, listen } from "@tauri-apps/api/event";
 import { getAllWebviewWindows } from "@tauri-apps/api/webviewWindow";
 import { useCallback, useEffect } from "react";
@@ -69,7 +69,7 @@ async function revokeManagedShare(sessionId: string) {
     .catch((error: unknown) => {
       console.error("[delete-session] failed to look up managed share", error);
       toast.warning(
-        "Note deleted, but its shared link could not be verified as removed.",
+        translate`Note deleted, but its shared link could not be verified as removed.`,
         { id: "shared-link-removal-unverified", duration: Infinity },
       );
       return null;
@@ -93,10 +93,13 @@ async function revokeManagedShare(sessionId: string) {
       "[delete-session] failed to revoke shared link",
       error instanceof Error ? error.name : typeof error,
     );
-    toast.warning("Note deleted, but its shared link could not be removed.", {
-      id: "shared-link-removal-failed",
-      duration: Infinity,
-    });
+    toast.warning(
+      translate`Note deleted, but its shared link could not be removed.`,
+      {
+        id: "shared-link-removal-failed",
+        duration: Infinity,
+      },
+    );
     return;
   }
 

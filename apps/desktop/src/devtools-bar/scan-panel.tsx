@@ -1,3 +1,4 @@
+import { Trans, useLingui as useLocalizedUi } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -45,6 +46,8 @@ export function ScanPanel({
   state: ReactToolsState;
   copyText?: (text: string) => Promise<void>;
 }>) {
+  const { t: translate } = useLocalizedUi();
+
   const data = useScanData();
   const layout = useScanPanelLayout();
   const { panelRef } = layout;
@@ -64,12 +67,12 @@ export function ScanPanel({
       {...layout.handlers}
       data-devbar=""
       data-testid="react-scan-panel"
-      aria-label="React Scan performance"
+      aria-label={translate`React Scan performance`}
       className="border-border bg-background text-foreground flex min-h-0 flex-col overflow-hidden rounded-[22px] border font-mono text-[11px] leading-snug shadow-xl"
     >
       <div className="flex min-h-0 flex-1">
         <aside
-          aria-label="Slowdown history"
+          aria-label={translate`Slowdown history`}
           className="bg-background/15 border-border/40 flex w-[28%] max-w-[300px] min-w-[180px] shrink-0 flex-col border-r"
         >
           <div
@@ -77,7 +80,7 @@ export function ScanPanel({
             className="border-border/40 flex h-10 shrink-0 cursor-move touch-none items-center gap-2 border-b pr-3 pl-6"
           >
             <span className="min-w-0 flex-1 truncate">
-              History{" "}
+              <Trans>History</Trans>{" "}
               {state.settings.showNotificationCount
                 ? `(${data.events.length})`
                 : ""}
@@ -91,7 +94,7 @@ export function ScanPanel({
                 clearScanHistory();
               }}
             >
-              Clear
+              <Trans>Clear</Trans>
             </button>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto p-2">
@@ -132,8 +135,10 @@ export function ScanPanel({
             ))}
             {!data.events.length ? (
               <p className="text-muted-foreground px-2 py-3">
-                Interact with the app to capture clicks, typing, and frame
-                drops.
+                <Trans>
+                  Interact with the app to capture clicks, typing, and frame
+                  drops.
+                </Trans>
               </p>
             ) : null}
           </div>
@@ -150,7 +155,7 @@ export function ScanPanel({
           >
             <div
               role="tablist"
-              aria-label="Performance views"
+              aria-label={translate`Performance views`}
               className="flex min-w-0 items-center gap-1"
             >
               {(["ranked", "overview", "prompts", "settings"] as const).map(
@@ -180,7 +185,7 @@ export function ScanPanel({
             </div>
             <button
               type="button"
-              aria-label="Close React Scan panel"
+              aria-label={translate`Close React Scan panel`}
               className={buttonClass}
               onClick={() => setReactToolbarVisible(false)}
             >
@@ -189,11 +194,14 @@ export function ScanPanel({
           </div>
           {view === "settings" && !state.inspecting ? (
             <div className="space-y-3 overflow-auto p-3">
-              <p>React Scan {state.version}</p>
+              <p>
+                <Trans>React Scan</Trans>
+                {state.version}
+              </p>
               <label className="flex items-center justify-between gap-3">
-                Animation speed
+                <Trans>Animation speed</Trans>
                 <select
-                  aria-label="Animation speed"
+                  aria-label={translate`Animation speed`}
                   value={state.settings.animationSpeed}
                   onChange={(event) => {
                     const animationSpeed = event.target.value;
@@ -205,9 +213,15 @@ export function ScanPanel({
                       setReactScanSettings({ animationSpeed });
                   }}
                 >
-                  <option value="fast">Fast</option>
-                  <option value="slow">Slow</option>
-                  <option value="off">Off</option>
+                  <option value="fast">
+                    <Trans>Fast</Trans>
+                  </option>
+                  <option value="slow">
+                    <Trans>Slow</Trans>
+                  </option>
+                  <option value="off">
+                    <Trans>Off</Trans>
+                  </option>
                 </select>
               </label>
               {(
@@ -232,9 +246,11 @@ export function ScanPanel({
                 </label>
               ))}
               <p className="text-muted-foreground">
-                Console logging and render outlines add profiling overhead.
-                Browser timing support varies; unavailable event timings are not
-                evidence of zero work.
+                <Trans>
+                  Console logging and render outlines add profiling overhead.
+                  Browser timing support varies; unavailable event timings are
+                  not evidence of zero work.
+                </Trans>
               </p>
             </div>
           ) : state.inspecting ? (
@@ -277,8 +293,10 @@ export function ScanPanel({
             </div>
           ) : (
             <div className="text-muted-foreground p-4">
-              Select a captured event to inspect its timings and copy a
-              performance prompt.
+              <Trans>
+                Select a captured event to inspect its timings and copy a
+                performance prompt.
+              </Trans>
             </div>
           )}
         </div>
@@ -310,6 +328,8 @@ function Prompts({
   prompts: Record<PromptMode, string>;
   copyText?: (text: string) => Promise<void>;
 }>) {
+  const { t: translate } = useLocalizedUi();
+
   const [mode, setMode] = useState<PromptMode>("fix");
   const [copied, setCopied] = useState<string | null>(null);
   const [error, setError] = useState(false);
@@ -319,7 +339,7 @@ function Prompts({
       <div
         className="flex items-center gap-1"
         role="tablist"
-        aria-label="Prompt type"
+        aria-label={translate`Prompt type`}
       >
         {(["fix", "explanation", "data"] as const).map((tab) => (
           <button
@@ -352,7 +372,7 @@ function Prompts({
             );
           }}
         >
-          {copied === prompt ? "Copied" : "Copy Prompt"}
+          {copied === prompt ? translate`Copied` : translate`Copy Prompt`}
         </button>
       </div>
       <textarea
@@ -363,16 +383,18 @@ function Prompts({
       />
       <p role="status" className="text-muted-foreground shrink-0">
         {error
-          ? "Could not copy. Select the prompt text and copy it manually."
+          ? translate`Could not copy. Select the prompt text and copy it manually.`
           : prompt
-            ? "React Scan's prompt for this event. Paste it into your coding assistant."
-            : "This event has left the capture buffer. Select a more recent event."}
+            ? translate`React Scan's prompt for this event. Paste it into your coding assistant.`
+            : translate`This event has left the capture buffer. Select a more recent event.`}
       </p>
     </div>
   );
 }
 
 function Ranked({ event }: Readonly<{ event: ScanEvent }>) {
+  const { t: translate } = useLocalizedUi();
+
   const rows = [
     ...event.components.map((component) => ({
       label: component.name,
@@ -417,8 +439,8 @@ function Ranked({ event }: Readonly<{ event: ScanEvent }>) {
             <div className="border-border/40 text-muted-foreground space-y-1 border-t px-3 py-2">
               <p>
                 {row.component.mounted
-                  ? "Includes mounting renders"
-                  : "Update renders"}
+                  ? translate`Includes mounting renders`
+                  : translate`Update renders`}
                 {row.component.compiled ? " · React Compiler" : ""}
               </p>
               {row.component.changes.length ? (
@@ -430,15 +452,19 @@ function Ranked({ event }: Readonly<{ event: ScanEvent }>) {
                   </p>
                 ))
               ) : (
-                <p>No prop, state, or context changes recorded.</p>
+                <p>
+                  <Trans>No prop, state, or context changes recorded.</Trans>
+                </p>
               )}
             </div>
           ) : null}
         </details>
       ))}
       <p className="text-muted-foreground pt-2">
-        Expand a component for its render reasons. Browser work is listed
-        alongside React renders.
+        <Trans>
+          Expand a component for its render reasons. Browser work is listed
+          alongside React renders.
+        </Trans>
       </p>
     </div>
   );
@@ -448,15 +474,21 @@ function Overview({ event }: Readonly<{ event: ScanEvent }>) {
   return (
     <div className="space-y-4">
       <div className="flex items-baseline justify-between">
-        <span>What was time spent on?</span>
-        <strong className="tabular-nums">{ms(event.duration)}ms total</strong>
+        <span>
+          <Trans>What was time spent on?</Trans>
+        </span>
+        <strong className="tabular-nums">
+          {ms(event.duration)}
+          <Trans>ms total</Trans>
+        </strong>
       </div>
       {event.timings.map((timing) => (
         <div key={timing.label} className="space-y-1.5">
           <div className="flex justify-between gap-3">
             <span>{timing.label}</span>
             <span className="text-muted-foreground tabular-nums">
-              {ms(timing.time)}ms ·{" "}
+              {ms(timing.time)}
+              <Trans>ms ·</Trans>{" "}
               {Math.round(
                 (Math.max(0, timing.time) / Math.max(1, event.duration)) * 100,
               )}
@@ -474,8 +506,10 @@ function Overview({ event }: Readonly<{ event: ScanEvent }>) {
         </div>
       ))}
       <p className="text-muted-foreground">
-        Timings are reported by React Scan. Development profiling and render
-        outlines can add overhead.
+        <Trans>
+          Timings are reported by React Scan. Development profiling and render
+          outlines can add overhead.
+        </Trans>
       </p>
     </div>
   );
@@ -489,8 +523,10 @@ function Inspector() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <p className="border-border/40 text-muted-foreground shrink-0 border-b px-3 py-2">
-        Select a component in the app to inspect props, state, context, and
-        render changes. Esc releases selection.
+        <Trans>
+          Select a component in the app to inspect props, state, context, and
+          render changes. Esc releases selection.
+        </Trans>
       </p>
       <div ref={host} className="min-h-0 flex-1" />
     </div>

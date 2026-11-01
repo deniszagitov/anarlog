@@ -3,17 +3,17 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { connectLocalLibrary, execute } from "@anlg/plugin-db";
 import { Button } from "@anlg/ui/components/ui/button";
+import { toast } from "@anlg/ui/components/ui/toast";
+
+import { supabase } from "./client";
+
 import {
   Dialog,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
-import { toast } from "@anlg/ui/components/ui/toast";
-
-import { supabase } from "./client";
-
+} from "~/shared/ui/dialog";
 import {
   GlassDialogCancelButton,
   GlassDialogContent,

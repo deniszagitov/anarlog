@@ -1,3 +1,5 @@
+import { t, t as translate } from "@lingui/core/macro";
+
 import { md2json } from "@anlg/editor/markdown";
 import { commands as fsSyncCommands } from "@anlg/plugin-fs-sync";
 import { commands } from "@anlg/plugin-session";
@@ -128,7 +130,7 @@ export async function moveSessionContents({
   if (!sourceSessionId || !targetSessionId) {
     return {
       status: "error",
-      message: "Both the source and target meetings are required.",
+      message: t`Both the source and target meetings are required.`,
       sourceMeetingId: sourceSessionId || undefined,
       targetMeetingId: targetSessionId || undefined,
     };
@@ -137,7 +139,7 @@ export async function moveSessionContents({
   if (sourceSessionId === targetSessionId) {
     return {
       status: "error",
-      message: "Choose two different meetings.",
+      message: t`Choose two different meetings.`,
       sourceMeetingId: sourceSessionId,
       targetMeetingId: targetSessionId,
     };
@@ -146,8 +148,7 @@ export async function moveSessionContents({
   if (isSessionBusy(sourceSessionId) || isSessionBusy(targetSessionId)) {
     return {
       status: "error",
-      message:
-        "Wait until recording and transcription finish on both meetings, then try again.",
+      message: translate`Wait until recording and transcription finish on both meetings, then try again.`,
       sourceMeetingId: sourceSessionId,
       targetMeetingId: targetSessionId,
     };
@@ -161,7 +162,7 @@ export async function moveSessionContents({
   if (!source) {
     return {
       status: "error",
-      message: "The source meeting could not be loaded.",
+      message: t`The source meeting could not be loaded.`,
       sourceMeetingId: sourceSessionId,
       targetMeetingId: targetSessionId,
     };
@@ -169,7 +170,7 @@ export async function moveSessionContents({
   if (!target) {
     return {
       status: "error",
-      message: "The target meeting could not be loaded.",
+      message: t`The target meeting could not be loaded.`,
       sourceMeetingId: sourceSessionId,
       targetMeetingId: targetSessionId,
     };
@@ -200,8 +201,7 @@ export async function moveSessionContents({
   if (!hasAnythingToMove) {
     return {
       status: "nothing_to_move",
-      message:
-        "The source meeting has no recording, transcript, or notes to move.",
+      message: translate`The source meeting has no recording, transcript, or notes to move.`,
       sourceMeetingId: sourceSessionId,
       targetMeetingId: targetSessionId,
     };
@@ -210,8 +210,7 @@ export async function moveSessionContents({
   if (targetHasAudio || target.transcripts.length > 0) {
     return {
       status: "error",
-      message:
-        "The target meeting already has a recording or transcript. Move into an empty meeting, or delete the existing recording first.",
+      message: translate`The target meeting already has a recording or transcript. Move into an empty meeting, or delete the existing recording first.`,
       sourceMeetingId: sourceSessionId,
       targetMeetingId: targetSessionId,
     };
@@ -288,7 +287,7 @@ export async function moveSessionContents({
     }
     return {
       status: "error",
-      message: "The move could not be completed. Nothing was changed.",
+      message: t`The move could not be completed. Nothing was changed.`,
       sourceMeetingId: sourceSessionId,
       targetMeetingId: targetSessionId,
     };

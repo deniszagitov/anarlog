@@ -4,12 +4,6 @@ import { useState } from "react";
 
 import { Check } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
 import { useMountEffect } from "@anlg/ui/hooks/use-mount-effect";
 import { cn } from "@anlg/utils";
 
@@ -23,6 +17,12 @@ import type { ActivityRecord } from "./queries";
 import { ProgressBar } from "./tremor/progress-bar";
 
 import { useAuth } from "~/auth";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "~/shared/ui/dialog";
 import { DEFAULT_USER_ID } from "~/shared/utils";
 import { commands } from "~/types/tauri.gen";
 

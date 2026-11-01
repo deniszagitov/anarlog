@@ -1,3 +1,4 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
 import { Trans, useLingui } from "@lingui/react/macro";
 import { useForm } from "@tanstack/react-form";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -35,6 +36,8 @@ const LEGACY_CUSTOM_INSTRUCTIONS_PREAMBLE =
   "For structure, formatting, tone, and emphasis, these instructions take precedence over the Format Requirements. They do not override the requirements to stay accurate, use only the provided source material, and return only the summary.";
 
 export function AutoTemplateDetails() {
+  const { t: translate } = useLocalizedUi();
+
   const formatOverride = useConfigValue("auto_summary_prompt");
   const sourceQuery = useQuery({
     queryKey: ["template-source", "enhance-format"],
@@ -53,7 +56,7 @@ export function AutoTemplateDetails() {
   if (sourceQuery.error || !sourceQuery.data) {
     return (
       <div className="text-destructive flex h-full items-center justify-center px-6 text-center text-sm">
-        {sourceQuery.error?.message || "Auto format is unavailable."}
+        {sourceQuery.error?.message || translate`Auto format is unavailable.`}
       </div>
     );
   }
@@ -148,7 +151,9 @@ export function AutoFormatForm({
       <div className="flex h-12 shrink-0 items-center justify-between gap-3 pr-1 pl-3">
         <div className="flex min-w-0 items-center gap-2">
           <Sparkle className="size-4 shrink-0 text-violet-500" />
-          <span className="truncate text-sm font-semibold">Auto</span>
+          <span className="truncate text-sm font-semibold">
+            <Trans>Auto</Trans>
+          </span>
         </div>
         <div className="flex shrink-0 items-center gap-1">
           <Button

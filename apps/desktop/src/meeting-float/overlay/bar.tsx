@@ -1,3 +1,5 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
 import { useEffect, useRef, useState } from "react";
 
 import type {
@@ -189,6 +191,8 @@ function StopControl({
   colors: BarColors;
   onStop: () => void;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const [hovered, setHovered] = useState(false);
   const width = state.liveCaptionToggleVisible
     ? FLOATING_BAR_COMPACT_STOP_WIDTH
@@ -225,12 +229,12 @@ function StopControl({
     >
       {state.dictation?.phase === "transcribing" ? (
         <span role="status" className="text-xs">
-          Finishing…
+          <Trans>Finishing…</Trans>
         </span>
       ) : hovered ? (
         <span className="flex items-center gap-1.5 text-xs font-semibold">
           <Square size={9} />
-          {state.dictation ? "Done" : "Stop"}
+          {state.dictation ? translate`Done` : translate`Stop`}
         </span>
       ) : state.status === "error" ? (
         <WarningCircle size={20} aria-hidden="true" />
@@ -343,7 +347,7 @@ function TranscriptList({
           }}
         >
           <CaretDown size={10} weight="bold" />
-          Go to bottom
+          <Trans>Go to bottom</Trans>
         </button>
       ) : null}
     </div>

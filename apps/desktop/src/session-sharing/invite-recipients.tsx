@@ -1,4 +1,4 @@
-import { Trans } from "@lingui/react/macro";
+import { Trans, useLingui } from "@lingui/react/macro";
 import { useState } from "react";
 import type { ReactNode } from "react";
 
@@ -265,6 +265,7 @@ export function ShareInviteRecipientRows({
   disabled: boolean;
   status?: ReactNode;
 }) {
+  const { t } = useLingui();
   return invite.recipients.map((recipient) => {
     const label = recipient.name || recipient.email;
     return (
@@ -288,7 +289,7 @@ export function ShareInviteRecipientRows({
         ) : null}
         <button
           type="button"
-          aria-label={`Remove ${label}`}
+          aria-label={t`Remove ${label}`}
           disabled={disabled}
           onClick={() => invite.remove(recipient.email)}
           className="text-muted-foreground hover:bg-accent hover:text-foreground flex size-7 shrink-0 items-center justify-center rounded-md disabled:cursor-not-allowed"

@@ -200,6 +200,10 @@ export interface NoteEditorProps {
   sessionMentionDropConfig?: SessionMentionDropConfig;
   showFormatToolbar?: boolean;
   showSlashCommand?: boolean;
+  labels?: {
+    slashCommands?: ComponentProps<typeof SlashCommandMenu>["labels"];
+    formatToolbar?: ComponentProps<typeof FormatToolbar>["labels"];
+  };
   readOnly?: boolean;
   scrollBottomInset?: number;
   onViewReady?: (view: EditorView) => void;
@@ -622,6 +626,7 @@ export const NoteEditor = forwardRef<NoteEditorRef, NoteEditorProps>(
       sessionMentionDropConfig,
       showFormatToolbar = true,
       showSlashCommand = true,
+      labels,
       readOnly = false,
       scrollBottomInset = 0,
       onViewReady: onViewReadyProp,
@@ -1027,11 +1032,14 @@ export const NoteEditor = forwardRef<NoteEditorRef, NoteEditorProps>(
                 <EditorCommandsBridge commandsRef={commandsRef} />
                 {((showFormatToolbar && !readOnly) || onCommentSelection) && (
                   <FormatToolbar
+                    labels={labels?.formatToolbar}
                     onComment={onCommentSelection}
                     showFormatting={showFormatToolbar && !readOnly}
                   />
                 )}
-                {showSlashCommand && !readOnly && <SlashCommandMenu />}
+                {showSlashCommand && !readOnly && (
+                  <SlashCommandMenu labels={labels?.slashCommands} />
+                )}
                 {mentionConfig && !readOnly && (
                   <MentionSuggestion config={mentionConfig} />
                 )}

@@ -12,7 +12,7 @@ impl MenuItemHandler for TrayHide {
     const ID: &'static str = "anlg_tray_hide";
 
     fn build(app: &AppHandle<tauri::Wry>) -> Result<MenuItemKind<tauri::Wry>> {
-        let item = MenuItem::with_id(app, Self::ID, "Hide", true, None::<&str>)?;
+        let item = MenuItem::with_id(app, Self::ID, crate::locale::tr("Hide"), true, None::<&str>)?;
         Ok(MenuItemKind::MenuItem(item))
     }
 

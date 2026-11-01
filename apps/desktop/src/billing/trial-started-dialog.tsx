@@ -2,16 +2,16 @@ import { t } from "@lingui/core/macro";
 
 import { PRO_TRIAL_DAYS } from "@anlg/pricing";
 import { Button } from "@anlg/ui/components/ui/button";
+
+import { TrialDialogIcon } from "./trial-dialog-icon";
+
 import {
   Dialog,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@anlg/ui/components/ui/dialog";
-
-import { TrialDialogIcon } from "./trial-dialog-icon";
-
+} from "~/shared/ui/dialog";
 import { GlassDialogContent } from "~/shared/ui/glass-dialog";
 
 interface TrialStartedDialogProps {

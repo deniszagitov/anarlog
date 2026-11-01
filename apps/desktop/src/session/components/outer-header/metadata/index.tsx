@@ -1,3 +1,6 @@
+import { useLingui as useLocalizedUi } from "@lingui/react/macro";
+import { Trans } from "@lingui/react/macro";
+
 import { commands as openerCommands } from "@anlg/plugin-opener2";
 import { MapPin, VideoCamera } from "@anlg/ui/components/icons";
 import { Button } from "@anlg/ui/components/ui/button";
@@ -5,11 +8,12 @@ import {
   AppFloatingPanel,
   PopoverContent,
 } from "@anlg/ui/components/ui/popover";
-import { safeFormat, safeParseDate, TZDate } from "@anlg/utils";
+import { safeParseDate, TZDate } from "@anlg/utils";
 
 import { DateEditor } from "./date";
 import { ParticipantsDisplay } from "./participants";
 
+import { safeFormat } from "~/i18n/format";
 import { useSessionEvent } from "~/session/hooks/useSessionEvent";
 import { useConfigValue } from "~/shared/config";
 import { useTimeFormat } from "~/shared/hooks/useTimeFormat";
@@ -73,6 +77,8 @@ export function EventDisplay({
   };
   children?: React.ReactNode;
 }) {
+  const { t: translate } = useLocalizedUi();
+
   const timeFormat = useTimeFormat();
   const tz = useConfigValue("timezone") || undefined;
 
@@ -109,7 +115,7 @@ export function EventDisplay({
       ? safeFormat(endDate, timeFormat)
       : safeFormat(endDate, `MMM d, yyyy ${timeFormat}`);
 
-    return `${startStr} to ${endStr}`;
+    return translate`${startStr} to ${endStr}`;
   };
 
   const getMeetingLinkDomain = () => {
@@ -140,7 +146,7 @@ export function EventDisplay({
   return (
     <div className="flex flex-col gap-3">
       <div className="text-foreground min-w-0 text-base font-medium break-words">
-        {event.title || "Untitled Event"}
+        {event.title || translate`Untitled Event`}
       </div>
 
       <div className="bg-accent h-px" />
@@ -163,7 +169,7 @@ export function EventDisplay({
                 className="text-muted-foreground shrink-0"
               />
               <span className="truncate">
-                {meetingDomain || "Meeting link"}
+                {meetingDomain || translate`Meeting link`}
               </span>
             </div>
             <Button
@@ -172,7 +178,7 @@ export function EventDisplay({
               className="shrink-0"
               onClick={handleJoinMeeting}
             >
-              Join
+              <Trans>Join</Trans>
             </Button>
           </div>
         </>

@@ -1,4 +1,4 @@
-import { t } from "@lingui/core/macro";
+import { t, t as translate } from "@lingui/core/macro";
 import { arch, platform } from "@tauri-apps/plugin-os";
 import { useCallback } from "react";
 
@@ -450,7 +450,7 @@ export const useRunBatch = (sessionId: string) => {
       }
 
       if (!shouldUseSelectedTarget && !options?.recovery && !options?.resume) {
-        toast.warning("Using a batch transcription provider", {
+        toast.warning(translate`Using a batch transcription provider`, {
           description: `${
             selectedTarget
               ? selectedProviderLabel(conn, selectedModel)

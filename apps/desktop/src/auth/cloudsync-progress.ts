@@ -1,6 +1,8 @@
-import { getCloudsyncStatus } from "@anlg/plugin-db";
-import { commands as notificationCommands } from "@anlg/plugin-notification";
+import { t as translate } from "@lingui/core/macro";
 
+import { getCloudsyncStatus } from "@anlg/plugin-db";
+
+import { showLocalizedNotification } from "~/services/notification";
 import { playCompletionSound } from "~/shared/completion-sound";
 import { shouldShowNotification } from "~/shared/notification-policy";
 
@@ -42,16 +44,16 @@ async function showCompletionNotification(userId: string) {
       return;
     }
 
-    const result = await notificationCommands.showNotification({
+    const result = await showLocalizedNotification({
       key: `cloudsync-initial-sync-complete-${userId}`,
-      title: "Cloud sync complete",
-      message: "Your Anarlog data is ready on this device.",
+      title: translate`Cloud sync complete`,
+      message: translate`Your Anarlog data is ready on this device.`,
       timeout: null,
       source: null,
       start_time: null,
       participants: null,
       event_details: null,
-      action_label: "Open Anarlog",
+      action_label: translate`Open Anarlog`,
       action: null,
       action_menu: null,
       action_variant: null,

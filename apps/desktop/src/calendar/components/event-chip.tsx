@@ -1,4 +1,5 @@
 import { t } from "@lingui/core/macro";
+import { Trans } from "@lingui/react/macro";
 import { useMutation } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useCallback, useMemo, useState } from "react";
@@ -81,7 +82,7 @@ export function EventChip({
     const menu: MenuItemDef[] = [
       {
         id: "ignore",
-        text: recurrenceSeriesId ? "Delete This Event" : "Delete Event",
+        text: recurrenceSeriesId ? t`Delete This Event` : t`Delete Event`,
         action: handleIgnore,
       },
     ];
@@ -89,13 +90,13 @@ export function EventChip({
     if (recurrenceSeriesId) {
       menu.push({
         id: "ignore-series",
-        text: "Delete All Recurring Events",
+        text: t`Delete All Recurring Events`,
         action: handleIgnoreSeries,
       });
     }
 
     return menu;
-  }, [recurrenceSeriesId, handleIgnore, handleIgnoreSeries]);
+  }, [recurrenceSeriesId, handleIgnore, handleIgnoreSeries, t]);
   const showContextMenu = useNativeContextMenu(contextMenu);
 
   if (!event) {
@@ -465,7 +466,7 @@ function EventPopoverContent({
         {openNote.isPending ? (
           <CircleNotch className="size-3.5 animate-spin" aria-hidden="true" />
         ) : null}
-        Open note
+        <Trans>Open note</Trans>
       </Button>
     </div>
   );

@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
   isIgnored: vi.fn(() => false),
   openCurrent: vi.fn(),
   openNew: vi.fn(),
+  requestRename: vi.fn(),
   platform: "macos",
   preloadSession: vi.fn(() => Promise.resolve(null)),
   sessionMode: "inactive",
@@ -81,6 +82,10 @@ vi.mock("@anlg/ui/components/ui/tooltip", () => ({
 
 vi.mock("~/session/hooks/useEnhancedNotes", () => ({
   useIsSessionEnhancing: () => false,
+}));
+
+vi.mock("~/session/components/rename-dialog", () => ({
+  useRequestSessionRename: () => mocks.requestRename,
 }));
 
 vi.mock("~/session/queries", () => ({
@@ -196,6 +201,7 @@ describe("TimelineItemComponent", () => {
     mocks.stop.mockClear();
     mocks.openCurrent.mockClear();
     mocks.openNew.mockClear();
+    mocks.requestRename.mockClear();
     mocks.platform = "macos";
     mocks.preloadSession.mockReset();
     mocks.preloadSession.mockResolvedValue(null);
@@ -320,6 +326,13 @@ describe("TimelineItemComponent", () => {
       type: "note",
       value: "session-note-window",
     });
+  });
+
+  it("renames the clicked note without selecting or opening it", () => {
+    renderSession("other-session", {}, { selected: false });
+    findMenuItem("rename")?.action?.();
+    expect(mocks.requestRename).toHaveBeenCalledWith("other-session");
+    expect(mocks.openCurrent).not.toHaveBeenCalled();
   });
 
   it.each([
