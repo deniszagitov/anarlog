@@ -91,6 +91,9 @@ if (failures.length) {
     ...process.env,
     CARGO: cargo,
     CARGO_BUILD_JOBS: process.env.CARGO_BUILD_JOBS ?? "4",
+    // Stripped host dylibs can have misaligned LINKEDIT string pools on macOS 27.
+    CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_STRIP: "none",
+    CARGO_PROFILE_DEV_BUILD_OVERRIDE_STRIP: "none",
     PATH: [nativeTools, toolBin, process.env.PATH]
       .filter(Boolean)
       .join(delimiter),
