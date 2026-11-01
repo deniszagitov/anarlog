@@ -200,6 +200,56 @@ expression: canonicalize_json(contract)
           "synopsis": "anarlog meetings import-status [-h] <id>"
         },
         {
+          "about": "Transcribe missing text from an existing meeting's saved audio with the selected local provider",
+          "arguments": [
+            {
+              "name": "ID",
+              "required": true
+            }
+          ],
+          "name": "anarlog meetings transcribe",
+          "options": [
+            {
+              "flags": "--wait",
+              "is_flag": true,
+              "required": false
+            },
+            {
+              "default": "3600",
+              "flags": "--timeout",
+              "is_flag": false,
+              "required": false,
+              "value_name": "TIMEOUT"
+            },
+            {
+              "flags": "-h, --help",
+              "help": "Print help",
+              "is_flag": false,
+              "required": false
+            }
+          ],
+          "synopsis": "anarlog meetings transcribe [--wait] [--timeout] [-h] <id>"
+        },
+        {
+          "about": "Read durable status for an existing meeting transcription",
+          "arguments": [
+            {
+              "name": "ID",
+              "required": true
+            }
+          ],
+          "name": "anarlog meetings transcribe-status",
+          "options": [
+            {
+              "flags": "-h, --help",
+              "help": "Print help",
+              "is_flag": false,
+              "required": false
+            }
+          ],
+          "synopsis": "anarlog meetings transcribe-status [-h] <id>"
+        },
+        {
           "about": "Read local capture intervals without meeting content or identifiers",
           "name": "anarlog meetings pilot-usage",
           "options": [
