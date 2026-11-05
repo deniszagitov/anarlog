@@ -7,6 +7,9 @@ exclude = ["/js", "/node_modules"]
 links = "tauri-plugin-db"
 description = ""
 
+[features]
+local-only = ["anlg-db-core/local-only"]
+
 [dependencies]
 anlg-agent-access = { workspace = true }
 anlg-db-app = { workspace = true }

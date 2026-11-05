@@ -385,3 +385,36 @@ async fn repeated_cloudsync_status_polling_returns_base_status_on_a_busy_pool() 
         .expect("repeated CloudSync status polling exhausted the pool")
         .unwrap();
 }
+
+#[cfg(feature = "local-only")]
+#[tokio::test]
+async fn local_only_build_persists_notes_and_refuses_existing_cloudsync_replica() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("app.db");
+    let db = open_app_db(Some(&path)).await.unwrap();
+    assert!(!db.cloudsync_enabled());
+    assert!(db.cloudsync_path().is_none());
+    sqlx::query("CREATE TABLE local_release_probe (value TEXT NOT NULL)")
+        .execute(db.pool())
+        .await
+        .unwrap();
+    sqlx::query("INSERT INTO local_release_probe VALUES ('sample note')")
+        .execute(db.pool())
+        .await
+        .unwrap();
+    db.pool().close().await;
+    let db = open_app_db(Some(&path)).await.unwrap();
+    let value: String = sqlx::query_scalar("SELECT value FROM local_release_probe")
+        .fetch_one(db.pool())
+        .await
+        .unwrap();
+    assert_eq!(value, "sample note");
+    // This marker represents an initialized replica. Never silently strip its
+    // metadata or migrate it without the extension it requires.
+    sqlx::query("CREATE TABLE cloudsync_table_settings (value TEXT)")
+        .execute(db.pool())
+        .await
+        .unwrap();
+    db.pool().close().await;
+    assert!(open_app_db(Some(&path)).await.is_err());
+}

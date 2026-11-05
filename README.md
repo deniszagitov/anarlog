@@ -103,6 +103,8 @@ Product docs live at [docs.anarlog.so](https://docs.anarlog.so). To build the de
 | `skills/anarlog`   | Published agent skill for the CLI and MCP server                                           |
 | `enterprise/`      | Source-visible enterprise components, commercially licensed                                |
 
+For the experimental local/BYOK fork build, see [Local installation and build limitations](LOCAL_INSTALL.md).
+
 ## Local development
 
 The local-first desktop app and website start without secrets. Hosted AI, CloudSync, authentication, billing, and connected integrations need their optional local services and configuration.

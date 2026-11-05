@@ -1,6 +1,6 @@
 # Overview
 
-For Denis's fork, also follow [FORK_DEVELOPMENT.md](FORK_DEVELOPMENT.md). Keep fork policy and personal configuration out of upstream pull requests.
+For this fork, also follow [FORK_DEVELOPMENT.md](FORK_DEVELOPMENT.md). Keep fork policy and personal configuration out of upstream pull requests.
 
 For Anarlog work, read and follow [.agents/skills/anarlog-workflow/SKILL.md](.agents/skills/anarlog-workflow/SKILL.md). Start requested work immediately; record useful decisions and non-obvious lessons in Linear, not routine execution logs.
 

@@ -3,6 +3,10 @@ name = "cloudsync"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+# Omit SQLite Sync entirely from local-only distributions.
+local-only = []
+
 [dependencies]
 dirs = { workspace = true }
 futures-util = { workspace = true }

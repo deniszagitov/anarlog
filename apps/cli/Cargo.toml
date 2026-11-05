@@ -7,6 +7,9 @@ edition = "2024"
 name = "anarlog"
 path = "src/main.rs"
 
+[features]
+local-only = ["anlg-db-core/local-only"]
+
 [dependencies]
 anlg-agent-access = { workspace = true }
 anlg-db-app = { workspace = true }

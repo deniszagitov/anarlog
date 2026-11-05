@@ -14,6 +14,9 @@ const COMMANDS: &[&str] = &[
 ];
 
 fn main() {
+    // Local release builds provide an exact commit, including in Git worktrees
+    // where the HEAD file does not change when the current branch advances.
+    println!("cargo:rerun-if-env-changed=VERGEN_GIT_SHA");
     let gitcl = vergen_gix::GixBuilder::default()
         .sha(false)
         .build()

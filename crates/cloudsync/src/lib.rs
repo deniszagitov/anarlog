@@ -1,6 +1,7 @@
 #![deny(unsafe_code)]
 
 mod api;
+#[cfg(not(feature = "local-only"))]
 mod bundle;
 mod close;
 mod error;
@@ -16,7 +17,15 @@ pub use api::{
     cleanup_on_connection, commit_alter, db_version, disable, enable, init, init_on_connection,
     is_enabled, set_filter, siteid, terminate, uuid, version,
 };
+#[cfg(not(feature = "local-only"))]
 pub use bundle::bundled_extension_path;
+
+#[cfg(feature = "local-only")]
+pub fn bundled_extension_path() -> Result<PathBuf, Error> {
+    Err(Error::ExtensionInitialization(
+        "SQLite Sync is excluded from this local-only build".to_string(),
+    ))
+}
 pub use close::install_transaction_observer;
 pub use error::{Error, ErrorKind};
 pub use locked::{OwnedSqliteConnection, ReservedConnection};
@@ -54,20 +63,23 @@ pub fn apply_with_initializer(
     Ok((options, extension_path))
 }
 
-#[cfg(any(
-    all(test, target_os = "ios"),
-    all(test, target_os = "macos", target_arch = "aarch64"),
-    all(test, target_os = "macos", target_arch = "x86_64"),
-    all(test, target_os = "linux", target_env = "gnu", target_arch = "aarch64"),
-    all(test, target_os = "linux", target_env = "gnu", target_arch = "x86_64"),
-    all(
-        test,
-        target_os = "linux",
-        target_env = "musl",
-        target_arch = "aarch64"
-    ),
-    all(test, target_os = "linux", target_env = "musl", target_arch = "x86_64"),
-    all(test, target_os = "windows", target_arch = "x86_64"),
+#[cfg(all(
+    not(feature = "local-only"),
+    any(
+        all(test, target_os = "ios"),
+        all(test, target_os = "macos", target_arch = "aarch64"),
+        all(test, target_os = "macos", target_arch = "x86_64"),
+        all(test, target_os = "linux", target_env = "gnu", target_arch = "aarch64"),
+        all(test, target_os = "linux", target_env = "gnu", target_arch = "x86_64"),
+        all(
+            test,
+            target_os = "linux",
+            target_env = "musl",
+            target_arch = "aarch64"
+        ),
+        all(test, target_os = "linux", target_env = "musl", target_arch = "x86_64"),
+        all(test, target_os = "windows", target_arch = "x86_64"),
+    )
 ))]
 mod tests {
     use super::*;
@@ -1732,5 +1744,13 @@ mod tests {
             connection.close().await.unwrap();
         }
         pool.close().await;
+    }
+}
+
+#[cfg(all(test, feature = "local-only"))]
+mod local_only_tests {
+    #[test]
+    fn local_only_never_resolves_a_cached_or_bundled_extension() {
+        assert!(super::bundled_extension_path().is_err());
     }
 }

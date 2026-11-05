@@ -39,9 +39,14 @@ pub(crate) fn prepare_binaries() -> Result<()> {
 
     println!("prepare-binaries: binaries/char-chrome-native-host-{triple}{ext}");
 
+    let local_features = if env::var_os("ANARLOG_LOCAL_ONLY").is_some() {
+        vec!["--features", "local-only"]
+    } else {
+        Vec::new()
+    };
     cmd!(
         sh,
-        "{cargo} build --release --target {triple} -p anarlog-cli"
+        "{cargo} build --release --target {triple} -p anarlog-cli {local_features...}"
     )
     .run()?;
 

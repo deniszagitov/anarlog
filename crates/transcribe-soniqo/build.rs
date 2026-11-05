@@ -232,6 +232,40 @@ fn prepare_swift_package(swift_build_dir: &Path) {
     patch_speech_swift_manifest(swift_build_dir);
     patch_huggingface_transfer_anonymous_hub_auth(swift_build_dir);
     patch_parakeet_streaming_offline_mode(swift_build_dir);
+    patch_local_hub_resources(
+        swift_build_dir,
+        env::var("ANARLOG_LOCAL_ONLY").as_deref() == Ok("1"),
+    );
+}
+
+#[cfg(target_os = "macos")]
+fn patch_local_hub_resources(swift_build_dir: &Path, local: bool) {
+    let path = swift_build_dir.join("checkouts/swift-transformers/Sources/Hub/Hub.swift");
+    let source = fs::read_to_string(&path).expect("read Hub resource lookup");
+    let (from, to) = if local {
+        (
+            "Bundle.module.url(forResource:",
+            "Bundle.main.url(forResource:",
+        )
+    } else {
+        (
+            "Bundle.main.url(forResource:",
+            "Bundle.module.url(forResource:",
+        )
+    };
+    assert_eq!(
+        source.matches(from).count() + source.matches(to).count(),
+        1,
+        "Hub resource lookup changed"
+    );
+    if source.contains(from) {
+        use std::os::unix::fs::PermissionsExt;
+        let mut permissions = fs::metadata(&path).unwrap().permissions();
+        permissions.set_mode(permissions.mode() | 0o200);
+        fs::set_permissions(&path, permissions).unwrap();
+        fs::write(&path, source.replacen(from, to, 1))
+            .expect("adapt Hub resources for Local bundle");
+    }
 }
 
 #[cfg(target_os = "macos")]
@@ -614,6 +648,7 @@ fn main() {
         println!("cargo:rerun-if-changed=swift-lib/src");
         println!("cargo:rerun-if-changed=swift-lib/Package.swift");
         println!("cargo:rerun-if-changed=swift-lib/Package.resolved");
+        println!("cargo:rerun-if-env-changed=ANARLOG_LOCAL_ONLY");
     }
 
     #[cfg(not(target_os = "macos"))]

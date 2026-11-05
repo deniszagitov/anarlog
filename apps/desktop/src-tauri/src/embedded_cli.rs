@@ -277,11 +277,16 @@ fn resolve_resource_path<R: tauri::Runtime, T: tauri::Manager<R>>(manager: &T) -
         return Some(bundled_resource_path);
     }
 
-    let debug_path = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("resources")
-        .join("cli")
-        .join(file_name);
-    debug_path.exists().then_some(debug_path)
+    #[cfg(debug_assertions)]
+    {
+        let debug_path = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("resources")
+            .join("cli")
+            .join(file_name);
+        return debug_path.exists().then_some(debug_path);
+    }
+    #[cfg(not(debug_assertions))]
+    None
 }
 
 #[cfg(any(target_os = "macos", target_os = "windows", target_os = "linux"))]

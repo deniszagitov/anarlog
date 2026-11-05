@@ -9,17 +9,38 @@
       "binaries/char-chrome-native-host",
       "binaries/check-permissions",
       "resources/cli/anarlog-cli"
-    ]
+    ],
+    "macOS": {
+      "frameworks": []
+    },
+    "resources": {
+      "../../../LICENSE": "licenses/Anarlog-MIT.txt",
+      "../../../LOCAL_INSTALL.md": "LOCAL_INSTALL.md",
+      "../../../crates/transcribe-soniqo/third-party/hub/gpt2_tokenizer_config.json": "gpt2_tokenizer_config.json",
+      "../../../crates/transcribe-soniqo/third-party/hub/t5_tokenizer_config.json": "t5_tokenizer_config.json",
+      "../../../crates/transcribe-soniqo/third-party/hub/LICENSE": "licenses/SwiftTransformers-Apache-2.0.txt",
+      "../../../crates/transcribe-soniqo/third-party/hub/README.md": "licenses/SwiftTransformers-Provenance.md"
+    }
   },
   "plugins": {
     "deep-link": {
       "desktop": {
-        "schemes": ["anarlog-local"]
+        "schemes": [
+          "anarlog-local"
+        ]
       }
     },
     "updater": {
       "active": false,
       "endpoints": []
     }
+  },
+  "version": "0.1.0",
+  "build": {
+    "features": [
+      "direct-distribution",
+      "local-only"
+    ],
+    "beforeBuildCommand": "node ../../scripts/build-local-frontend.mjs"
   }
 }
