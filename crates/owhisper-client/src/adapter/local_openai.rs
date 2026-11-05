@@ -39,19 +39,15 @@ mod batch {
             let path = path.as_ref().to_path_buf();
             Box::pin(async move {
                 let mut url = url::Url::parse(base).map_err(|_| {
-                    Error::provider_configuration("local_openai", "Enter a local ASR server URL.")
+                    Error::provider_configuration("local_openai", "Enter an ASR server URL.")
                 })?;
                 if !matches!(url.scheme(), "http" | "https")
-                    || !matches!(
-                        url.host_str(),
-                        Some("localhost" | "127.0.0.1" | "::1" | "[::1]")
-                    )
                     || !url.username().is_empty()
                     || url.password().is_some()
                 {
                     return Err(Error::provider_configuration(
                         "local_openai",
-                        "Local ASR accepts only loopback inference endpoints.",
+                        "ASR requires an HTTP or HTTPS endpoint without embedded credentials.",
                     ));
                 }
                 let model = params
@@ -94,10 +90,15 @@ mod batch {
                     form = form.text("prompt", params.keywords.join(", "));
                 }
 
-                let client = reqwest::Client::builder()
-                    .no_proxy()
-                    .redirect(reqwest::redirect::Policy::none())
-                    .build()?;
+                let mut client =
+                    reqwest::Client::builder().redirect(reqwest::redirect::Policy::none());
+                if matches!(
+                    url.host_str(),
+                    Some("localhost" | "127.0.0.1" | "::1" | "[::1]")
+                ) {
+                    client = client.no_proxy();
+                }
+                let client = client.build()?;
                 let mut request = client.post(url).multipart(form);
                 if !key.is_empty() {
                     request = request.bearer_auth(key);
@@ -142,7 +143,7 @@ mod batch {
         use wiremock::{Mock, MockServer, ResponseTemplate};
 
         #[tokio::test]
-        async fn local_asr_sends_real_wav_and_preserves_the_selected_model() {
+        async fn custom_asr_accepts_a_server_hostname_and_preserves_auth_model_and_word_timing() {
             let server = MockServer::start().await;
             Mock::given(method("POST"))
                 .and(path("/v1/audio/transcriptions"))
@@ -155,8 +156,11 @@ mod batch {
             let result = LocalOpenAiAdapter
                 .transcribe_file(
                     &crate::http_client::create_client(),
-                    &format!("{}/v1?provider=local_openai", server.uri()),
-                    "",
+                    &format!(
+                        "{}/v1?provider=local_openai",
+                        server.uri().replace("127.0.0.1", "localhost.")
+                    ),
+                    "corporate-key",
                     &ListenParams {
                         model: Some("gemma4:e2b-mlx".into()),
                         ..Default::default()
@@ -167,6 +171,10 @@ mod batch {
                 .unwrap();
             let requests = server.received_requests().await.unwrap();
             let body = &requests[0].body;
+            assert_eq!(
+                requests[0].headers.get("authorization").unwrap(),
+                "Bearer corporate-key"
+            );
             assert!(body.windows(4).any(|window| window == b"RIFF"));
             assert!(body.windows(4).any(|window| window == b"WAVE"));
             assert!(String::from_utf8_lossy(body).contains("gemma4:e2b-mlx"));
@@ -209,7 +217,7 @@ mod batch {
         }
 
         #[tokio::test]
-        async fn local_asr_rejects_remote_endpoints_and_does_not_follow_redirects() {
+        async fn custom_asr_rejects_embedded_credentials_and_does_not_follow_redirects() {
             let params = ListenParams {
                 model: Some("local-asr".into()),
                 ..Default::default()
@@ -218,7 +226,7 @@ mod batch {
             let remote = LocalOpenAiAdapter
                 .transcribe_file(
                     &client,
-                    "https://example.invalid/v1",
+                    "https://user:password@example.invalid/v1",
                     "",
                     &params,
                     anlg_data::english_1::AUDIO_PATH,

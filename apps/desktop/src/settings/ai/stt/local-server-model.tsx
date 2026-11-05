@@ -6,7 +6,7 @@ import { providerCredentialIdentity } from "@anlg/provider-validation";
 import { Input } from "@anlg/ui/components/ui/input";
 
 import { providerFetch } from "~/ai/provider-fetch";
-import { isLocalInferenceEndpoint } from "~/local-ai";
+import { isInferenceEndpoint } from "~/local-ai";
 import { useAiProvidersState } from "~/settings/providers";
 
 export function LocalServerModel({
@@ -32,7 +32,7 @@ export function LocalServerModel({
         apiKey,
       }),
     ],
-    enabled: isLocalInferenceEndpoint(baseUrl),
+    enabled: isInferenceEndpoint(baseUrl),
     staleTime: 30_000,
     retry: false,
     queryFn: async ({ signal }) => {

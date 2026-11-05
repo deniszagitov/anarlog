@@ -23,7 +23,7 @@ import { useAuth } from "~/auth";
 import { useBillingAccess } from "~/auth/billing-context";
 import { withCloudsyncActivity } from "~/db/cloudsync-activity";
 import { env } from "~/env";
-import { isLocalAiBuild, isLocalInferenceEndpoint } from "~/local-ai";
+import { isAllowedInferenceEndpoint, isLocalAiBuild } from "~/local-ai";
 import {
   deleteProcessedAudioForRetention,
   normalizeAudioRetention,
@@ -436,10 +436,12 @@ export const useRunBatch = (sessionId: string) => {
         isLocalAiBuild() &&
         !isOnDeviceSttModel(target.provider, target.model) &&
         !isLocalFileSttModel(target.provider, target.model) &&
-        (!isLocalInferenceEndpoint(target.baseUrl) ||
+        (!isAllowedInferenceEndpoint(target.baseUrl, target.provider) ||
           (target.provider === "anarlog" && target.model === "cloud"))
       ) {
-        throw new Error("Local AI requires a local transcription provider.");
+        throw new Error(
+          "Choose an on-device transcription model or configure a Custom ASR server.",
+        );
       }
 
       if (target.provider === "anarlog" && target.model === "cloud") {

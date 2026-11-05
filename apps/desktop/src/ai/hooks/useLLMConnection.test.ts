@@ -6,7 +6,10 @@ import { z } from "zod";
 
 import { normalizeLLMProviderId, useLanguageModel } from "./useLLMConnection";
 
-const mocks = vi.hoisted(() => ({ provider: "custom" as string }));
+const mocks = vi.hoisted(() => ({
+  provider: "custom" as string,
+  baseUrl: "http://127.0.0.1:8000/v1",
+}));
 const managed = vi.hoisted(() => ({ ready: true, disabled: false }));
 vi.mock("@tauri-apps/plugin-http", () => ({ fetch: vi.fn() }));
 vi.mock("~/settings/queries", () => ({
@@ -19,7 +22,7 @@ vi.mock("~/auth/billing-context", () => ({
 vi.mock("~/settings/providers", () => ({
   useAiProvider: () => ({
     type: "llm",
-    base_url: "http://127.0.0.1:8000/v1",
+    base_url: mocks.baseUrl,
     api_key: "local-key",
   }),
 }));
@@ -34,6 +37,41 @@ vi.mock("~/shared/config", () => ({
 
 afterEach(() => {
   mocks.provider = "custom";
+  mocks.baseUrl = "http://127.0.0.1:8000/v1";
+  vi.unstubAllEnvs();
+});
+
+it("generates with a corporate Custom endpoint in the local build without a cloud account", async () => {
+  vi.stubEnv("VITE_LOCAL_AI", "true");
+  mocks.baseUrl = "https://inference.example.invalid/v1";
+  vi.mocked(tauriFetch).mockImplementation(async (input, init) => {
+    expect(String(input)).toBe(`${mocks.baseUrl}/chat/completions`);
+    expect(new Headers(init?.headers).get("Authorization")).toBe(
+      "Bearer local-key",
+    );
+    expect(JSON.parse(String(init?.body)).model).toBe("mtplx");
+    return Response.json({
+      id: "corporate-completion",
+      model: "mtplx",
+      created: 0,
+      choices: [
+        {
+          index: 0,
+          message: { role: "assistant", content: "Corporate summary" },
+          finish_reason: "stop",
+        },
+      ],
+    });
+  });
+  const { result, unmount } = renderHook(() => useLanguageModel());
+  expect(result.current).not.toBeNull();
+  const completion = await generateText({
+    model: result.current!,
+    prompt: "Summarize the meeting",
+    maxRetries: 0,
+  });
+  expect(completion.text).toBe("Corporate summary");
+  unmount();
 });
 
 it.each([false, true])(

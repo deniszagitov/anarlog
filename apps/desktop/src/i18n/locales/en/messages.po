@@ -679,6 +679,7 @@ msgstr "After {0}"
 #: src/settings/ai/shared/index.tsx
 #: src/settings/ai/stt/local-file-model.tsx
 #: src/settings/ai/stt/select.tsx
+#: src/settings/ai/stt/shared.tsx
 msgid "After recording"
 msgstr "After recording"
 
@@ -2092,10 +2093,6 @@ msgstr "Connect a CRM in Settings › CRM to enrich contacts."
 #: src/settings/crm/index.tsx
 msgid "Connect a CRM to look up your contacts from Anarlog. Connections are managed through your Anarlog account."
 msgstr "Connect a CRM to look up your contacts from Anarlog. Connections are managed through your Anarlog account."
-
-#: src/settings/ai/stt/configure.tsx
-msgid "Connect a local **OpenAI-compatible ASR** server. For Ollama, use `http://127.0.0.1:11434/v1` and enter `ollama` as the API key. For the MLX server, use its loopback URL and access token. Select the exact speech model served by that runtime. Transcription runs after recording; text-only models have chunk timing, not word alignment."
-msgstr "Connect a local **OpenAI-compatible ASR** server. For Ollama, use `http://127.0.0.1:11434/v1` and enter `ollama` as the API key. For the MLX server, use its loopback URL and access token. Select the exact speech model served by that runtime. Transcription runs after recording; text-only models have chunk timing, not word alignment."
 
 #: src/onboarding/calendar.tsx
 #: src/onboarding/index.tsx
@@ -4615,14 +4612,6 @@ msgstr "Loading your workspace. This should only take a moment."
 #: src/task/resource-view.tsx
 msgid "Loading..."
 msgstr "Loading..."
-
-#: src/settings/ai/stt/shared.tsx
-msgid "Local ASR (Ollama / MLX)"
-msgstr "Local ASR (Ollama / MLX)"
-
-#: src/settings/ai/stt/shared.tsx
-msgid "Local OpenAI-compatible ASR"
-msgstr "Local OpenAI-compatible ASR"
 
 #: src/settings/ai/stt/health.tsx
 msgid "Local STT server is starting up…"
@@ -9128,6 +9117,7 @@ msgid "We filter out models from the combobox based on heuristics like **input m
 msgstr "We filter out models from the combobox based on heuristics like **input modalities** and **tool support**."
 
 #: src/settings/ai/llm/configure.tsx
+#: src/settings/ai/stt/configure.tsx
 msgid "We only support **OpenAI-compatible** endpoints for now."
 msgstr "We only support **OpenAI-compatible** endpoints for now."
 

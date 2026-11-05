@@ -7,7 +7,7 @@ import type { AIProviderStorage } from "@anlg/store";
 import { useAuth } from "~/auth";
 import { useBillingAccess } from "~/auth/billing-context";
 import { env } from "~/env";
-import { isLocalAiBuild, isLocalInferenceEndpoint } from "~/local-ai";
+import { isAllowedInferenceEndpoint, isLocalAiBuild } from "~/local-ai";
 import { type ProviderId, PROVIDERS } from "~/settings/ai/stt/shared";
 import { useAiProvidersState } from "~/settings/providers";
 import { useSettingsReady } from "~/settings/queries";
@@ -169,7 +169,10 @@ export const useSTTConnection = () => {
     if (!baseUrl || (!apiKey && current_stt_provider !== "nvidia")) {
       return null;
     }
-    if (isLocalAiBuild() && !isLocalInferenceEndpoint(baseUrl)) {
+    if (
+      isLocalAiBuild() &&
+      !isAllowedInferenceEndpoint(baseUrl, current_stt_provider)
+    ) {
       return null;
     }
 

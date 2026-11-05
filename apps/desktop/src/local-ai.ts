@@ -18,6 +18,25 @@ export function isLocalInferenceEndpoint(value: string) {
   }
 }
 
+export function isInferenceEndpoint(value: string) {
+  try {
+    const url = new URL(value);
+    return (
+      ["http:", "https:"].includes(url.protocol) &&
+      !url.username &&
+      !url.password
+    );
+  } catch {
+    return false;
+  }
+}
+
+export function isAllowedInferenceEndpoint(value: string, provider: string) {
+  return provider === "custom"
+    ? isInferenceEndpoint(value)
+    : isLocalInferenceEndpoint(value);
+}
+
 export function useLocalFeatureAccess(localOperation = true) {
   const billing = useBillingAccess();
   const localAccess = localOperation && isLocalAiBuild();

@@ -1,12 +1,14 @@
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http";
 
-import { isLocalAiBuild, isLocalInferenceEndpoint } from "~/local-ai";
+import { isInferenceEndpoint, isLocalAiBuild } from "~/local-ai";
 
 export const providerFetch: typeof fetch = async (input, init) => {
   const url = new URL(input instanceof Request ? input.url : input);
   if (isLocalAiBuild()) {
-    if (!isLocalInferenceEndpoint(url.toString())) {
-      throw new Error("Local AI requires a loopback inference endpoint.");
+    if (!isInferenceEndpoint(url.toString())) {
+      throw new Error(
+        "Enter an HTTP or HTTPS inference endpoint without embedded credentials.",
+      );
     }
   }
   const requestInit: Parameters<typeof tauriFetch>[1] = isLocalAiBuild()

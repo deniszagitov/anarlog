@@ -1237,10 +1237,10 @@ const _PROVIDERS = [
     disabled: false,
     id: "custom",
     get displayName() {
-      return isLocalAiBuild() ? t`Local ASR (Ollama / MLX)` : t`Custom`;
+      return t`Custom`;
     },
     description: isLocalAiBuild()
-      ? msg`Local OpenAI-compatible ASR`
+      ? msg`After recording`
       : msg`Deepgram-compatible`,
     badge: isLocalAiBuild() ? "After recording" : null,
     icon: <Shuffle />,

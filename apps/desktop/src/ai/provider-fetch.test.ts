@@ -13,18 +13,23 @@ beforeEach(() => {
 });
 
 describe("providerFetch", () => {
-  it("keeps local inference on loopback and prevents remote redirects", async () => {
+  it("accepts corporate inference URLs while rejecting embedded credentials and redirects", async () => {
     vi.stubEnv("VITE_LOCAL_AI", "true");
     try {
       await expect(
-        providerFetch("https://api.openai.com/v1/chat/completions", {
-          method: "POST",
-          body: "private transcript",
-        }),
-      ).rejects.toThrow("loopback inference endpoint");
+        providerFetch(
+          "https://user:password@example.invalid/v1/chat/completions",
+          {
+            method: "POST",
+            body: "private transcript",
+          },
+        ),
+      ).rejects.toThrow("without embedded credentials");
       expect(tauriFetch).not.toHaveBeenCalled();
 
-      await providerFetch("http://127.0.0.1:8765/v1/chat/completions");
+      await providerFetch(
+        "https://inference.example.invalid/v1/chat/completions",
+      );
       expect(vi.mocked(tauriFetch).mock.calls[0][1]).toMatchObject({
         redirect: "error",
         maxRedirections: 0,

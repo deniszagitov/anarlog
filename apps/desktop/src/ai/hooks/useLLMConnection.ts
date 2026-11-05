@@ -28,7 +28,7 @@ import { createTracedFetch, tracedFetch } from "../traced-fetch";
 import { useAuth } from "~/auth";
 import { useBillingAccess } from "~/auth/billing-context";
 import { env } from "~/env";
-import { isLocalAiBuild, isLocalInferenceEndpoint } from "~/local-ai";
+import { isAllowedInferenceEndpoint, isLocalAiBuild } from "~/local-ai";
 import { type ProviderId, PROVIDERS } from "~/settings/ai/llm/shared";
 import {
   CHATGPT_API_BASE_URL,
@@ -231,7 +231,8 @@ const resolveLLMConnection = (params: {
   if (
     isLocalAiBuild() &&
     (modelId.includes(":cloud") ||
-      (providerId !== "apple_foundation" && !isLocalInferenceEndpoint(baseUrl)))
+      (providerId !== "apple_foundation" &&
+        !isAllowedInferenceEndpoint(baseUrl, providerId)))
   ) {
     return {
       conn: null,

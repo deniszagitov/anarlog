@@ -15,7 +15,7 @@ vi.mock("~/settings/providers", () => ({
   useAiProvidersState: () => ({
     providers: {
       "stt:custom": {
-        base_url: "http://127.0.0.1:11434/v1",
+        base_url: "https://inference.example.invalid/v1",
         api_key: "ollama",
       },
     },
@@ -52,7 +52,7 @@ test("offers server model identifiers without cloud aliases and preserves a manu
     ).toBe("gemma4:e2b-mlx"),
   );
   expect(fetchMock).toHaveBeenCalledWith(
-    new URL("http://127.0.0.1:11434/v1/models"),
+    new URL("https://inference.example.invalid/v1/models"),
     expect.objectContaining({ headers: { Authorization: "Bearer ollama" } }),
   );
   fireEvent.change(screen.getByRole("combobox"), {

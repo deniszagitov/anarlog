@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { renderHook, waitFor } from "@testing-library/react";
 import { createElement, type ReactNode } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const {
   authState,
@@ -60,6 +60,11 @@ vi.mock("~/settings/providers", () => ({
   useAiProvidersState: () => ({
     isReady: readiness.provider,
     providers: {
+      "stt:custom": {
+        type: "stt",
+        base_url: "https://inference.example.invalid/v1",
+        api_key: "corporate-key",
+      },
       "stt:anarlog": {
         type: "stt",
         base_url: "   ",
@@ -101,6 +106,30 @@ vi.mock("~/stt/capabilities", () => ({
 import { useSTTConnection } from "./useSTTConnection";
 
 describe("useSTTConnection", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("routes the corporate speech model through Custom without a cloud account", () => {
+    vi.stubEnv("VITE_LOCAL_AI", "true");
+    config.current_stt_provider = "custom";
+    config.current_stt_model = "corporate-parakeet";
+    authState.session = null;
+    billingState.isPaid = false;
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    const wrapper = ({ children }: { children: ReactNode }) =>
+      createElement(QueryClientProvider, { client: queryClient }, children);
+    const { result, unmount } = renderHook(() => useSTTConnection(), {
+      wrapper,
+    });
+    expect(result.current.conn).toEqual({
+      provider: "custom",
+      model: "corporate-parakeet",
+      baseUrl: "https://inference.example.invalid/v1?provider=local_openai",
+      apiKey: "corporate-key",
+    });
+    unmount();
+  });
   beforeEach(() => {
     config.current_stt_provider = "anarlog";
     config.current_stt_model = "cloud";
