@@ -1,0 +1,150 @@
+# Local distribution review
+
+Research date: 2026-11-05. Reviewed application/source baseline: `a39f3661236700f216d8e6c016a43a28ad3350c7`.
+
+This report records technical evidence and licensing questions, not legal clearance. No dependency replacement, feature removal, public-history rewrite, push, release, notarization upload, or colleague contact was performed. Changes prepared in the isolated checkout are documentation, a read-only history inventory with a regression test, and removal of four unused desktop font source files. The previously built application still identifies the baseline above; it was not rebuilt for this documentation checkpoint. Public npm metadata and tarballs were inspected without running their code.
+
+## POS dependency: confirmed release blocker
+
+The current automatic keyword extractor incorporates code with an explicit GPL-3.0-or-later file header inside an otherwise LGPL-described package. A permissive, behavior-equivalent drop-in replacement was not established. Keeping the current implementation requires resolution of the per-file license/provenance and combined-work obligations plus the written approval required by [LICENSING.md:52](LICENSING.md#third-party-provenance). Adding an LGPL notice alone does not resolve this finding.
+
+### Exact package and provenance
+
+- The lockfile selects `pos@0.4.2` through `retext-pos@5.0.0`: [pnpm-lock.yaml](pnpm-lock.yaml), entries `pos@0.4.2` and `retext-pos@5.0.0`. Its tarball integrity is `sha512-5HtivCe1HaOqjQZZNhtKrIR1zBvm2FLVVGl4b1poHPZDbXq1BEqYOlmWmetbzqrkRFITxPbEpVgpB03qNS4cSw==`.
+- The [published npm metadata](https://registry.npmjs.org/pos/0.4.2) identifies version 0.4.2, an LGPL license entry, Percy Wegmann as author, and Darius Kazemi as contributor. Metadata declares `gitHead` `0abed44a6f8a5997e77daaa7d479a359b4611180`; the public GitHub raw-file URL at that revision returned HTTP 404 during this review. Do not represent that declared SHA as a verified reachable release commit.
+- The [npm 0.4.2 tarball](https://registry.npmjs.org/pos/-/pos-0.4.2.tgz) contains an LGPL version 3 `LICENSE`; `POSTagger.js` and `lexer.js` carry Percy Wegmann's 2010 LGPLv3 headers. `BrillTransformationRules.js` separately names Hugo W. L. ter Doest, copyright 2015, and specifies GPL version 3 or later. `lexicon.js` identifies Eric Brill's English lexicon without a separate license header in that file. The package README credits Mark Watson's FastTag and Eric Brill's rules/lexicon. These credits identify provenance requiring review, not proof that one contributor can relicense all components.
+- The installed and freshly downloaded tarball copies of `BrillTransformationRules.js` have the same SHA256: `e42c0cdbc0748dfac3d13056a21ad619447add9080a6215677b2548388d71b14`. This ties the inspected file to the installed package without relying solely on repository `master`.
+- Reachable immutable upstream corroboration: [GPL header and rules at 9daabf9f086998aaefaee75efb88f634cb292531](https://github.com/dariusk/pos-js/blob/9daabf9f086998aaefaee75efb88f634cb292531/BrillTransformationRules.js#L1-L17). The [file-history API](https://api.github.com/repos/dariusk/pos-js/commits?path=BrillTransformationRules.js&per_page=100) lists [3dc33468064323fed003723c0877a24b556ed1b8](https://github.com/dariusk/pos-js/commit/3dc33468064323fed003723c0877a24b556ed1b8), which externalized the rules in 2015, and [06d27141e9e2676225a53ad27614481b55994845](https://github.com/dariusk/pos-js/commit/06d27141e9e2676225a53ad27614481b55994845), which fixed rule 6 in 2016. Both list Hugo ter Doest as author. Commit authorship does not establish the complete legal ownership chain.
+
+### This is executed code, not an unused dependency
+
+1. [useKeywords.ts:177-186](apps/desktop/src/stt/useKeywords.ts#L177-L186) creates the English retext pipeline, adds `retextPos`, then `retextKeywords`.
+2. [retext-pos 5.0.0 implementation](https://github.com/retextjs/retext-pos/blob/d5d476a91718e583515f52b52b622ac338e703cc/lib/index.js) imports `pos`, constructs its default `Tagger`, and calls `tagger.tag(values)` for each nonempty sentence before writing `node.data.partOfSpeech`.
+3. The installed `pos/POSTagger.js:9-10` requires and instantiates `BrillTransformationRules`; lines 51-55 apply `getRules()` to every tagged word. The default constructor supplies eight transformation rules. They are part of normal tagging behavior, not an optional plugin disabled by the application.
+4. The already built `apps/desktop/dist/assets/useKeywords-CTJq4rRu.js` contains all five characteristic rules-object methods (`getRule`, `setRule`, `appendRule`, `setRules`, `getRules`). Its reviewed SHA256 is `b8aab402cd94c3b89a2fd66a86ea7daf66868109620a4a33490339edf7d6c4fb`, size 1,760,051 bytes. The Hugo copyright string was not found in that minified asset. This is evidence for this frontend build, not certification of a later `.app` or DMG.
+5. The installed `retext-keywords@8.0.2/lib/index.js:338-347` selects words using POS tags beginning with `N`, or `JJ` on an initially uppercase word. Changing tagger output can therefore change keyword/keyphrase selection, ranking, and the final transcription hints. Its [upstream implementation](https://github.com/retextjs/retext-keywords/blob/8.0.2/lib/index.js) is the relevant consumer contract.
+
+### Published versions do not provide an established permissive downgrade
+
+All versions returned by the [pos npm registry metadata](https://registry.npmjs.org/pos) declare LGPL; all versions returned by the [retext-pos metadata](https://registry.npmjs.org/retext-pos) depend on `pos`. The public [pos-js tags API](https://api.github.com/repos/dariusk/pos-js/tags?per_page=100) returned an empty tag list. Repository tags therefore cannot be used here as a complete npm-release catalogue.
+
+Tarballs directly inspected: `pos` 0.1.1, 0.3.0, 0.4.1, and 0.4.2. Version 0.1.1 has an LGPL tagger and no separate BrillTransformationRules file; 0.3.0, 0.4.1, and 0.4.2 include the GPL-headed rules file. This is not an exhaustive per-file audit of every historical version. A downgrade has not been shown to remove LGPL obligations or preserve behavior. The registry's package-level license cannot override a conflicting per-file grant.
+
+### Preservation options
+
+| Option | Functionality | Required work and remaining uncertainty |
+| --- | --- | --- |
+| Keep the exact dependency and resolve rights/compliance | Best prospect of preserving exact current output | Resolve GPL/LGPL per-file scope, data provenance, and combined-work treatment; obtain required written approval. Any alternative grant must cover the relevant rights holders and data, not merely the npm maintainer. Prepare the correct notices, sources, rebuild/replacement instructions, and distribution terms. No such approval or alternative grant was found. |
+| Use an independently licensed POS engine behind an NLCST adapter | Can retain automatic extraction as a product feature; exact results can differ | Preserve sentence/word-node alignment and write compatible POS tags while retaining `retext-keywords`. Audit code, dictionaries/models, dependencies, and notices for an exact pinned candidate; compare results and transcription-hint behavior. No adapter was implemented or equivalence benchmark run. |
+| Build a wholly independent extractor | Can retain a keyword feature with a changed algorithm | Define requirements from product behavior and synthetic examples; use independently licensed data and implementation. Do not copy, translate, or mechanically rewrite the GPL rules/lexicon. Exact semantic parity is not established. This is a larger implementation and validation task. |
+| Disable automatic NLP extraction only in Local | Loses automatic keywords/keyphrases from notes, titles, and event titles/descriptions | Explicit dictionary entries, session/event participant names, and hashtags could be preserved separately in [useKeywords.ts](apps/desktop/src/stt/useKeywords.ts#L98-L129). Automatic inference from event text would be lost. Requires an explicit product decision. A runtime branch alone is insufficient: eliminate imports/code from the shipped dependency graph and inspect `dist`, native assets, and notices. No disabling was performed. |
+
+Two primary-source candidates, not cleared substitutes:
+
+- **wink-pos-tagger 2.2.2** declares MIT, with immutable `gitHead` `4721917e78c0db31439d10f46df999127e4cd75e`; its [source](https://github.com/winkjs/wink-pos-tagger/tree/4721917e78c0db31439d10f46df999127e4cd75e) and [official API](https://winkjs.org/wink-pos-tagger/Tagger.html) expose Penn-style tags and raw-token tagging, making an NLCST adapter technically plausible. Published tarballs for its direct runtime dependencies were inspected; their package licenses are MIT. However, [wink-lexicon](https://github.com/winkjs/wink-lexicon/tree/b1befb4bcdb989e5063bc196aae92d24a046af69) expressly includes WordNet and fnTBL-derived data. [Princeton's primary license](https://wordnet.princeton.edu/license-and-commercial-use) permits distribution subject to retaining its notices. The fnTBL primary license URL referenced by Wink returned 404. That unresolved data-rights provenance prevents treating this route as fully cleared. Independent implementation of transformation-based tagging is not itself evidence of copying `pos-js`, but a full provenance audit remains necessary.
+- **compromise 14.19.0** has an MIT [published tarball/metadata](https://registry.npmjs.org/compromise/14.19.0). Its runtime dependencies are `efrt@2.9.0` and `suffix-thumb@6.0.0`, both with MIT metadata and license files in the inspected tarballs. The [project source/docs](https://github.com/spencermountain/compromise) use their own richer tag hierarchy and token model. An adapter and carefully defined noun/adjective mapping would be necessary; it is not a behavior-equivalent `retext-pos` switch. Package-level checks and targeted header scans are not a complete proof of every dictionary/rule's provenance. The tarball lacks a `gitHead` field, so release provenance must use the exact tarball integrity and a verified source mapping before adoption.
+
+### Validation needed before claiming preserved behavior
+
+Use synthetic, non-personal English examples covering context-sensitive noun/verb changes, proper nouns, uppercase adjectives, unknown product names, punctuation, contractions, numbers, repeated phrases, and mixed-script notes. Compare the final ranked keywords/keyphrases and normalized top-50 hints, not only POS accuracy. Verify explicit hashtags, dictionary entries, and participant names separately from inferred terms from titles/event text. Measure browser bundle size, startup cost, and sentence/word alignment. A private comparison of dependency outputs is not permission to copy its implementation or datasets into a replacement.
+
+### Compliance boundaries
+
+For an exclusively LGPL combination, [LGPLv3 section 4](https://www.gnu.org/licenses/lgpl-3.0.html#section4) permits application licensing choices subject to notices, license copies, replacement/relinking rights and materials, and applicable installation information. A static/minified frontend needs a practical rebuild/recombination route; shipping only a license file or pointing to a mutable branch does not establish that route. [GPLv3 section 6](https://www.gnu.org/licenses/gpl-3.0.html#section6) governs the associated source-delivery mechanisms. Own independent MIT files need not automatically lose their MIT grants, but the GPL-headed component prevents declaring the shipped combination exclusively MIT or treating an LGPL-only checklist as clearance.
+
+Technical confidence is high for the installed dependency chain, executed rules, inspected file headers, and current frontend inclusion. Legal scope, complete rights ownership, historical compliance, and semantic equivalence of replacements remain unconfirmed. The minimum decision is either approval of a documented rights/compliance route that preserves the current dependency, or approval to implement and validate an independently licensed replacement. Silently dropping the automatic extraction feature is not a no-regression solution.
+
+## SQLite Sync: distinguish the historical grants from current upstream
+
+The Local desktop and embedded CLI already exclude the extension under `local-only`. Local SQLite persistence remains available; opening an initialized CloudSync replica is deliberately rejected without the extension. Thus a Sync upgrade is unnecessary for the Local binary and would introduce unrelated compatibility risk. The Git checkout still contains upstream vendor files and their ancestors.
+
+Exact upstream license snapshots inspected:
+
+| Version/source | Immutable source and license | Relevant distinction |
+| --- | --- | --- |
+| 0.8.68 | [15cf37498acde9d793c90b572bca41672d1c244b](https://github.com/sqliteai/sqlite-sync/blob/15cf37498acde9d793c90b572bca41672d1c244b/LICENSE.md) | Modified Elastic License 2.0 with an additional OSI-open-source-project grant; no later Network Layer Restriction in this text. |
+| 1.0.12 | [6694c2e8b084d6f33d8bf86742ac1f2b8243bd6e](https://github.com/sqliteai/sqlite-sync/blob/6694c2e8b084d6f33d8bf86742ac1f2b8243bd6e/LICENSE.md) | Same license blob as 0.8.68. |
+| 1.1.2 | [6b3acb5f4c7506d419e0432c7d36c993e0fdb815](https://github.com/sqliteai/sqlite-sync/blob/6b3acb5f4c7506d419e0432c7d36c993e0fdb815/LICENSE.md) | Same license blob; upstream Anarlog's historical request-deadline/bounded-send rebuilds pin this revision. |
+| 1.2.0 | [285a1390c92fce3a1dc6f98daef213f882a5b23b](https://github.com/sqliteai/sqlite-sync/blob/285a1390c92fce3a1dc6f98daef213f882a5b23b/LICENSE.md) | Modified Elastic terms and additional grant, now with the Network Layer Restriction. |
+| Post-release main | [3bb94747ecf13fa50494fe48d76661202a0392df/LICENSE](https://github.com/sqliteai/sqlite-sync/blob/3bb94747ecf13fa50494fe48d76661202a0392df/LICENSE) | Apache-2.0 source after the October 19 license change; not an identified released Apache-licensed binary. |
+
+The first three versions share license blob `69b13f21d75cba62afd71d4ea2b067aecfc76024`; 1.2.0 uses `cca263efecc57651b9237072541c02114c650c39`. The [network restriction was introduced September 2](https://github.com/sqliteai/sqlite-sync/commit/79b60ae1f3d442258d7248cacf67c3c6b8ae7476). [Apache LICENSE was added October 19](https://github.com/sqliteai/sqlite-sync/commit/0fcc3ddb142a80c0f0a2f25cfe10babca80981b6), followed by deletion of the old LICENSE.md. At the review date, the latest published release was still [1.2.0, September 28](https://github.com/sqliteai/sqlite-sync/releases/tag/1.2.0).
+
+The older additional grant expressly addresses OSI-licensed open-source projects, while other conditions address non-open-source/commercial production uses and managed services. Applying those provisions to this mixed-license monorepo and each distribution needs a documented review. The September network restriction must not be assumed to govern earlier versions retroactively. Conversely, the October Apache license must not be assumed to clear every older vendored binary or patch.
+
+Current Anarlog moved to an unpatched 1.2.0 source version at `e761d0c4e7b5c51ff3af3ecac377e9702a3940e2`; earlier history includes source patches and prebuilt libraries. Exact provenance/build attestation for every historical binary was not established. A byte mismatch against an official archive alone proves neither a license violation nor a particular modification. No conclusion that all historical network patches were prohibited is justified by these findings.
+
+### Viable routes and their costs
+
+1. **Keep the Local exclusion and existing history.** Preserve Local behavior. Complete the version-to-binary/patch provenance map, retain the applicable license texts and modification notices, and resolve their application plus the repository's written-review requirement. Obtain rights-holder clarification where the recorded grant/provenance is insufficient. An automatic requirement to buy a license for every older patch is not established.
+2. **For future Sync-enabled builds, evaluate a pinned Apache-2.0 upstream revision.** This may remove the current source-available dependency for new builds after a full rights/dependency review. It requires building from verified source, ABI/API and schema checks, and temporary-database migration/upgrade tests. There was no reviewed Apache binary release to substitute directly. It does not resolve old history, and was not implemented merely to unblock Local.
+3. **Choose a separately reviewed Local source snapshot or new distribution branch/repository.** Exclude unrelated vendor binaries, SF Pro assets, and enterprise material while preserving required notices, provenance, and upstream attribution. A branch without old parents would not rewrite public main, but it is a distinct distribution choice requiring agreement, not a way to declare the existing public fork clean. Existing public refs/copies remain. The current helper requires a clean Git checkout, so an arbitrary exported directory without `.git` is not already a supported build route. A reviewed source commit or archive-aware provenance mode would be needed.
+
+Deleting files in a new commit alone does not remove their ancestors. No public-history filtering or force push is proposed.
+
+## What the Git-history check establishes
+
+[`scripts/audit-local-source-history.mjs`](scripts/audit-local-source-history.mjs) reads all reachable objects, then inventories selected path-labelled blobs. At the reviewed baseline it traversed 9,975 commits and identified 131 distinct blobs: 124 under the Sync vendor family, three patch blobs, and four SF Pro font blobs. Twenty-one distinct blobs were in the current tree and 110 only in history. **All 131 were already reachable from public `origin/main` at `1cbd11224c6300d402b92af09b4456ec54e91f1f`.** No newly introduced blob in these selected families was found relative to that base. This is not a license clearance or a full copyright audit.
+
+No path-labelled vendored `pos`/`BrillTransformationRules` source or named desktop distribution artifact was found by that targeted historical inventory. Lockfile references and npm downloads are different from vendored source. Embedded code in differently named artifacts still requires separate analysis. Git reports one representative path per content object, so this tool does not enumerate every historical alias or every public ref.
+
+Reproduce the inventory with:
+
+```sh
+node scripts/audit-local-source-history.mjs . HEAD origin/main
+node --test scripts/audit-local-source-history.test.mjs
+```
+
+The regression creates independent synthetic files, commits and deletes them, then verifies that both deleted blobs remain in the historical inventory and that the tool never returns publication clearance. No third-party bytes are copied into the test.
+
+Only four unused **desktop** SF Pro source files were removed in this checkpoint. The Local builder already pruned their generated copies and the desktop uses system fonts. Rebuilding its frontend before/after removal produced the same 642 files with identical SHA-256 hashes, zero additions/deletions, and zero changed files. Four web copies and all historical font objects remain; the web part uses those assets and was not silently changed. This cleanup therefore does not clear a whole-repository source publication. Apple's [font terms](https://developer.apple.com/fonts/) and [system-font guidance](https://developer.apple.com/documentation/technologyoverviews/fonts) require separate attention to the remaining copies.
+
+[GitHub source archives are snapshots, whereas clones include history](https://docs.github.com/en/repositories/working-with-files/using-files/downloading-source-code-archives). Review both the exact commit's archive/tree and all refs reachable through the chosen publication route. A clean release archive does not erase already public history; a clone of this branch includes its parents.
+
+## Distribution notices are not complete yet
+
+Existing Local packaging supplies the project MIT license, the bundled Cabin Sketch font's OFL, and license/provenance for the two vendored Swift Transformers tokenizer resources. These are useful but are not a complete native/frontend notice set.
+
+A targeted offline Cargo tree for `desktop`, `local-only`, `aarch64-apple-darwin`, normal and build edges yielded 1,267 unique package rows. That includes build-time dependencies and is not a list of exactly the linked bytes. It exposed an additional runtime obligation: `mp3lame-encoder@0.2.3` and `mp3lame-sys@0.1.11` declare LGPL-3.0. The normal dependency path goes through [crates/mp3](crates/mp3/src/encoder.rs), `audio-norm`, `fs-sync-core`, and desktop plugins. The sys crate builds bundled **LAME 3.100 statically**; its native tree also contains the GNU Library GPL version 2 text. Package metadata alone must not replace per-file/native-license inspection. Primary release sources: [encoder crate](https://crates.io/api/v1/crates/mp3lame-encoder/0.2.3/download), [sys crate including its build script and LAME sources](https://crates.io/api/v1/crates/mp3lame-sys/0.1.11/download).
+
+The final notice/source package needs, at minimum:
+
+- An exact source SHA, dependency pins and build instructions matching each shipped executable and web asset; preserved copyright, license, NOTICE, and modification records.
+- POS rights resolution and applicable GPL/LGPL source-delivery terms; for LGPL components, a practical compliant replacement/rebuild or relinking route, required materials, and applicable installation information. Static inclusion is relevant; simply copying a license file is insufficient. Removing MP3 encoding would affect audio functionality and was not attempted.
+- Every native sidecar/CLI and Swift package at its exact resolved revision, including existing build-time source patches. ONNX Runtime's prebuilt native library needs its own third-party notices, not just the Rust `ort` wrapper's SPDX value.
+- A frontend module-to-package/per-file audit including dictionaries and models, plus fonts and other copied assets. An installed-package inventory overcounts build tools and does not prove the contents of the shipped bundle.
+- Separate treatment of any optional downloaded model and its actual terms. Downloading instead of embedding material is not a license workaround.
+
+No complete `THIRD_PARTY_NOTICES` or compliance source archive was labelled ready. License compatibility and applicable approval remain unresolved for the distribution as a whole; MIT grants on independent project files do not globally relicense third-party or enterprise material.
+
+## Installation on the colleague's Mac
+
+The existing baseline `.app` is arm64, declares macOS 15+, contains no bundled SQLite Sync or SF Pro, and passed strict/deep ad-hoc signature verification. **Gatekeeper assessment rejected it (exit 3); it has no Developer ID team identity and is not notarized.** No new DMG was prepared and no clean colleague-Mac install, recording, or provider test was performed. These facts do not establish that the app is installable without intervention.
+
+| Route after licensing is resolved | Consequences and checks |
+| --- | --- |
+| Developer ID signed, hardened, notarized direct download | Preferred low-friction route for the existing desktop feature set. Use an already authorized personal signing identity, sign nested code correctly, notarize and staple, and publish a commit/hash/platform manifest. Check signer/team identity before use: an employer certificate would reveal and act under that identity. No certificate or account was created and no app uploaded. |
+| Colleague builds a reviewed Local source checkout | Preserves the Local feature set but requires compatible Xcode/Metal, Rust, Node/pnpm, time, and a verified source/dependency channel. No author Keychain items or provider keys should be needed. Local compilation is not a notarized installer; managed-device and TCC restrictions still need testing. The source distribution must itself be lawful. |
+| Explicit per-app Gatekeeper exception | Apple documents “Open Anyway” as a user decision after evaluating trust. It is not notarization or a successful clean-machine test and can be unavailable under device management. Do not disable Gatekeeper globally or remove quarantine attributes as the delivery procedure. |
+| App Store/TestFlight | A separate engineering/distribution project: current private APIs, capture behavior, sandbox/entitlements, store conditions, and GPL compatibility need review. Not a quick replacement for this direct-distribution build or a licensing bypass. |
+
+Primary Apple references: [Developer ID](https://developer.apple.com/developer-id/), [certificate roles and types](https://developer.apple.com/help/account/certificates/create-developer-id-certificates/), [notarization requirements](https://developer.apple.com/documentation/security/notarizing-macos-software-before-distribution), [notarytool authentication](https://developer.apple.com/documentation/technotes/tn3147-migrating-to-the-latest-notarization-tool), and [Gatekeeper/user exceptions](https://support.apple.com/en-us/102445). Notarytool can use an existing Apple ID app-specific password or existing App Store Connect API key; it does not inherently require generating a new API key. Availability of suitable existing credentials/signing authority was not established; none were created or requested.
+
+Before claiming a supported installation, test the exact final artifact from a quarantined download on a fresh supported Mac/user: checksum and signature/ticket, no developer-path dependencies, first-run permissions, synthetic note persistence across restart, short synthetic Russian/English audio capture/playback/transcription, and optional providers configured with that user's own credentials. Record OS/architecture, managed-device limitations, and the actual results. Updates remain manual because this fork's updater is disabled.
+
+## Remaining decisions and checkpoint validation
+
+- Choose the POS rights/compliance route or authorize a validated independent replacement. No known permissive, behavior-equivalent drop-in was established; loss of automatic NLP is a separate product choice.
+- Choose the source-publication scope and resolve historical Sync/font provenance and grants. Retaining the existing public history and publishing a separately scoped snapshot have different consequences; neither automatically repairs past distribution.
+- Complete the actual shipped-component notices and applicable source/replacement materials, including MP3/LAME and ONNX/Swift dependencies.
+- Choose an authorized signing/install route and run a real clean-machine acceptance test. There is no verified ready installer yet.
+
+The safe changes in this checkpoint do not alter automatic NLP, dependency versions, MP3 encoding, or database behavior. Validation completed:
+
+- Frontend rebuilt successfully; all 642 files had identical SHA-256 values before/after the desktop source-font cleanup.
+- All three selected Local/history/privacy Node tests passed, as did all nine license-boundary unit tests and the boundary checker.
+- Formatting and whitespace checks passed; a redacted Gitleaks scan of the four added/updated text files found zero findings. This limited scan is additional to the earlier incoming-history/artifact audit, not a new certification of all binaries.
+- The common repository Node suite passed 94 of 97 tests. Its three failures match the previous baseline: two require unavailable `pwsh`, and one detects an existing canonical-skill/plugin mirror mismatch. Node here is 22.23.1, whereas CI requests 22.23.4. Full CI is not claimed green.
+- The native application was not rebuilt for this checkpoint. Its previous signature/Gatekeeper/privacy results apply only to the baseline SHA identified above; a future release must rebuild and rescan its actual source commit.
+
+Publication remains blocked by the concrete rights/provenance/notices findings above. No push or release was attempted.

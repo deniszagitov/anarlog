@@ -30,7 +30,9 @@ The Git repository retains upstream history and vendored files under their origi
 
 The current frontend imports `pos@0.4.2` through `retext-pos`. Although its package metadata refers to LGPL, `BrillTransformationRules.js` has a separate GPL-3.0-or-later header and is used by the tagger. A package-level LGPL notice alone does not resolve that mixed provenance. The repository's written-approval requirement in `LICENSING.md` applies before publishing a distribution containing GPL code. Resolve this through the required rights/approval review or an agreed feature/dependency change; do not label the complete binary exclusively MIT.
 
-The Local packaging step excludes four unused upstream SF Pro font files. macOS supplies its own system font; Apple's font license does not permit embedding those SF Pro files in a distributed app. Other third-party notices, source requirements, and Swift/native dependencies still need complete distribution review.
+The four unused desktop SF Pro source files have been removed, and Local packaging also excludes their generated copies. macOS supplies its own system font; Apple's font license does not permit embedding those SF Pro files in a distributed app. Web copies and historical Git objects remain. Other third-party notices, source requirements, and Swift/native dependencies still need complete distribution review, including the statically linked MP3/LAME dependency.
+
+See [LOCAL_DISTRIBUTION_REVIEW.md](LOCAL_DISTRIBUTION_REVIEW.md) for the version-specific SQLite Sync license history, POS alternatives and their functional costs, source-publication scope, incomplete notices, and installation/signing options. Current upstream Apache-licensed SQLite Sync source does not by itself clear older vendored binaries or repository history. There is no completed license clearance or verified colleague installer.
 
 ## Build from source
 
