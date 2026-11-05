@@ -14,16 +14,17 @@ if (
 ) {
   throw new Error("Pass the built Anarlog Local.app bundle.");
 }
-const vendors = ["aarch64", "x86_64"].map((arch) =>
-  readFileSync(
+const vendors = ["aarch64", "x86_64"]
+  .map((arch) =>
     join(
       root,
       "crates/cloudsync/vendor/cloudsync/macos",
       arch,
       "cloudsync.dylib",
     ),
-  ),
-);
+  )
+  .filter(existsSync)
+  .map((path) => readFileSync(path));
 const findings = [];
 const anonymousVendorCiPaths = new Set();
 let files = 0;

@@ -62,6 +62,14 @@ def verify_output(output, expected_sha, version):
         expected.add(name)
     if set(path.name for path in output.iterdir()) != expected:
         raise ValueError("Unexpected files in the release upload directory")
+    expected_sums = "".join(
+        f"{item['sha256']}  {item['name']}\n" for item in manifest["artifacts"]
+    )
+    expected_sums += f"{digest(output / 'release.json')}  release.json\n"
+    if (output / "SHA256SUMS").read_text() != expected_sums:
+        raise ValueError(
+            "Published checksum file does not match the verified artifacts"
+        )
 
 
 def source_packages():
@@ -284,9 +292,24 @@ def build_package(output):
     (resources / "dependency-inventory.json").write_text(
         json.dumps(inventory, indent=2) + "\n"
     )
+    subprocess.run(
+        ["node", str(ROOT / "scripts/verify-local-artifact.mjs"), str(app), sha],
+        check=True,
+    )
     with (output / f"{stem}-source.tar.gz").open("wb") as destination:
         git = subprocess.Popen(
-            ["git", "archive", "--format=tar", f"--prefix={stem}/", sha],
+            [
+                "git",
+                "archive",
+                "--format=tar",
+                f"--prefix={stem}/",
+                sha,
+                "--",
+                ".",
+                ":(exclude)enterprise",
+                ":(exclude)crates/cloudsync/vendor",
+                ":(exclude)apps/web/public/fonts/SF-Pro-Text-*.otf",
+            ],
             cwd=ROOT,
             stdout=subprocess.PIPE,
         )

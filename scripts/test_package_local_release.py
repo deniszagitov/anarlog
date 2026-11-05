@@ -31,7 +31,8 @@ class ReleaseUploadTests(unittest.TestCase):
                 ],
             }
             (output / "release.json").write_text(json.dumps(manifest))
-            (output / "SHA256SUMS").write_text("")
+            sums = f"{manifest['artifacts'][0]['sha256']}  {asset.name}\n{release.digest(output / 'release.json')}  release.json\n"
+            (output / "SHA256SUMS").write_text(sums)
             (output / "release-notes.md").write_text("fixture")
             release.verify_output(output, sha, "0.1.0")
             with self.assertRaisesRegex(ValueError, "identity"):
@@ -42,6 +43,10 @@ class ReleaseUploadTests(unittest.TestCase):
             asset.write_bytes(b"verified application fixture")
             (output / ".env").write_text("private fixture, never upload")
             with self.assertRaisesRegex(ValueError, "Unexpected files"):
+                release.verify_output(output, sha, "0.1.0")
+            (output / ".env").unlink()
+            (output / "SHA256SUMS").write_text("altered checksums")
+            with self.assertRaisesRegex(ValueError, "checksum file"):
                 release.verify_output(output, sha, "0.1.0")
 
 
