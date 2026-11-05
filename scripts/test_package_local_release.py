@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import subprocess
 
 spec = importlib.util.spec_from_file_location(
     "local_release", Path(__file__).with_name("package-local-release.py")
@@ -13,6 +14,56 @@ spec.loader.exec_module(release)
 
 
 class ReleaseUploadTests(unittest.TestCase):
+    def test_swift_inventory_uses_public_provenance_instead_of_local_clone_origin(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            build = Path(temporary)
+            workspace = build / "fixture/out/swift-rs/fixture"
+            checkout = workspace / "checkouts/dependency"
+            checkout.mkdir(parents=True)
+
+            def git(*args):
+                subprocess.run(
+                    ["git", "-C", str(checkout), *args], check=True, capture_output=True
+                )
+
+            git("init", "-q")
+            git(
+                "-c",
+                "user.name=Fixture",
+                "-c",
+                "user.email=fixture@example.invalid",
+                "commit",
+                "--allow-empty",
+                "-m",
+                "Fixture",
+            )
+            git(
+                "remote", "add", "origin", "/Users/test-person/private-cache/dependency"
+            )
+            (workspace / "workspace-state.json").write_text(
+                json.dumps(
+                    {
+                        "object": {
+                            "dependencies": [
+                                {
+                                    "subpath": "dependency",
+                                    "packageRef": {
+                                        "location": "https://github.com/example/dependency.git"
+                                    },
+                                }
+                            ]
+                        }
+                    }
+                )
+            )
+            packages = release.swift_source_packages(build)
+            self.assertEqual(len(packages), 1)
+            info = next(iter(packages.values()))[1]
+            self.assertEqual(
+                info["source"], "https://github.com/example/dependency.git"
+            )
+            self.assertNotIn("/Users/", json.dumps(info))
+
     def test_upload_refuses_wrong_source_tampered_assets_and_extra_private_files(self):
         with tempfile.TemporaryDirectory() as temporary:
             output = Path(temporary)

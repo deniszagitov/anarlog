@@ -72,6 +72,39 @@ def verify_output(output, expected_sha, version):
         )
 
 
+def swift_source_packages(build):
+    packages = {}
+    for state in sorted(build.glob("*/out/swift-rs/*/workspace-state.json")):
+        for dependency in json.loads(state.read_text())["object"]["dependencies"]:
+            reference = dependency["packageRef"]
+            checkout = state.parent / "checkouts" / dependency["subpath"]
+            if not checkout.is_dir():
+                continue
+            remote = urlsplit(reference["location"])
+            if (
+                remote.scheme != "https"
+                or not remote.hostname
+                or remote.username
+                or remote.password
+            ):
+                raise ValueError(
+                    "Swift dependency provenance must be a public HTTPS URL"
+                )
+            revision = run("git", "-C", str(checkout), "rev-parse", "HEAD")
+            source = urlunsplit((remote.scheme, remote.hostname, remote.path, "", ""))
+            key = f"swift/{checkout.name}@{revision}"
+            packages[key] = (
+                checkout,
+                {
+                    "name": checkout.name,
+                    "version": revision,
+                    "license": "See included notices and source headers; build-time patches are included in the source archive",
+                    "source": source,
+                },
+            )
+    return packages
+
+
 def source_packages():
     trees = json.loads(
         run(
@@ -204,27 +237,7 @@ def source_packages():
             },
         )
     build = ROOT / "apps/desktop/src-tauri/target/release/build"
-    for state in sorted(build.glob("*/out/swift-rs/*/workspace-state.json")):
-        for checkout in sorted((state.parent / "checkouts").glob("*")):
-            if not checkout.is_dir():
-                continue
-            revision = run("git", "-C", str(checkout), "rev-parse", "HEAD")
-            key = f"swift/{checkout.name}@{revision}"
-            remote = urlsplit(
-                run("git", "-C", str(checkout), "remote", "get-url", "origin")
-            )
-            source = urlunsplit(
-                (remote.scheme, remote.hostname or "", remote.path, "", "")
-            )
-            packages[key] = (
-                checkout,
-                {
-                    "name": checkout.name,
-                    "version": revision,
-                    "license": "See included notices and source headers",
-                    "source": source,
-                },
-            )
+    packages.update(swift_source_packages(build))
     return packages
 
 
