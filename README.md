@@ -1,4 +1,6 @@
-> **Note:** The team is now building **[char](https://char.com)**. The **anarlog** community application remains open-source, MIT-licensed, and maintained as the local-first meeting notetaker in this repo. Source-visible enterprise components are commercially licensed.
+> **Anarlog Local fork:** Download the Apple Silicon macOS application from [this fork's Releases](https://github.com/deniszagitov/anarlog/releases). See [installation and provider setup](LOCAL_INSTALL.md). Local builds use your own transcription and LLM endpoints and keys, have separate storage, and update manually. Experimental downloads are signed ad hoc, not notarized by Apple. Each release includes matching sources, third-party notices, and checksums; third-party GPL/LGPL terms apply to the combined distribution where required.
+
+> **Upstream:** The team is now building **[char](https://char.com)**. The **anarlog** community application remains open-source, MIT-licensed, and maintained as the local-first meeting notetaker in this repo. Source-visible enterprise components are commercially licensed.
 
 <div align="center">
 
@@ -69,10 +71,10 @@ It is built for people who want AI meeting notes without handing their conversat
 
 anarlog keeps audio transcription separate from the language model used for summaries and chat. You can change either one without changing the other.
 
-| Stage                                       | App setting       | Anarlog Cloud                                                                                                                                            | Local or bring your own                                                                   |
-| ------------------------------------------- | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Stage                                       | App setting       | Anarlog Cloud                                                                                                                  | Local or bring your own                                                                   |
+| ------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
 | Audio → transcript                          | **Transcription** | Managed **Pro (Cloud)** prefers Soniox 5 for live and batch transcription, with eligible fallbacks based on language and mode. | Soniqo or Apple Speech when available, or your selected transcription provider and model  |
-| Transcript + memo → summary, title, or chat | **Intelligence**  | Managed **Auto** (also shown as Pro (Cloud)) currently uses the latest Claude Sonnet alias through OpenRouter.                                           | Your selected API, subscription, OpenAI-compatible server, or eligible Apple Intelligence |
+| Transcript + memo → summary, title, or chat | **Intelligence**  | Managed **Auto** (also shown as Pro (Cloud)) currently uses the latest Claude Sonnet alias through OpenRouter.                 | Your selected API, subscription, OpenAI-compatible server, or eligible Apple Intelligence |
 
 The active provider and model are always visible under **Settings → Transcription** and **Settings → Intelligence**. Read [Models and providers](https://docs.anarlog.so/models-and-providers) for the current routes, local model list, and privacy boundaries.
 

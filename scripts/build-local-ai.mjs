@@ -173,6 +173,12 @@ if (failures.length) {
   Object.assign(environment, {
     CARGO: cargo,
     VERGEN_GIT_SHA: revision.stdout.trim(),
+    APP_VERSION: JSON.parse(
+      readFileSync(
+        resolve(root, "apps/desktop/src-tauri/tauri.conf.local-ai.json"),
+        "utf8",
+      ),
+    ).version,
     CARGO_BUILD_JOBS: process.env.CARGO_BUILD_JOBS ?? "4",
     // Stripped host dylibs can have misaligned LINKEDIT string pools on macOS 27.
     CARGO_PROFILE_RELEASE_BUILD_OVERRIDE_STRIP: "none",
@@ -251,7 +257,14 @@ if (failures.length) {
   // Seal bundle integrity without credentials. This is not a Developer ID
   // signature or notarization and does not make Gatekeeper accept the app.
   for (const args of [
-    ["--force", "--sign", "-", app],
+    [
+      "--force",
+      "--sign",
+      "-",
+      "--entitlements",
+      resolve(root, "apps/desktop/src-tauri/Entitlements.plist"),
+      app,
+    ],
     ["--verify", "--deep", "--strict", app],
   ]) {
     const result = spawnSync("codesign", args, { stdio: "inherit" });
