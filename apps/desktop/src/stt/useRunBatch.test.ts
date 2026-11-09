@@ -1206,6 +1206,58 @@ describe("useRunBatch", () => {
     },
   );
 
+  test("transcribes saved audio through a remote Custom ASR in Local builds", async () => {
+    vi.stubEnv("VITE_LOCAL_AI", "true");
+    try {
+      startTranscriptionMock.mockImplementationOnce(
+        async (_params, options) => {
+          options.handlePersist(
+            [
+              {
+                text: "Recognized speech",
+                start_ms: 0,
+                end_ms: 100,
+                channel: 0,
+              },
+            ],
+            [],
+          );
+        },
+      );
+      useSTTConnectionMock.mockReturnValue({
+        conn: {
+          provider: "custom",
+          model: "speech-model",
+          baseUrl: "https://inference.example.com/v1?provider=local_openai",
+          apiKey: "test-key",
+        },
+      });
+      const { result } = renderHook(() => useRunBatch("session-1"));
+
+      await act(async () => {
+        await result.current("/tmp/session.wav");
+      });
+
+      expect(startTranscriptionMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          provider: "deepgram",
+          model: "speech-model",
+          base_url: "https://inference.example.com/v1?provider=local_openai",
+          api_key: "test-key",
+        }),
+        expect.any(Object),
+      );
+      expect(saveBatchTranscriptMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          session_id: "session-1",
+          words: [expect.objectContaining({ text: "Recognized speech" })],
+        }),
+      );
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
   test.each([
     { isPaid: false, name: "rejects Soniqo for unpaid users" },
     { isPaid: true, name: "falls back to cloud for paid users" },

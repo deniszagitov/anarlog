@@ -436,7 +436,11 @@ export const useRunBatch = (sessionId: string) => {
         isLocalAiBuild() &&
         !isOnDeviceSttModel(target.provider, target.model) &&
         !isLocalFileSttModel(target.provider, target.model) &&
-        (!isAllowedInferenceEndpoint(target.baseUrl, target.provider) ||
+        (!isAllowedInferenceEndpoint(
+          target.baseUrl,
+          // Custom uses the Deepgram transport internally, but retains its endpoint policy.
+          selectedProviderId ?? target.provider,
+        ) ||
           (target.provider === "anarlog" && target.model === "cloud"))
       ) {
         throw new Error(

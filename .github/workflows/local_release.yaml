@@ -6,7 +6,7 @@ on:
       version:
         description: Version committed in tauri.conf.local-ai.json
         required: true
-        default: "0.1.0"
+        default: "0.1.1"
         type: string
       publish:
         description: Publish verified files to an experimental GitHub release
