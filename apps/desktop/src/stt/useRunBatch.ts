@@ -246,14 +246,6 @@ export function getBatchFallbackTarget({
     : null;
 }
 
-async function canUseBatchTarget(
-  provider: TranscriptionParams["provider"],
-  model: string,
-  languages: readonly string[],
-) {
-  return isSupportedLanguagesBatch(provider, model, languages);
-}
-
 function selectedProviderLabel(
   conn: { provider: string; model: string } | null,
   modelOverride?: string,
@@ -381,8 +373,10 @@ export const useRunBatch = (sessionId: string) => {
       );
       const selectedTargetSupported =
         selectedTarget && !selectedOnDeviceUnsupported
-          ? await canUseBatchTarget(
-              selectedTarget.provider,
+          ? await isSupportedLanguagesBatch(
+              selectedProviderId === "custom"
+                ? selectedProviderId
+                : selectedTarget.provider,
               selectedTarget.model,
               languages,
             )

@@ -4,6 +4,11 @@ export function isLocalAiBuild() {
   return import.meta.env.VITE_LOCAL_AI === "true";
 }
 
+// The native dictation engine uses this device-local owner for recovery and learning.
+export function dictationOwner(userId: string | undefined) {
+  return userId ?? (isLocalAiBuild() ? "anarlog-local" : null);
+}
+
 export function isLocalInferenceEndpoint(value: string) {
   try {
     const url = new URL(value);

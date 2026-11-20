@@ -147,6 +147,11 @@ msgstr "{0, plural, one {# запись слишком велика для пр�
 msgid "{0} records are waiting for an app update"
 msgstr "{0, plural, one {# запись ожидает обновления приложения} few {# записи ожидают обновления приложения} many {# записей ожидают обновления приложения} other {# записи ожидают обновления приложения}}"
 
+#. placeholder {0}: seconds(item)
+#: src/dictation/recovery.tsx
+msgid "{0} s"
+msgstr "{0} с"
+
 #. placeholder {0}: Math.round((percentage ?? 0) * 100)
 #: src/session/components/note-input/transcript/screens/empty.tsx
 msgid "{0}% complete"
@@ -444,6 +449,7 @@ msgstr "Доступ обновлён."
 
 #: src/onboarding/permissions.tsx
 #: src/settings/general/permissions.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Accessibility"
 msgstr "Универсальный доступ"
 
@@ -488,6 +494,7 @@ msgstr "Активность за последний год"
 #: src/contacts/shared.tsx
 #: src/resource-sharing/share-dialog.tsx
 #: src/settings/dictionary/index.tsx
+#: src/settings/dictionary/replacements.tsx
 #: src/settings/todo/github.tsx
 #: src/sidebar/toast/registry.tsx
 msgid "Add"
@@ -512,6 +519,10 @@ msgstr "Добавить учётную запись {0}"
 #: src/settings/ai/stt/select.tsx
 msgid "Add {0} in System Settings > General > Language & Region to transcribe with {model}, or choose another model."
 msgstr "Добавьте {0} в «Системных настройках» → «Основные» → «Язык и регион» для распознавания с помощью {model} или выберите другую модель."
+
+#: src/settings/dictionary/replacements.tsx
+msgid "Add {term}"
+msgstr "Добавить «{term}»"
 
 #: src/resource-sharing/library.tsx
 msgid "Add a copy"
@@ -541,6 +552,10 @@ msgstr "Добавьте условие запуска, затем действ�
 msgid "Add an action"
 msgstr "Добавить действие"
 
+#: src/settings/general/camera-watermark.tsx
+msgid "Add Anarlog Camera to macOS"
+msgstr "Добавить Anarlog Camera в macOS"
+
 #: src/settings/automations/index.tsx
 msgid "Add and configure at least one action first."
 msgstr "Сначала добавьте и настройте хотя бы одно действие."
@@ -564,6 +579,10 @@ msgstr "Перед включением добавьте хотя бы одно 
 #: src/templates/auto-format-examples-dialog.tsx
 msgid "Add at least one example summary."
 msgstr "Добавьте хотя бы один пример конспекта."
+
+#: src/settings/general/camera-watermark.tsx
+msgid "Add camera"
+msgstr "Добавить камеру"
 
 #: src/session/folder-instructions.tsx
 msgid "Add context for this folder"
@@ -602,6 +621,7 @@ msgid "Add members"
 msgstr "Добавить участников"
 
 #: src/settings/dictionary/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Add names, jargon, or product terms to prefer"
 msgstr "Добавьте предпочтительные имена, профессиональные термины или названия продуктов"
 
@@ -615,6 +635,7 @@ msgstr "Добавить организацию"
 
 #: src/billing/trial-payment-reminder-dialog.tsx
 #: src/settings/general/billing.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Add payment method"
 msgstr "Добавить способ оплаты"
 
@@ -658,7 +679,12 @@ msgstr "Добавить вебхук"
 msgid "Added a copy to your library"
 msgstr "Копия добавлена в вашу библиотеку"
 
+#: src/settings/general/camera-watermark.tsx
+msgid "Adding…"
+msgstr "Добавление…"
+
 #: src/settings/general/spoken-languages.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Additional spoken languages"
 msgstr "Дополнительные языки речи"
 
@@ -692,6 +718,7 @@ msgid "After the meeting summary is ready"
 msgstr "Когда конспект встречи готов"
 
 #: src/settings/developers/skills.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Agent skills"
 msgstr "Навыки агентов"
 
@@ -734,6 +761,10 @@ msgstr "За всё время"
 #: src/settings/team/index.tsx
 msgid "Allow anyone-with-the-link sharing"
 msgstr "Разрешить доступ всем, у кого есть ссылка"
+
+#: src/settings/general/camera-watermark.tsx
+msgid "Allow camera"
+msgstr "Разрешить доступ к камере"
 
 #: src/stt/start-failure.ts
 msgid "Allow microphone access for Anarlog, then try again."
@@ -785,6 +816,18 @@ msgstr "Доступна версия Anarlog {0}"
 msgid "Anarlog {0} is ready to install"
 msgstr "Anarlog {0} готов к установке"
 
+#: src/settings/general/camera-watermark.tsx
+msgid "Anarlog Camera"
+msgstr "Anarlog Camera"
+
+#: src/services/camera-guidance.tsx
+msgid "Anarlog Camera is hiding your room now. Turn off {app}'s blur or background: it hides the badge."
+msgstr "Anarlog Camera уже скрывает вашу комнату. Отключите размытие или фон в {app}, чтобы стал виден значок записи."
+
+#: src/settings/general/camera-watermark.tsx
+msgid "Anarlog Camera needs your camera to show you."
+msgstr "Разрешите Anarlog Camera доступ к камере, чтобы вас было видно."
+
 #: src/onboarding/permissions.tsx
 msgid "Anarlog can hear others"
 msgstr "Anarlog слышит собеседников"
@@ -802,6 +845,7 @@ msgid "Anarlog can't reach {providerName}"
 msgstr "Anarlog не может подключиться к сервису {providerName}"
 
 #: src/settings/developers/cli.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Anarlog CLI"
 msgstr "Anarlog CLI"
 
@@ -869,6 +913,10 @@ msgstr "Anarlog заблокирован"
 #: src/store/zustand/listener/general-live.ts
 msgid "Anarlog keeps recording while live transcription reconnects. Missing text will be recovered from temporary audio while the meeting continues."
 msgstr "Anarlog продолжает запись во время восстановления подключения к распознаванию в реальном времени. Пропущенный текст будет восстановлен из временного аудио, пока встреча продолжается."
+
+#: src/services/camera-guidance.tsx
+msgid "Anarlog left {app}'s blur or background on because it couldn't confirm Anarlog Camera hides your room yet."
+msgstr "Фон или размытие в {app} остались включены. Anarlog пока не удалось проверить, скрывает ли Anarlog Camera вашу комнату."
 
 #: src/session-sharing/access-management.tsx
 msgid "Anarlog member"
@@ -966,6 +1014,7 @@ msgid "API documentation"
 msgstr "Документация API"
 
 #: src/settings/ai/shared/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "API Key"
 msgstr "Ключ API"
 
@@ -992,6 +1041,7 @@ msgid "App"
 msgstr "Приложение"
 
 #: src/settings/appearance/app-icon.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "App icon"
 msgstr "Значок приложения"
 
@@ -1043,6 +1093,10 @@ msgstr "Применить к конспекту"
 #: src/session-sharing/access-management.tsx
 msgid "Approve"
 msgstr "Одобрить"
+
+#: src/settings/general/camera-watermark.tsx
+msgid "Approve Anarlog Camera in System Settings under Login Items & Extensions."
+msgstr "Разрешите Anarlog Camera в разделе «Объекты входа и расширения» системных настроек."
 
 #: src/composer/index.tsx
 msgid "Ask Anarlog AI anything"
@@ -1131,6 +1185,7 @@ msgid "Audio could not be recovered"
 msgstr "Не удалось восстановить аудио"
 
 #: src/settings/general/audio-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Audio file retention"
 msgstr "Срок хранения аудиофайлов"
 
@@ -1204,6 +1259,7 @@ msgid "Automate what happens before, during, or after meetings based on the cond
 msgstr "Настройте действия до, во время и после встреч по выбранным вами условиям."
 
 #: src/settings/general/app-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Automatically install updates"
 msgstr "Устанавливать обновления автоматически"
 
@@ -1262,6 +1318,10 @@ msgstr "Среднее по дням записи, учтённым выше."
 #: src/sidebar/custom-sidebar-header.tsx
 msgid "Back"
 msgstr "Назад"
+
+#: src/settings/general/camera-watermark.tsx
+msgid "Background"
+msgstr "Фон"
 
 #: src/settings/general/timezone.tsx
 msgid "Bangkok"
@@ -1326,6 +1386,10 @@ msgstr "Цветение"
 msgid "Blueprint"
 msgstr "Чертёж"
 
+#: src/settings/general/camera-watermark.tsx
+msgid "Blur"
+msgstr "Размытие"
+
 #: src/editor-bridge/note-editor.tsx
 msgid "Bold"
 msgstr "Полужирный"
@@ -1335,6 +1399,7 @@ msgid "Both the source and target meetings are required."
 msgstr "Укажите исходную и целевую встречи."
 
 #: src/settings/general/notification.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Bounce app icon"
 msgstr "Подпрыгивание значка приложения"
 
@@ -1391,6 +1456,14 @@ msgstr "Календарь подключён"
 #: src/settings/team/index.tsx
 msgid "Calendar-scheduled capture jobs. Canceling stops the bot from joining."
 msgstr "Записи, запланированные в календаре. Отмена не позволит боту подключиться к встрече."
+
+#: src/settings/general/camera-watermark.tsx
+msgid "Camera"
+msgstr "Камера"
+
+#: src/settings/general/camera-watermark.tsx
+msgid "Camera access"
+msgstr "Доступ к камере"
 
 #: src/session-sharing/access-management.tsx
 msgid "Can comment"
@@ -1487,10 +1560,12 @@ msgid "Capture conversations in 4 different weeks. They don't need to be consecu
 msgstr "Записывайте разговоры в течение 4 разных недель. Недели могут идти не подряд."
 
 #: src/settings/general/meeting-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Capture meeting chat in Memos"
 msgstr "Сохранять чат встречи в заметках"
 
 #: src/settings/general/meeting-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Capture shared screens in Memos"
 msgstr "Сохранять демонстрацию экрана в заметках"
 
@@ -1532,6 +1607,10 @@ msgstr "Изменить логотип рабочего пространств�
 msgid "Changes stay on this device until you resume sync."
 msgstr "Изменения останутся на этом устройстве, пока вы не возобновите синхронизацию."
 
+#: src/dictation/recovery.tsx
+msgid "Chat"
+msgstr "Чат"
+
 #: src/chat/components/toolbar-controls.tsx
 msgid "Chat history"
 msgstr "История чатов"
@@ -1543,10 +1622,6 @@ msgstr "Тарифы ChatGPT"
 #: src/i18n/native-menu.ts
 msgid "Check for Updates"
 msgstr "Проверить обновления"
-
-#: src/chat/components/input/use-dictation.ts
-msgid "Check microphone permission and the selected input device, then try again."
-msgstr "Проверьте доступ к микрофону и выбранное устройство ввода, затем повторите попытку."
 
 #: src/stt/start-failure.ts
 msgid "Check that your vault folder is available and your disk has free space, then try again."
@@ -1734,6 +1809,7 @@ msgid "Choose how Auto structures and styles your summaries."
 msgstr "Настройте структуру и стиль автоматически создаваемых конспектов."
 
 #: src/settings/general/audio-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Choose how long recordings stay on this device."
 msgstr "Выберите срок хранения записей на этом устройстве."
 
@@ -1769,6 +1845,10 @@ msgstr "Claude Pro / Max"
 #: src/settings/general/storage/legacy-cleanup.tsx
 msgid "Clean Up"
 msgstr "Очистить"
+
+#: src/settings/dictation-engine.tsx
+msgid "Clean up dictation"
+msgstr "Редактировать текст после диктовки"
 
 #: src/settings/general/storage/legacy-cleanup.tsx
 msgid "Clean up legacy files?"
@@ -1807,10 +1887,12 @@ msgid "Clear selection"
 msgstr "Снять выделение"
 
 #: src/settings/developers/cli.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "CLI & MCP"
 msgstr "CLI и MCP"
 
 #: src/settings/dictation.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Click here, then use your dictation shortcut."
 msgstr "Нажмите здесь, затем используйте сочетание клавиш для диктовки."
 
@@ -1857,6 +1939,7 @@ msgid "Closed"
 msgstr "Закрыто"
 
 #: src/settings/developers/cloud-api.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Cloud API & Connectors"
 msgstr "Облачный API и коннекторы"
 
@@ -1881,6 +1964,7 @@ msgid "Cloud API key copied"
 msgstr "Ключ облачного API скопирован"
 
 #: src/settings/developers/cloud-api.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Cloud API keys"
 msgstr "Ключи облачного API"
 
@@ -1889,11 +1973,13 @@ msgid "Cloud API URL copied"
 msgstr "URL облачного API скопирован"
 
 #: src/settings/sync/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Cloud sync"
 msgstr "Облачная синхронизация"
 
 #: src/auth/cloudsync-progress.ts
 #: src/settings/general/notification.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Cloud sync complete"
 msgstr "Облачная синхронизация завершена"
 
@@ -2031,6 +2117,7 @@ msgid "Complete sign-in in your browser, then return to Anarlog."
 msgstr "Завершите вход в браузере, затем вернитесь в Anarlog."
 
 #: src/settings/general/notification.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Completion sound"
 msgstr "Звук завершения"
 
@@ -2052,6 +2139,7 @@ msgstr "Настройте модель чата для быстрого вво�
 
 #: src/settings/ai/llm/configure.tsx
 #: src/settings/ai/stt/configure.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Configure Providers"
 msgstr "Настроить провайдеров"
 
@@ -2155,6 +2243,7 @@ msgid "Connected"
 msgstr "Подключено"
 
 #: src/settings/general/account.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Connected accounts"
 msgstr "Подключённые учётные записи"
 
@@ -2267,6 +2356,7 @@ msgstr "Разговоров: {total}"
 msgid "Copied"
 msgstr "Скопировано"
 
+#: src/dictation/recovery.tsx
 #: src/i18n/native-menu.ts
 #: src/main/windows-title-bar.tsx
 #: src/session/components/note-input/header-enhanced.tsx
@@ -2286,6 +2376,10 @@ msgstr "Копировать URL: {label}"
 #: src/devtools-bar/index.tsx
 msgid "Copy a diagnostics snapshot (build, device, metrics, top commands and components, sync) as JSON"
 msgstr "Копировать диагностику (сборка, устройство, метрики, основные команды и компоненты, синхронизация) в JSON"
+
+#: src/dictation/recovery.tsx
+msgid "Copy and remove"
+msgstr "Скопировать и удалить"
 
 #: src/settings/developers/cli.tsx
 msgid "Copy config"
@@ -2766,11 +2860,13 @@ msgid "Cut"
 msgstr "Вырезать"
 
 #: src/settings/stats/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Daily conversations"
 msgstr "Ежедневные разговоры"
 
 #: src/devtools-bar/quick-settings.tsx
 #: src/settings/appearance/theme.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Dark"
 msgstr "Тёмная"
 
@@ -2800,6 +2896,10 @@ msgstr "Дата: {days, plural, one {последний # день} few {пос
 msgid "Date: {range}"
 msgstr "Дата: {range}"
 
+#: src/settings/general/camera-watermark.tsx
+msgid "Daylight"
+msgstr "Дневной свет"
+
 #: src/onboarding/account/offer-card.tsx
 msgid "days"
 msgstr "дн."
@@ -2828,6 +2928,7 @@ msgid "Default language for the interface, transcription, and AI responses."
 msgstr "Язык интерфейса, распознавания речи и ответов ИИ по умолчанию."
 
 #: src/settings/general/default-share-access.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Default sharing"
 msgstr "Общий доступ по умолчанию"
 
@@ -2943,6 +3044,7 @@ msgid "Detect meetings from microphone activity."
 msgstr "Обнаруживать встречи по активности микрофона."
 
 #: src/settings/general/notification.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Detection delay"
 msgstr "Задержка обнаружения"
 
@@ -2973,6 +3075,7 @@ msgstr "Настройки устройства"
 
 #: src/settings/sync/index.tsx
 #: src/settings/team/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Devices"
 msgstr "Устройства"
 
@@ -3009,8 +3112,13 @@ msgid "Disable"
 msgstr "Отключить"
 
 #: src/settings/general/notification.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Disable all notifications"
 msgstr "Отключить все уведомления"
+
+#: src/dictation/recovery.tsx
+msgid "Discard"
+msgstr "Удалить"
 
 #: src/calendar/components/oauth/provider-content.tsx
 #: src/calendar/components/sidebar.tsx
@@ -3029,6 +3137,14 @@ msgstr "Отключить доступ к закрытым репозитори
 #: src/store/zustand/listener/general-live.ts
 msgid "Disk almost full"
 msgstr "Диск почти заполнен"
+
+#: src/settings/dictionary/replacements.tsx
+msgid "Dismiss"
+msgstr "Отклонить"
+
+#: src/settings/dictionary/replacements.tsx
+msgid "Dismiss {term}"
+msgstr "Отклонить «{term}»"
 
 #: src/devtools-bar/actions.tsx
 msgid "Dismiss all native notifications."
@@ -3146,6 +3262,10 @@ msgstr "Дублировать"
 msgid "Duration"
 msgstr "Длительность"
 
+#: src/settings/general/camera-watermark.tsx
+msgid "Dusk"
+msgstr "Сумерки"
+
 #: src/settings/todo/shared.tsx
 msgid "e.g. owner/repo"
 msgstr "например, owner/repo"
@@ -3181,6 +3301,10 @@ msgstr "Редактирование заметок"
 #: src/chat/components/message/tool/edit-summary.tsx
 msgid "Edit memo — review tab opened"
 msgstr "Редактирование заметок — открыта вкладка проверки"
+
+#: src/settings/dictation-engine.tsx
+msgid "Edit selected text by voice"
+msgstr "Редактировать выделенный текст голосом"
 
 #: src/chat/components/message/tool/edit-summary.tsx
 msgid "Edit summary"
@@ -3241,6 +3365,7 @@ msgid "Enable Cloud API & Connectors"
 msgstr "Включить облачный API и коннекторы"
 
 #: src/settings/dictation.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Enable dictation"
 msgstr "Включить диктовку"
 
@@ -3356,6 +3481,7 @@ msgstr "Esc — закрыть"
 
 #: src/devtools-bar/quick-settings.tsx
 #: src/settings/general/notification.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Event notifications"
 msgstr "Уведомления о событиях"
 
@@ -3408,6 +3534,7 @@ msgid "Examples must be Markdown or plain text files."
 msgstr "Примеры должны быть файлами Markdown или обычного текста."
 
 #: src/settings/general/notification.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Exclude apps from detection"
 msgstr "Исключить приложения из обнаружения"
 
@@ -3441,6 +3568,7 @@ msgid "Export folder"
 msgstr "Папка экспорта"
 
 #: src/settings/general/storage/export-location.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Export location"
 msgstr "Папка для экспорта"
 
@@ -3605,6 +3733,10 @@ msgstr "Показать каждый вид нативного уведомле
 msgid "First Words"
 msgstr "Первые слова"
 
+#: src/settings/dictation-engine.tsx
+msgid "Fixes punctuation and filler words with your selected AI model. If it takes longer than a few seconds, your words are inserted as spoken."
+msgstr "Выбранная модель ИИ исправляет пунктуацию и убирает слова-паразиты. Если обработка займёт больше нескольких секунд, Anarlog вставит исходную расшифровку."
+
 #: src/templates/template-icon-picker.tsx
 msgid "Flags"
 msgstr "Флаги"
@@ -3627,6 +3759,7 @@ msgstr "Fn / глобус"
 
 #: src/settings/appearance/sidebar-item-fields.tsx
 #: src/sidebar/note-filter-menu.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Folder"
 msgstr "Папка"
 
@@ -3688,6 +3821,7 @@ msgid "Free"
 msgstr "Бесплатный"
 
 #: src/settings/referrals.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Free months earned"
 msgstr "Заработано бесплатных месяцев"
 
@@ -3853,6 +3987,7 @@ msgid "Guide"
 msgstr "Руководство"
 
 #: src/settings/dictation.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Hands-free dictation"
 msgstr "Диктовка без удержания клавиш"
 
@@ -3987,6 +4122,7 @@ msgid "Host process resident memory (WebKit renders in a separate process on mac
 msgstr "Резидентная память основного процесса (на macOS WebKit отрисовывает интерфейс в отдельном процессе)"
 
 #: src/settings/stats/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Hours transcribed"
 msgstr "Часов распознано"
 
@@ -4013,6 +4149,14 @@ msgstr "Ключ сохранён"
 #: src/templates/template-icon-picker.tsx
 msgid "Icons"
 msgstr "Значки"
+
+#: src/services/camera-guidance.tsx
+msgid "If {app} blurs or replaces your background, that hides the badge. Keep it on until Anarlog Camera hides your room, then check your video before turning off {app}'s background."
+msgstr "Размытие или замена фона в {app} скрывает значок записи. Дождитесь, пока Anarlog Camera скроет комнату, и проверьте своё видео перед отключением фона в {app}."
+
+#: src/settings/dictation-engine.tsx
+msgid "If a dictation can't be transcribed or inserted, keep it on this device for 24 hours so you can retry, copy or discard it."
+msgstr "Если речь не удалось распознать или текст не удалось вставить, запись сохранится на устройстве на 24 часа. Можно повторить попытку, скопировать текст или удалить запись."
 
 #: src/settings/general/account.tsx
 msgid "If Anarlog stays closed, paste the link in the sign-in window."
@@ -4283,6 +4427,7 @@ msgid "Join & record"
 msgstr "Присоединиться и записать"
 
 #: src/settings/team/email-auto-join.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Join automatically with a work email"
 msgstr "Присоединяться автоматически с рабочей почтой"
 
@@ -4295,6 +4440,7 @@ msgid "Join our community and stay updated:"
 msgstr "Присоединяйтесь к сообществу и следите за новостями:"
 
 #: src/settings/general/meeting-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Join scheduled meetings"
 msgstr "Подключаться к запланированным встречам"
 
@@ -4335,6 +4481,10 @@ msgstr "Показывать значок приложения в Dock во вр
 msgid "Keep this version"
 msgstr "Оставить эту версию"
 
+#: src/settings/dictation-engine.tsx
+msgid "Keep unsent dictations"
+msgstr "Сохранять невставленные диктовки"
+
 #: src/auth/connect-local-library-dialog.tsx
 msgid "Keep using locally"
 msgstr "Продолжить локально"
@@ -4342,6 +4492,10 @@ msgstr "Продолжить локально"
 #: src/settings/sync/index.tsx
 msgid "Keep your recovery key saved somewhere safe. You can still use it if another synced device is unavailable."
 msgstr "Храните ключ восстановления в безопасном месте. Он пригодится, если другое синхронизированное устройство недоступно."
+
+#: src/dictation/recovery.tsx
+msgid "Kept on this device for 24 hours. Anarlog never inserts these by itself."
+msgstr "Хранятся на устройстве 24 часа. Anarlog вставит текст только по вашей команде."
 
 #: src/settings/developers/cloud-api.tsx
 msgid "Key name (e.g. Claude Code)"
@@ -4356,6 +4510,7 @@ msgid "Kimi Code membership"
 msgstr "Подписка Kimi Code"
 
 #: src/settings/general/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Language & Region"
 msgstr "Язык и регион"
 
@@ -4381,6 +4536,7 @@ msgid "Last delivery {0}"
 msgstr "Последняя доставка: {0}"
 
 #: src/settings/dictation.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Last dictation"
 msgstr "Последняя диктовка"
 
@@ -4421,6 +4577,10 @@ msgstr "Последнее использование: {0}"
 msgid "Later"
 msgstr "Позже"
 
+#: src/settings/dictation-engine.tsx
+msgid "Learn from your corrections"
+msgstr "Учиться на моих исправлениях"
+
 #: src/chat/components/message/error.tsx
 msgid "Learn how to fix this"
 msgstr "Как это исправить"
@@ -4449,12 +4609,17 @@ msgstr "Меньше"
 msgid "Let people with access play the recording."
 msgstr "Разрешить людям с доступом воспроизводить запись."
 
+#: src/settings/dictation-engine.tsx
+msgid "Lets transcription and cleanup see a short snippet of the focused app to spell names right. Password fields, private windows and excluded apps are never read, and nothing is stored."
+msgstr "Для точного написания имён распознаванию и редактуре доступен короткий фрагмент текста из активного приложения. Поля паролей, приватные окна и исключённые приложения пропускаются. Фрагмент не сохраняется."
+
 #: src/auth/connect-local-library-dialog.tsx
 msgid "Library connected, but sync could not restart. Try again in sync settings."
 msgstr "Библиотека подключена, но перезапустить синхронизацию не удалось. Повторите попытку в настройках синхронизации."
 
 #: src/devtools-bar/quick-settings.tsx
 #: src/settings/appearance/theme.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Light"
 msgstr "Светлая"
 
@@ -4513,6 +4678,7 @@ msgid "Live transcript paused because {cause}. {savedAudioNote}"
 msgstr "Транскрипция приостановлена: {cause}. {savedAudioNote}"
 
 #: src/settings/dictation.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Live transcript preview"
 msgstr "Предпросмотр текущей транскрипции"
 
@@ -4617,7 +4783,12 @@ msgstr "Загрузка…"
 msgid "Local STT server is starting up…"
 msgstr "Локальный сервер распознавания запускается…"
 
+#: src/settings/dictation-engine.tsx
+msgid "Local transcription never falls back to a cloud provider."
+msgstr "Локальное распознавание всегда выполняется на устройстве."
+
 #: src/settings/privacy/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Lock app"
 msgstr "Заблокировать приложение"
 
@@ -4642,6 +4813,14 @@ msgstr "Низкий"
 msgid "Low-light canvas"
 msgstr "Приглушённый холст"
 
+#: src/settings/dictation-engine.tsx
+msgid "Lower other audio while dictating"
+msgstr "Приглушать другие звуки во время диктовки"
+
+#: src/settings/general/camera-watermark.tsx
+msgid "macOS asks you to approve the camera once."
+msgstr "macOS один раз запросит разрешение на использование камеры."
+
 #: src/settings/ai/shared/index.tsx
 msgid "macOS cannot access your login Keychain. Repairing briefly locks it and asks for your Mac password before Anarlog retries this API key."
 msgstr "macOS не может получить доступ к связке ключей «Вход». Восстановление ненадолго заблокирует её и запросит пароль Mac, после чего Anarlog повторит попытку использовать ключ API."
@@ -4651,7 +4830,12 @@ msgstr "macOS не может получить доступ к связке кл
 msgid "macOS could not access your recovery key. Repair Keychain access, then resume sync."
 msgstr "macOS не удалось получить доступ к ключу восстановления. Восстановите доступ к связке ключей, затем возобновите синхронизацию."
 
+#: src/settings/general/camera-watermark.tsx
+msgid "macOS couldn't add the camera: {extensionFailure}"
+msgstr "Не удалось добавить камеру в macOS — {extensionFailure}"
+
 #: src/settings/general/main-language.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Main language"
 msgstr "Основной язык"
 
@@ -4672,6 +4856,7 @@ msgid "Make the summary shorter."
 msgstr "Сделать конспект короче."
 
 #: src/settings/general/billing.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Manage billing"
 msgstr "Управление оплатой"
 
@@ -4680,6 +4865,7 @@ msgid "Manage or cancel your subscription in the billing portal."
 msgstr "Управляйте подпиской или отмените её в платёжном кабинете."
 
 #: src/settings/general/account.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Manage sign-in methods"
 msgstr "Управление способами входа"
 
@@ -4734,6 +4920,7 @@ msgid "MCP configuration copied"
 msgstr "Конфигурация MCP скопирована"
 
 #: src/settings/developers/cli.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "MCP server"
 msgstr "Сервер MCP"
 
@@ -4825,6 +5012,7 @@ msgid "members"
 msgstr "участники"
 
 #: src/settings/team/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Members"
 msgstr "Участники"
 
@@ -4891,6 +5079,7 @@ msgstr "Параметры микрофона"
 #: src/settings/dictation.tsx
 #: src/settings/general/audio-settings.tsx
 #: src/settings/general/permissions.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Microphone"
 msgstr "Микрофон"
 
@@ -4899,6 +5088,7 @@ msgid "Microphone access turned on"
 msgstr "Доступ к микрофону включён"
 
 #: src/settings/general/notification.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Microphone detection"
 msgstr "Обнаружение по микрофону"
 
@@ -5029,6 +5219,14 @@ msgstr "Нужно больше времени? Пригласите друга.
 #: src/settings/automations/workflow-builder.tsx
 msgid "Needs setup"
 msgstr "Нужна настройка"
+
+#: src/settings/dictation-engine.tsx
+msgid "Never read these apps"
+msgstr "Исключить приложения"
+
+#: src/settings/dictation-engine.tsx
+msgid "Never read these websites"
+msgstr "Исключить сайты"
 
 #: src/sidebar/automations.tsx
 msgid "New automation"
@@ -5307,6 +5505,10 @@ msgstr "Нет одного самого загруженного дня"
 msgid "No speech detected"
 msgstr "Речь не обнаружена"
 
+#: src/dictation/recovery.tsx
+msgid "No speech was detected in this recording."
+msgstr "В записи не обнаружена речь."
+
 #: src/settings/sync/log.tsx
 msgid "No sync activity yet."
 msgstr "Синхронизации пока не было."
@@ -5333,6 +5535,10 @@ msgstr "Транскрипция недоступна"
 msgid "No upcoming bots."
 msgstr "Предстоящих подключений бота нет."
 
+#: src/settings/general/camera-watermark.tsx
+msgid "None"
+msgstr "Без фона"
+
 #: src/settings/stats/insights.tsx
 msgid "Not available"
 msgstr "Недоступно"
@@ -5345,6 +5551,10 @@ msgstr "Не подключено"
 #: src/session/components/note-input/enhanced/index.tsx
 msgid "Not enough transcript recorded to summarize."
 msgstr "Для создания сводки записано недостаточно текста."
+
+#: src/settings/general/camera-watermark.tsx
+msgid "Not included in this build."
+msgstr "Недоступно в этой сборке."
 
 #: src/settings/developers/cli.tsx
 msgid "Not installed"
@@ -5408,6 +5618,7 @@ msgid "Notes"
 msgstr "Заметки"
 
 #: src/settings/appearance/sidebar-item-fields.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Notes list"
 msgstr "Список заметок"
 
@@ -5495,6 +5706,14 @@ msgstr "Локальное распознавание речи, записи и 
 #: src/devtools-bar/actions.tsx
 msgid "Onboarding"
 msgstr "Первоначальная настройка"
+
+#: src/settings/dictation-engine.tsx
+msgid "One app name or bundle ID per line"
+msgstr "Одно название приложения или идентификатор пакета в строке"
+
+#: src/settings/dictation-engine.tsx
+msgid "One domain per line, like bank.example"
+msgstr "Один домен в строке, например bank.example"
 
 #: src/folders/folder-editor.tsx
 #: src/settings/general/default-share-access.tsx
@@ -5608,6 +5827,10 @@ msgstr "Открыть репозиторий на GitHub"
 msgid "Open Settings"
 msgstr "Открыть настройки"
 
+#: src/settings/general/camera-watermark.tsx
+msgid "Open System Settings"
+msgstr "Открыть системные настройки"
+
 #: src/resource-sharing/share-dialog.tsx
 #: src/settings/general/billing.tsx
 msgid "Open Teams"
@@ -5696,6 +5919,10 @@ msgstr "Первоначальные условия: скидка {amount} на 
 #: src/devtools-bar/actions.tsx
 msgid "OTA"
 msgstr "OTA"
+
+#: src/dictation/recovery.tsx
+msgid "Other apps"
+msgstr "Другие приложения"
 
 #: src/session/components/version-history-dialog.tsx
 msgid "Other device's version"
@@ -5865,6 +6092,10 @@ msgstr "телефон"
 msgid "Phone"
 msgstr "Телефон"
 
+#: src/services/camera-guidance.tsx
+msgid "Pick Anarlog Camera as your camera. Anarlog couldn't switch it in {app}."
+msgstr "Выберите Anarlog Camera в настройках камеры. Не удалось переключить камеру в {app} автоматически."
+
 #: src/contacts/contact-page-header.tsx
 msgid "Pin"
 msgstr "Закрепить"
@@ -5934,6 +6165,7 @@ msgid "Post a recap to Slack"
 msgstr "Отправить итоги в Slack"
 
 #: src/settings/general/meeting-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Post recording disclosure in meeting chat"
 msgstr "Сообщать о записи в чате встречи"
 
@@ -6039,6 +6271,7 @@ msgid "Primary owner"
 msgstr "Основной владелец"
 
 #: src/settings/general/primary-recording-device.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Primary recording device"
 msgstr "Основное устройство записи"
 
@@ -6177,6 +6410,10 @@ msgstr "Читать элементы управления встречей и �
 msgid "Read meeting controls and visible chat."
 msgstr "Читать элементы управления встречей и видимый чат."
 
+#: src/settings/dictation-engine.tsx
+msgid "Reads the field once after you dictate and suggests dictionary words you corrected. Suggestions wait for your review in Dictionary."
+msgstr "После диктовки Anarlog один раз считывает текст поля и предлагает добавить исправленные слова в словарь. Предложения можно просмотреть в разделе «Словарь»."
+
 #: src/devtools-bar/actions.tsx
 #: src/settings/general/notification.tsx
 msgid "Ready"
@@ -6296,13 +6533,22 @@ msgstr "Требуется проверить запись"
 msgid "Recording not found. It may have been deleted."
 msgstr "Запись не найдена. Возможно, она удалена."
 
+#: src/dictation/recovery.tsx
+msgid "Recording not transcribed yet."
+msgstr "Запись ещё не расшифрована."
+
 #: src/stt/meeting-disclosure.ts
 msgid "Recording started, but Anarlog could not post the meeting chat disclosure."
 msgstr "Запись началась, но Anarlog не удалось сообщить о ней в чате встречи."
 
 #: src/settings/general/notification.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Recording status prompts"
 msgstr "Запросы о состоянии записи"
+
+#: src/services/meeting-capture-stop.tsx
+msgid "Recording stopped"
+msgstr "Запись остановлена"
 
 #: src/stt/saved-capture-audio.tsx
 msgid "Recording stopped unexpectedly, so the audio was kept on purpose. Create the meeting note to transcribe and summarize it, or resume listening. The audio is deleted once it is transcribed."
@@ -6359,6 +6605,7 @@ msgid "Reload current title"
 msgstr "Загрузить текущий заголовок"
 
 #: src/settings/general/audio-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Remember speakers"
 msgstr "Запоминать спикеров"
 
@@ -6391,6 +6638,10 @@ msgstr "Убрать {0}"
 #: src/settings/team/index.tsx
 msgid "Remove {0} from {workspaceName}? They will lose access to this workspace."
 msgstr "Удалить {0} из {workspaceName}? Доступ к этому рабочему пространству будет потерян."
+
+#: src/settings/dictionary/replacements.tsx
+msgid "Remove {from}"
+msgstr "Удалить «{from}»"
 
 #: src/session-sharing/invite-recipients.tsx
 msgid "Remove {label}"
@@ -6527,6 +6778,10 @@ msgstr "Заменить репозиторий"
 msgid "Replace with..."
 msgstr "Заменить на…"
 
+#: src/settings/dictionary/replacements.tsx
+msgid "Replacements"
+msgstr "Замены"
+
 #: src/main/windows-title-bar.tsx
 msgid "Report a Bug"
 msgstr "Сообщить об ошибке"
@@ -6610,6 +6865,7 @@ msgid "Resolve the web and desktop edits before inviting anyone."
 msgstr "Разрешите конфликт веб-версии и приложения, прежде чем кого-либо приглашать."
 
 #: src/settings/general/notification.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Respect Do-Not-Disturb mode"
 msgstr "Учитывать режим «Не беспокоить»"
 
@@ -7028,6 +7284,7 @@ msgid "Send message"
 msgstr "Отправить сообщение"
 
 #: src/settings/privacy/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Send sanitized crash and error reports to help improve Anarlog."
 msgstr "Отправлять очищенные от личных данных отчёты о сбоях и ошибках, чтобы помочь улучшить Anarlog."
 
@@ -7163,6 +7420,7 @@ msgid "Share one item with a guest, or add it to a Team for everyone."
 msgstr "Поделитесь одним элементом с гостем или добавьте его в Team для всех участников."
 
 #: src/settings/general/app-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Share usage data"
 msgstr "Отправлять данные об использовании"
 
@@ -7252,6 +7510,7 @@ msgid "Show Anarlog in the Dock and app switcher."
 msgstr "Показывать Anarlog в Dock и переключателе приложений."
 
 #: src/settings/general/app-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Show app in Dock"
 msgstr "Показывать приложение в Dock"
 
@@ -7284,6 +7543,7 @@ msgid "Show events in menu bar"
 msgstr "Показывать события в строке меню"
 
 #: src/settings/general/meeting-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Show floating bar"
 msgstr "Показывать плавающую панель"
 
@@ -7307,6 +7567,7 @@ msgid "Show meeting times as 14:00 instead of 2:00 PM."
 msgstr "Показывать время встреч как 14:00 вместо 2:00 PM."
 
 #: src/settings/general/app-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Show release notes"
 msgstr "Показать историю изменений"
 
@@ -7392,6 +7653,7 @@ msgid "Show This Event"
 msgstr "Показать это событие"
 
 #: src/settings/general/app-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Show tray icon"
 msgstr "Показывать значок в строке меню"
 
@@ -7406,6 +7668,10 @@ msgstr "Показывать уведомление после начально�
 #: src/settings/dictation.tsx
 msgid "Show words in the floating panel as you speak. Uses a live connection to your selected transcription provider when supported. Text is inserted when you finish."
 msgstr "Показывать слова в плавающей панели во время речи. Используется постоянное подключение к выбранному провайдеру распознавания, если он это поддерживает. Текст вставляется после завершения."
+
+#: src/settings/general/camera-watermark.tsx
+msgid "Show your camera with a badge saying Anarlog is taking notes in apps where you pick Anarlog Camera."
+msgstr "Показывать значок «Anarlog ведёт заметки» в приложениях, где выбрана Anarlog Camera."
 
 #. placeholder {0}: options.length
 #: src/settings/ai/shared/model-combobox.tsx
@@ -7538,6 +7804,7 @@ msgid "Sign in with your Claude account. After you authorize, copy the code and 
 msgstr "Войдите через учётную запись Claude. После авторизации скопируйте код, и мы завершим подключение."
 
 #: src/settings/general/account.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Sign out"
 msgstr "Выйти"
 
@@ -7738,6 +8005,7 @@ msgid "Start a Pro trial or add your own LLM API key to generate a summary from 
 msgstr "Начните пробный период Pro или добавьте собственный ключ API языковой модели, чтобы создать конспект по этой транскрипции."
 
 #: src/settings/general/app-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Start Anarlog at login"
 msgstr "Запускать Anarlog при входе в систему"
 
@@ -7770,6 +8038,7 @@ msgid "Start voice input"
 msgstr "Начать голосовой ввод"
 
 #: src/settings/general/meeting-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Start when meeting begins"
 msgstr "Начинать при начале встречи"
 
@@ -7896,10 +8165,12 @@ msgid "Stop voice input"
 msgstr "Остановить голосовой ввод"
 
 #: src/settings/general/meeting-settings.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Stop when meeting ends"
 msgstr "Останавливать при завершении встречи"
 
 #: src/settings/general/storage/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Storage"
 msgstr "Хранилище"
 
@@ -7910,6 +8181,10 @@ msgstr "Собиратель историй"
 #: src/editor-bridge/note-editor.tsx
 msgid "Strikethrough"
 msgstr "Зачёркнутый"
+
+#: src/settings/general/camera-watermark.tsx
+msgid "Studio"
+msgstr "Студия"
 
 #: src/instruction/index.tsx
 msgid "Submit callback URL"
@@ -7939,6 +8214,10 @@ msgstr "Предложить следующий вопрос."
 msgid "Suggested attendees"
 msgstr "Предлагаемые участники"
 
+#: src/settings/dictionary/replacements.tsx
+msgid "Suggested from your corrections"
+msgstr "Предложения на основе ваших исправлений"
+
 #: src/session/components/note-input/raw.tsx
 msgid "Suggested templates"
 msgstr "Предлагаемые шаблоны"
@@ -7952,6 +8231,7 @@ msgid "Summary"
 msgstr "Конспект"
 
 #: src/settings/general/notification.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Summary complete"
 msgstr "Конспект завершён"
 
@@ -8002,6 +8282,14 @@ msgstr "Воскресенье"
 msgid "SuperGrok"
 msgstr "SuperGrok"
 
+#: src/settings/dictionary/replacements.tsx
+msgid "Swap a spoken phrase for the text you want, like \"my email\" for your address. Not applied when editing a selection."
+msgstr "Заменяет произнесённую фразу заданным текстом. Например, «моя почта» можно заменить вашим адресом. При редактировании выделенного текста замены отключены."
+
+#: src/settings/general/camera-watermark.tsx
+msgid "Switch my camera automatically"
+msgstr "Автоматически переключать камеру"
+
 #: src/devtools-bar/quick-settings.tsx
 msgid "Switch the app theme without opening Settings."
 msgstr "Переключать тему приложения, не открывая настройки."
@@ -8037,6 +8325,7 @@ msgstr "Синхронизация требует внимания"
 
 #: src/imports/screen.tsx
 #: src/settings/sync/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Sync now"
 msgstr "Синхронизировать сейчас"
 
@@ -8079,11 +8368,13 @@ msgstr "Синхронизируем…"
 
 #: src/devtools-bar/quick-settings.tsx
 #: src/settings/appearance/theme.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "System"
 msgstr "Системная"
 
 #: src/onboarding/permissions.tsx
 #: src/settings/general/permissions.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "System audio"
 msgstr "Системный звук"
 
@@ -8092,6 +8383,7 @@ msgid "System audio enabled"
 msgstr "Системный звук включён"
 
 #: src/settings/appearance/sidebar-item-fields.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Tags"
 msgstr "Теги"
 
@@ -8191,6 +8483,10 @@ msgstr "Возможно, срок действия ссылки истёк ил
 msgid "the local transcription model stopped responding"
 msgstr "локальная модель транскрипции перестала отвечать"
 
+#: src/services/meeting-capture-stop.tsx
+msgid "The meeting app closed."
+msgstr "Приложение встречи закрылось."
+
 #: src/session/move-contents.ts
 msgid "The move could not be completed. Nothing was changed."
 msgstr "Не удалось завершить перенос. Ничего не изменено."
@@ -8210,6 +8506,10 @@ msgstr "Такой страницы не существует."
 #: src/store/zustand/listener/general-live.ts
 msgid "The previous recording needs recovery"
 msgstr "Предыдущая запись требует восстановления"
+
+#: src/services/meeting-capture-stop.tsx
+msgid "The recording reached the 12-hour limit."
+msgstr "Достигнут предел длительности записи — 12 часов."
 
 #: src/session/move-contents.ts
 msgid "The source meeting could not be loaded."
@@ -8241,6 +8541,7 @@ msgstr "Не удалось скачать обновление"
 
 #: src/devtools-bar/quick-settings.tsx
 #: src/settings/appearance/theme.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Theme"
 msgstr "Тема"
 
@@ -8321,6 +8622,10 @@ msgstr "Этой заметки больше нет."
 msgid "This note was edited on another device at the same time. The later edit was kept."
 msgstr "Эта заметка одновременно изменялась на другом устройстве. Сохранена более поздняя правка."
 
+#: src/store/zustand/listener/general-live.ts
+msgid "This recording follows your Mac's default microphone. To select a different microphone, stop and start a new recording."
+msgstr "Для этой записи используется микрофон Mac по умолчанию. Чтобы выбрать другой микрофон, остановите запись и начните новую."
+
 #: src/chat/components/session-provider.tsx
 msgid "This recording is using batch transcription, so the transcript isn't available to chat yet. Ask again after transcription finishes, or switch to a Pro model for live transcription."
 msgstr "Эта запись распознаётся после завершения, поэтому транскрипция пока недоступна в чате. Спросите снова после распознавания или перейдите на модель Pro для распознавания в реальном времени."
@@ -8337,6 +8642,10 @@ msgstr "Требуется Anarlog Pro"
 msgid "This transcript is incomplete."
 msgstr "Эта транскрипция неполная."
 
+#: src/settings/sync/index.tsx
+msgid "This version can no longer sync. Your notes stay on this device, and changes made here will sync after you update."
+msgstr "Для синхронизации требуется обновление. Заметки останутся на устройстве, а изменения синхронизируются после обновления."
+
 #. placeholder {0}: status.fileCount
 #. placeholder {1}: formatBytes(status.totalBytes)
 #: src/settings/general/storage/legacy-cleanup.tsx
@@ -8352,6 +8661,7 @@ msgid "Ticket"
 msgstr "Задача"
 
 #: src/settings/general/timezone.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Timezone"
 msgstr "Часовой пояс"
 
@@ -8397,6 +8707,10 @@ msgstr "Токио"
 #: src/sidebar/timeline/utils/index.ts
 msgid "Tomorrow"
 msgstr "Завтра"
+
+#: src/dictation/recovery.tsx
+msgid "Transcribe"
+msgstr "Расшифровать"
 
 #: src/chat/components/input/index.tsx
 msgid "Transcribing voice input"
@@ -8524,9 +8838,21 @@ msgstr "Создавать задачи Linear по итогам встреч"
 msgid "Turn assigned follow-ups into Linear issue drafts."
 msgstr "Превращать назначенные дальнейшие действия в черновики задач Linear."
 
+#: src/settings/general/camera-watermark.tsx
+msgid "Turn on Anarlog Camera in System Settings under Privacy & Security, Camera."
+msgstr "Откройте системные настройки, выберите «Конфиденциальность и безопасность» → «Камера» и разрешите доступ для Anarlog Camera."
+
 #: src/calendar/components/apple/permission.tsx
 msgid "Turn on Anarlog in System Settings → Privacy & Security → Calendars, then return here."
 msgstr "Включите Anarlog в «Системных настройках» → «Конфиденциальность и безопасность» → «Календари», затем вернитесь сюда."
+
+#: src/settings/dictation-engine.tsx
+msgid "Turns down your speakers while you speak, then restores the level it changed."
+msgstr "Приглушает звук динамиков, пока вы говорите, и возвращает прежнюю громкость после диктовки."
+
+#: src/settings/dictionary/replacements.tsx
+msgid "Type"
+msgstr "Подставить текст"
 
 #: src/settings/appearance/app-icon.tsx
 msgid "Typewriter Key"
@@ -8574,6 +8900,10 @@ msgstr "Неизвестно"
 #: src/session/components/outer-header/metadata/date.tsx
 msgid "Unknown date"
 msgstr "Неизвестная дата"
+
+#: src/settings/general/camera-watermark.tsx
+msgid "unknown error"
+msgstr "неизвестная ошибка"
 
 #: src/chat/components/message/tool/edit-summary.tsx
 #: src/chat/components/message/tool/generic.tsx
@@ -8651,6 +8981,10 @@ msgstr "Открепить организацию"
 msgid "Unpin Organization"
 msgstr "Открепить организацию"
 
+#: src/dictation/recovery.tsx
+msgid "Unsent dictations"
+msgstr "Невставленные диктовки"
+
 #: src/onboarding/account/after-login.tsx
 msgid "Until {endsOn}"
 msgstr "До {endsOn}"
@@ -8709,6 +9043,10 @@ msgstr "Предстоящее событие"
 #: src/resource-sharing/share-dialog.tsx
 msgid "Update"
 msgstr "Обновить"
+
+#: src/settings/sync/index.tsx
+msgid "Update Anarlog to keep syncing"
+msgstr "Обновите Anarlog для синхронизации"
 
 #: src/i18n/native-menu.ts
 msgid "Update Available"
@@ -8906,6 +9244,7 @@ msgid "Use {color}"
 msgstr "Использовать цвет {color}"
 
 #: src/settings/appearance/time-format.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Use 24-hour time"
 msgstr "24-часовой формат времени"
 
@@ -8938,10 +9277,12 @@ msgid "Use files"
 msgstr "Использовать файлы"
 
 #: src/settings/general/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Use main language for summaries"
 msgstr "Использовать основной язык для конспектов"
 
 #: src/settings/sync/index.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Use recovery key instead"
 msgstr "Использовать ключ восстановления"
 
@@ -8968,6 +9309,10 @@ msgstr "Используйте этот домен для ссылок из ра
 #: src/lock/screen.tsx
 msgid "Use Touch ID or enter your password to view."
 msgstr "Используйте Touch ID или введите пароль для просмотра."
+
+#: src/settings/dictation-engine.tsx
+msgid "Use what's on screen"
+msgstr "Использовать текст на экране"
 
 #: src/lock/screen.tsx
 msgid "Use Windows Hello face, PIN, or password to view."
@@ -9118,10 +9463,12 @@ msgid "We only support **OpenAI-compatible** endpoints for now."
 msgstr "Сейчас поддерживаются только адреса **API, совместимого с OpenAI**."
 
 #: src/settings/developers/webhooks.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Webhooks"
 msgstr "Вебхуки"
 
 #: src/settings/general/week-start.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Week starts on"
 msgstr "Первый день недели"
 
@@ -9137,6 +9484,10 @@ msgstr "Добро пожаловать в Anarlog"
 #: src/chat/components/body/empty.tsx
 msgid "What action items have come up so far in this meeting?"
 msgstr "Какие задачи появились к этому моменту встречи?"
+
+#: src/settings/general/camera-watermark.tsx
+msgid "What Anarlog Camera shows behind you."
+msgstr "Что Anarlog Camera показывает на заднем плане."
 
 #: src/chat/components/body/empty.tsx
 msgid "What are my action items from this meeting?"
@@ -9166,6 +9517,14 @@ msgstr "Какие ключевые решения были приняты?"
 msgid "What's new in {version}?"
 msgstr "Что нового в {version}?"
 
+#: src/settings/general/camera-watermark.tsx
+msgid "When Anarlog records a call in {switchApps}, switch its camera to Anarlog Camera."
+msgstr "Когда Anarlog записывает звонок в {switchApps}, переключать камеру этого приложения на Anarlog Camera."
+
+#: src/settings/dictionary/replacements.tsx
+msgid "When I say"
+msgstr "Когда я говорю"
+
 #: src/settings/general/index.tsx
 msgid "When off, summaries follow the detected meeting language."
 msgstr "Если отключено, для конспектов используется определённый язык встречи."
@@ -9185,6 +9544,14 @@ msgstr "Модели whisper.cpp"
 #: src/i18n/native-menu.ts
 msgid "Window"
 msgstr "Окно"
+
+#: src/settings/dictation-engine.tsx
+msgid "With text selected in another app, say how to change it. The selection is sent to your selected AI model and is left unchanged if editing fails."
+msgstr "Выделите текст в другом приложении и скажите, как его изменить. Выбранный текст будет отправлен вашей модели ИИ. Если редактирование не удастся, текст останется прежним."
+
+#: src/settings/dictionary/replacements.tsx
+msgid "Words you fixed after dictating. Add them so dictation spells them right next time."
+msgstr "Слова, которые вы исправили после диктовки. Добавьте их в словарь, чтобы в следующий раз они распознавались правильно."
 
 #: src/task/tab-content.tsx
 msgid "Work on this task"
@@ -9260,6 +9627,10 @@ msgstr "Можно использовать до трёх примеров ко�
 #: src/onboarding/account/after-login.tsx
 msgid "You have an active plan"
 msgstr "У вас активный тариф"
+
+#: src/services/meeting-capture-stop.tsx
+msgid "You signed out or changed accounts."
+msgstr "Вы вышли из аккаунта или сменили его."
 
 #: src/settings/team/index.tsx
 msgid "You will become the Primary owner of {workspaceName}, with control over its members, billing, and deletion. The current Primary owner will remain an Owner."
@@ -9339,6 +9710,7 @@ msgid "Your Google account changed. Choose a folder again."
 msgstr "Ваша учётная запись Google изменилась. Выберите папку заново."
 
 #: src/settings/general/account-profile.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Your info"
 msgstr "Ваши данные"
 
@@ -9375,6 +9747,7 @@ msgid "Your personal notes and recordings stay on this device. Sync will connect
 msgstr "Личные заметки и записи останутся на этом устройстве. Синхронизация свяжет их с этой учётной записью и загрузит её существующие заметки. Копии в прежней учётной записи останутся там. Командные и общие заметки останутся в своём рабочем пространстве. Подключите интеграции для этой учётной записи заново. После подключения для этой библиотеки потребуется версия приложения с поддержкой переключения учётных записей."
 
 #: src/settings/general/billing.tsx
+#: src/sidebar/settings-nav-groups.ts
 msgid "Your plan"
 msgstr "Ваш тариф"
 

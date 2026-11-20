@@ -5162,6 +5162,10 @@ export type CreateReplicaCredentialsData = {
          * Account-level member identity public key
          */
         'x-anarlog-e2ee-member-public-key'?: string | null;
+        /**
+         * Comma-separated transports the client accepts; `accepted_replica` is required once SQLite Cloud is retired
+         */
+        'x-anarlog-cloudsync-transports'?: string | null;
     };
     path?: never;
     query?: never;
@@ -5185,6 +5189,10 @@ export type CreateReplicaCredentialsErrors = {
      * Account already uses a different recovery key
      */
     409: unknown;
+    /**
+     * SQLite Cloud is retired and the client predates the accepted replica
+     */
+    426: unknown;
     /**
      * Replica credential service unavailable
      */
@@ -5485,7 +5493,7 @@ export type CreateCredentialsData = {
          */
         'x-anarlog-e2ee-member-public-key'?: string | null;
         /**
-         * Comma-separated transports the client accepts; include `replica` to allow witness-only credentials
+         * Comma-separated transports the client accepts; `replica` allows witness-only credentials and `accepted_replica` is required once SQLite Cloud stops issuing tokens
          */
         'x-anarlog-cloudsync-transports'?: string | null;
     };
@@ -5504,7 +5512,7 @@ export type CreateCredentialsErrors = {
      */
     403: unknown;
     /**
-     * Desktop upgrade required
+     * Client update required
      */
     426: unknown;
     /**

@@ -26,8 +26,6 @@
     <a href="https://www.reddit.com/r/anarlog/">r/anarlog</a>
     &nbsp;•&nbsp;
     <a href="https://x.com/anarlogapp">@anarlogapp</a>
-    &nbsp;•&nbsp;
-    <a href="https://status.anarlog.so">Status</a>
   </p>
 
 <p>

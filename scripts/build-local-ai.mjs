@@ -221,6 +221,20 @@ if (failures.length) {
   );
   if (binaries.error) throw binaries.error;
   if (binaries.status !== 0) process.exit(binaries.status ?? 1);
+  const meetingHelpers = spawnSync(
+    process.execPath,
+    ["apps/desktop/src-tauri/scripts/prepare-meeting-helpers.mjs"],
+    {
+      cwd: root,
+      env: {
+        ...environment,
+        TAURI_CONF_PATH: "src-tauri/tauri.conf.local-ai.json",
+      },
+      stdio: "inherit",
+    },
+  );
+  if (meetingHelpers.error) throw meetingHelpers.error;
+  if (meetingHelpers.status !== 0) process.exit(meetingHelpers.status ?? 1);
   for (const args of [
     ["-F", "@anlg/ui", "build"],
     [

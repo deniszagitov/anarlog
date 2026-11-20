@@ -25,9 +25,9 @@ let package = Package(
       path: "src"
     ),
     .testTarget(
-      name: "DictationClipboardTests",
+      name: "ClipboardSnapshotTests",
       dependencies: ["swift-lib"],
-      path: "tests"
+      path: "Tests"
     ),
   ]
 )

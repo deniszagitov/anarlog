@@ -18,6 +18,8 @@ import {
 
 import { trackAnalyticsEvent } from "~/analytics";
 import { db, useDrizzleLiveQuery } from "~/db";
+import { useLocalFeatureAccess } from "~/local-ai";
+import { useNotifyPlanRequired } from "~/settings/plan-gate";
 
 type TemplateRow = (typeof templates)["$inferSelect"];
 type NewTemplateRow = (typeof templates)["$inferInsert"];
@@ -175,10 +177,16 @@ export async function getTemplateById(
 }
 
 export function useCreateTemplate(
-  entryPoint: "templates" | "session_note" = "templates",
+  entryPoint: "templates" | "session_note" | "community" = "templates",
 ) {
+  const access = useLocalFeatureAccess();
+  const notifyPlanRequired = useNotifyPlanRequired();
   const { mutateAsync } = useMutation({
     mutationFn: async (template: UserTemplateDraft) => {
+      if (entryPoint !== "community" && (!access.isReady || !access.allowed)) {
+        notifyPlanRequired("pro");
+        return;
+      }
       const id = crypto.randomUUID();
       const targets = assertCanonicalTemplateTargets(
         template.targets,
@@ -222,8 +230,14 @@ export function useCreateTemplate(
 }
 
 export function useSaveTemplate() {
+  const access = useLocalFeatureAccess();
+  const notifyPlanRequired = useNotifyPlanRequired();
   const { mutateAsync } = useMutation({
     mutationFn: async (template: UserTemplate) => {
+      if (!access.isReady || !access.allowed) {
+        notifyPlanRequired("pro");
+        return;
+      }
       const targets = assertCanonicalTemplateTargets(
         template.targets,
         `save template ${template.id} targets`,

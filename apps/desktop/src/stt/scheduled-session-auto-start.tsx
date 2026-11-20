@@ -2,6 +2,7 @@ import { useRef } from "react";
 
 import { useMountEffect } from "@anlg/ui/hooks/use-mount-effect";
 
+import { useLocalFeatureAccess } from "~/local-ai";
 import { isLockedFlag } from "~/lock/flag";
 import { useAppLock } from "~/lock/store";
 import { useSession } from "~/session/queries";
@@ -23,6 +24,7 @@ export function ScheduledSessionAutoStart({
   requiresCalendarEligibility?: boolean;
   sessionId: string;
 }) {
+  const access = useLocalFeatureAccess();
   const canStartLiveSession = useListener((state) =>
     state.canStartLiveSession(sessionId),
   );
@@ -35,11 +37,17 @@ export function ScheduledSessionAutoStart({
   );
   const locked = isLockedFlag(session?.locked) && !revealed;
 
-  if (recordingActive || (session && locked)) {
+  if (
+    recordingActive ||
+    (session && locked) ||
+    (requiresCalendarEligibility && access.isReady && !access.allowed)
+  ) {
     return <AbandonedScheduledSessionAutoStart sessionId={sessionId} />;
   }
 
-  return canStartLiveSession && session ? (
+  return canStartLiveSession &&
+    session &&
+    (!requiresCalendarEligibility || (access.isReady && access.allowed)) ? (
     <ReadyScheduledSessionAutoStart
       key={`${sessionId}:${requiresCalendarEligibility ? "scheduled" : "manual"}`}
       requiresCalendarEligibility={requiresCalendarEligibility}

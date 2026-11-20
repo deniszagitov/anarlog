@@ -4,6 +4,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -51,7 +52,12 @@ vi.mock("@anlg/ui/components/ui/toast", () => ({
 }));
 
 vi.mock("~/shared/config", () => ({
-  useConfigValue: () => [],
+  useConfigValue: (key: string) =>
+    key === "personalization_dictionary_terms" ? [] : undefined,
+}));
+
+vi.mock("~/auth", () => ({
+  useAuth: () => ({ session: { user: { id: "user-1" } } }),
 }));
 
 import { DictionarySettings, SettingsDictionary } from "./index";
@@ -75,10 +81,15 @@ describe("DictionarySettings", () => {
     mocks.billing.isPro = false;
     render(<SettingsDictionary />);
 
-    fireEvent.change(screen.getByRole("textbox"), {
+    const input = screen.getByPlaceholderText(
+      "Add names, jargon, or product terms to prefer",
+    );
+    fireEvent.change(input, {
       target: { value: "Parakeet" },
     });
-    fireEvent.click(screen.getByRole("button", { name: "Add" }));
+    fireEvent.click(
+      within(input.closest("form")!).getByRole("button", { name: "Add" }),
+    );
 
     await waitFor(() =>
       expect(mocks.setTerms).toHaveBeenCalledWith('["Parakeet"]'),
@@ -92,8 +103,10 @@ describe("DictionarySettings", () => {
 
     render(<SettingsDictionary />);
 
-    expect(screen.getByRole("textbox")).toBeTruthy();
-    fireEvent.click(screen.getByRole("textbox"));
+    // The term editor comes first, ahead of replacements.
+    const [terms] = screen.getAllByRole("textbox");
+    expect(terms).toBeTruthy();
+    fireEvent.click(terms!);
 
     expect(mocks.toastWarning).toHaveBeenCalledWith(
       "This requires Anarlog Pro",

@@ -270,7 +270,11 @@ const notifyCaptureWarning = <T extends GeneralState>(
               );
               if (result.status === "error")
                 toast.error(translate`Audio retry failed`, {
-                  description: result.error,
+                  description:
+                    result.error ===
+                    "native capture microphone requires restart"
+                      ? translate`This recording follows your Mac's default microphone. To select a different microphone, stop and start a new recording.`
+                      : result.error,
                 });
             })
             .catch((error) =>

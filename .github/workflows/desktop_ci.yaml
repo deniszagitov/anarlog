@@ -18,6 +18,7 @@ on:
       - scripts/repack-linux-appimage.test.mjs
       - apps/cli/**
       - apps/desktop/**
+      - browser-meeting-extension/**
       - packages/utils/**
       - plugins/**
       - crates/**
@@ -31,6 +32,7 @@ on:
       - scripts/repack-linux-appimage.test.mjs
       - apps/cli/**
       - apps/desktop/**
+      - browser-meeting-extension/**
       - packages/utils/**
       - plugins/**
       - crates/**
@@ -50,13 +52,19 @@ jobs:
         shard: [1, 2, 3]
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
       - uses: ./.github/actions/pnpm_install
       - run: pnpm -F ui build
       - if: matrix.shard == 1
         run: pnpm -F desktop typecheck
+      - if: matrix.shard == 1
+        run: pnpm -F @anlg/browser-meeting-extension typecheck
+      - if: matrix.shard == 1
+        run: pnpm -F @anlg/browser-meeting-extension test
+      - if: matrix.shard == 1
+        run: node --test apps/desktop/src-tauri/scripts/prepare-meeting-helpers.test.mjs
       - env:
           SHARD: ${{ matrix.shard }}
           SHARD_TOTAL: ${{ strategy.job-total }}
@@ -75,12 +83,12 @@ jobs:
             runner: "macos-26"
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
           fetch-depth: 0
       - uses: ./.github/actions/pnpm_install
-      - uses: denoland/setup-deno@v2
+      - uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2
       - run: pnpm -F ui build
       - run: pnpm -F desktop typecheck
       - run: pnpm -F desktop test
@@ -93,14 +101,14 @@ jobs:
       - if: github.event_name == 'workflow_dispatch' || inputs.rebuild_cloudsync
         run: crates/cloudsync/scripts/rebuild-macos.sh
       - if: github.event_name == 'workflow_dispatch' || inputs.rebuild_cloudsync
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: cloudsync-macos-aarch64-${{ github.sha }}
           path: crates/cloudsync/vendor/cloudsync/macos/aarch64/cloudsync.dylib
           if-no-files-found: error
           retention-days: 7
       - if: github.event_name == 'workflow_dispatch' || inputs.rebuild_cloudsync
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: cloudsync-macos-x86_64-${{ github.sha }}
           path: crates/cloudsync/vendor/cloudsync/macos/x86_64/cloudsync.dylib
@@ -114,6 +122,9 @@ jobs:
       - run: cargo test --locked -p tauri-plugin-template --lib
       - run: cargo test --locked -p cloudsync
       - run: "cargo test --locked -p db-core 'cloudsync::' -- --test-threads=1"
+      # The workspace run below excludes both crates; their meeting contract and notice tests are pure.
+      - run: cargo test --locked -p audio --lib
+      - run: "cargo test --locked -p tauri-plugin-detect --lib 'meeting_notice::'"
       - run: |
           cargo test --workspace \
             --exclude desktop \
@@ -201,7 +212,7 @@ jobs:
     if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
           fetch-depth: 0
@@ -209,7 +220,7 @@ jobs:
         with:
           platform: windows
       - if: github.event_name == 'workflow_dispatch' || inputs.rebuild_cloudsync
-        uses: msys2/setup-msys2@v2
+        uses: msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e # v2
         with:
           msystem: UCRT64
           install: git make mingw-w64-ucrt-x86_64-gcc
@@ -218,7 +229,7 @@ jobs:
         shell: "msys2 {0}"
         run: crates/cloudsync/scripts/rebuild-windows.sh
       - if: github.event_name == 'workflow_dispatch' || inputs.rebuild_cloudsync
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: cloudsync-windows-x86_64-${{ github.sha }}
           path: crates/cloudsync/vendor/cloudsync/windows/x86_64/cloudsync.dll
@@ -401,7 +412,7 @@ jobs:
             }
           }
       - if: github.event_name == 'workflow_dispatch' || inputs.rebuild_cloudsync
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: anarlog-windows-x64-nsis-${{ github.sha }}
           path: |
@@ -437,7 +448,7 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
           fetch-depth: 0
@@ -450,7 +461,7 @@ jobs:
       - if: github.event_name == 'workflow_dispatch' || inputs.rebuild_cloudsync
         run: crates/cloudsync/scripts/rebuild-linux.sh
       - if: github.event_name == 'workflow_dispatch' || inputs.rebuild_cloudsync
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: cloudsync-linux-gnu-${{ matrix.cloudsync_arch }}-${{ github.sha }}
           path: crates/cloudsync/vendor/cloudsync/linux/gnu/${{ matrix.cloudsync_arch }}/cloudsync.so
@@ -458,6 +469,7 @@ jobs:
           retention-days: 7
       - run: cargo check --locked --target ${{ matrix.target }} -p desktop
       - run: cargo test --locked --target ${{ matrix.target }} -p desktop embedded_cli --lib
+      - run: cargo test --locked --target ${{ matrix.target }} -p tauri-plugin-dictation --lib insertion::linux
       - run: cargo test --locked --target ${{ matrix.target }} -p cloudsync
       - run: "cargo test --locked --target ${{ matrix.target }} -p db-core 'cloudsync::' -- --test-threads=1"
       - if: github.event_name == 'workflow_dispatch' || inputs.rebuild_cloudsync
@@ -620,7 +632,7 @@ jobs:
               fi
             '
       - if: github.event_name == 'workflow_dispatch' || inputs.rebuild_cloudsync
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: anarlog-linux-${{ matrix.artifact_name }}-${{ github.sha }}
           path: |
@@ -633,7 +645,7 @@ jobs:
     if: ${{ !startsWith(github.head_ref || '', 'blog/') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
       - uses: ./.github/actions/pnpm_install
@@ -646,11 +658,15 @@ jobs:
       run:
         shell: bash
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
           fetch-depth: 0
       - run: swift build --package-path plugins/windows/swift-lib
+      - run: swift build --package-path tools/meeting-capture
+      # CI=1 skips the AudioEngineGuard tests that start a real audio engine.
+      - run: CI=1 swift test --package-path tools/meeting-capture
+      - run: swift test --package-path tools/camera-watermark
       - run: swift test --package-path crates/dictation-ui-macos/swift-lib
 
   ci:

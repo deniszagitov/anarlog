@@ -35,6 +35,12 @@ A fast-forward may complete immediately even with `--no-commit`. Otherwise inspe
 
 After each update, inspect the complete remaining fork diff, remove patches already implemented upstream, and recheck the capability findings below. A source merge does not update an installed binary. Test the custom build with disposable data before using it with existing notes.
 
+### Desktop-specific merge checks
+
+- Resolve conflicts in the Lingui source catalogs by message ID. Preserve fork Russian translations and upstream additions, and review overlapping translation edits. Once the React sources and `messages.po` files are merged, regenerate every `messages.ts` with `pnpm -F @anlg/desktop exec lingui extract --clean --workers 1` and `pnpm -F @anlg/desktop exec lingui compile --strict --workers 1`. The compiled files require no manual conflict resolution.
+- Reuse upstream's system and chat dictation engine. Local's device-scoped owner in `apps/desktop/src/local-ai.ts` keeps recovery and dictionary learning available offline. For new desktop subscription gates, check the UI, background scheduler and mutation together. Use the Local capability hook for on-device actions and preserve upstream authentication for hosted operations.
+- Preserve the Local bundle identifier, storage, Keychain service and CLI command when upstream changes packaging or desktop identity. Native meeting capture uses the upstream helper. An unsigned Local build can ship the capture helper without a provisioned camera extension.
+
 ## Make changes that stay easy to merge
 
 - Prefer configuration and supported provider interfaces before modifying core behavior. Desktop endpoint configuration is in [env.ts](apps/desktop/src/env.ts); local/BYOK provider definitions live under `settings/ai`. Keep credentials in ignored environment files or the existing secure settings flow. `VITE_*` values are embedded in the frontend: never put server secrets there.

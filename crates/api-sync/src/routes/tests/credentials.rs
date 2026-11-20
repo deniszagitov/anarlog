@@ -266,6 +266,143 @@ async fn token_route_selects_transport_from_default_opt_in_and_override() {
 }
 
 #[tokio::test]
+async fn token_route_stops_issuing_sqlitecloud_tokens_once_the_provider_drains() {
+    for mode in [SqliteCloudMode::Draining, SqliteCloudMode::Retired] {
+        for (case, protocol_mode, legacy_database_id, request, expect_replica) in [
+            (
+                "accepted replica client",
+                CloudsyncProtocolMode::E2eeEnforced,
+                None,
+                accepted_replica_token_request(),
+                true,
+            ),
+            (
+                "client that predates the accepted replica",
+                CloudsyncProtocolMode::E2eeEnforced,
+                None,
+                replica_capable_token_request(),
+                false,
+            ),
+            (
+                "client without the replica transport",
+                CloudsyncProtocolMode::E2eeEnforced,
+                None,
+                token_request(),
+                false,
+            ),
+            (
+                "plaintext client in dual protocol mode",
+                CloudsyncProtocolMode::Dual,
+                Some("legacy-database-id"),
+                Request::post("/token").body(Body::empty()).unwrap(),
+                false,
+            ),
+        ] {
+            let case = format!("{case} while {}", mode.as_str());
+            let server = MockServer::start().await;
+            mock_personal_only_e2ee_account(&server).await;
+            // A stale override must not bring provider issuance back.
+            mock_sync_transport_override(&server, Some("sqlite_sync")).await;
+            mock_sqlitecloud_token(&server, "sqlite-token").await;
+
+            let response = test_router_with_sqlitecloud_mode(
+                &server,
+                "issuer-key",
+                &["hyprnote_pro"],
+                protocol_mode,
+                legacy_database_id,
+                CloudsyncTransport::SqliteSync,
+                mode,
+            )
+            .oneshot(request)
+            .await
+            .unwrap();
+
+            if expect_replica {
+                assert_eq!(response.status(), StatusCode::OK, "{case}");
+                assert_eq!(
+                    response.headers()[http_header::CACHE_CONTROL],
+                    "no-store",
+                    "{case}"
+                );
+                let body = response_json(response).await;
+                assert_eq!(body["transport"], "replica", "{case}");
+                assert_eq!(body["encryptionKeyId"], TEST_KEY_ID, "{case}");
+                assert!(body.get("token").is_none(), "{case}");
+            } else {
+                assert_eq!(response.status(), StatusCode::UPGRADE_REQUIRED, "{case}");
+                let body = response_json(response).await;
+                assert_eq!(
+                    body["error"]["code"], "cloudsync_upgrade_required",
+                    "{case}"
+                );
+            }
+            let requests = server.received_requests().await.unwrap();
+            assert!(
+                !requests.iter().any(|request| matches!(
+                    request.url.path(),
+                    "/v2/tokens" | "/rest/v1/sync_transport_overrides"
+                )),
+                "{case}"
+            );
+        }
+    }
+}
+
+#[tokio::test]
+async fn replica_credentials_require_the_accepted_replica_once_the_provider_retires() {
+    let accepted = format!("replica, {ACCEPTED_REPLICA_TRANSPORT}");
+    for (mode, transports, expect_credentials) in [
+        (SqliteCloudMode::Enabled, None, true),
+        (SqliteCloudMode::Draining, None, true),
+        (SqliteCloudMode::Retired, Some("replica"), false),
+        (SqliteCloudMode::Retired, Some(accepted.as_str()), true),
+    ] {
+        let case = format!("{} with transports {transports:?}", mode.as_str());
+        let server = MockServer::start().await;
+        mock_personal_only_e2ee_account(&server).await;
+        let mut request =
+            Request::post("/replica/credentials").header(E2EE_KEY_ID_HEADER, TEST_KEY_ID);
+        if let Some(transports) = transports {
+            request = request.header(CLOUDSYNC_TRANSPORTS_HEADER, transports);
+        }
+
+        let response = test_router_with_sqlitecloud_mode(
+            &server,
+            "issuer-key",
+            &["hyprnote_pro"],
+            CloudsyncProtocolMode::E2eeEnforced,
+            None,
+            CloudsyncTransport::SqliteSync,
+            mode,
+        )
+        .oneshot(request.body(Body::empty()).unwrap())
+        .await
+        .unwrap();
+
+        if expect_credentials {
+            assert_eq!(response.status(), StatusCode::OK, "{case}");
+            assert_eq!(
+                response_json(response).await["transport"],
+                "replica",
+                "{case}"
+            );
+        } else {
+            assert_eq!(response.status(), StatusCode::UPGRADE_REQUIRED, "{case}");
+            let body = response_json(response).await;
+            assert_eq!(
+                body["error"]["code"], "cloudsync_upgrade_required",
+                "{case}"
+            );
+            assert!(
+                server.received_requests().await.unwrap().is_empty(),
+                "{case}"
+            );
+        }
+    }
+}
+
+#[tokio::test]
 async fn transport_override_failure_is_redacted() {
     let server = MockServer::start().await;
     Mock::given(method("GET"))

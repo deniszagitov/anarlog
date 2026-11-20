@@ -21,7 +21,10 @@ pub enum TapError {
 
 #[derive(Debug, Clone, Copy)]
 pub enum TapEvent {
+    /// A key press or a modifier change; `key` is set only for a press.
     Key(KeyEvent),
+    /// A key release, with its key code.
+    KeyUp(KeyEvent),
     MouseClick,
 }
 
@@ -69,10 +72,10 @@ impl EventTap {
 
     pub fn stop(mut self) {
         self.stop_flag.store(true, Ordering::SeqCst);
-        if let Some(t) = self.thread.take() {
-            if t.thread().id() != thread::current().id() {
-                let _ = t.join();
-            }
+        if let Some(t) = self.thread.take()
+            && t.thread().id() != thread::current().id()
+        {
+            let _ = t.join();
         }
     }
 }
@@ -80,10 +83,10 @@ impl EventTap {
 impl Drop for EventTap {
     fn drop(&mut self) {
         self.stop_flag.store(true, Ordering::SeqCst);
-        if let Some(thread) = self.thread.take() {
-            if thread.thread().id() != thread::current().id() {
-                let _ = thread.join();
-            }
+        if let Some(thread) = self.thread.take()
+            && thread.thread().id() != thread::current().id()
+        {
+            let _ = thread.join();
         }
     }
 }
@@ -183,11 +186,6 @@ extern "C" fn tap_callback(
         }
         let fn_is_pressed = ctx.fn_pressed.load(Ordering::SeqCst);
 
-        let key = if event_type == KCG_EVENT_KEY_DOWN {
-            Some(keycode)
-        } else {
-            None
-        };
         let modifiers = decode_flags(flags, fn_is_pressed);
         let modifier_release = event_type == KCG_EVENT_FLAGS_CHANGED
             && if keycode == 0x36 {
@@ -195,7 +193,12 @@ extern "C" fn tap_callback(
             } else {
                 !CGEventSourceKeyState(1, keycode)
             };
-        let consumed = (ctx.callback)(TapEvent::Key(KeyEvent::new(key, modifiers)));
+        let tap_event = match event_type {
+            KCG_EVENT_KEY_DOWN => TapEvent::Key(KeyEvent::new(Some(keycode), modifiers)),
+            KCG_EVENT_KEY_UP => TapEvent::KeyUp(KeyEvent::new(Some(keycode), modifiers)),
+            _ => TapEvent::Key(KeyEvent::new(None, modifiers)),
+        };
+        let consumed = (ctx.callback)(tap_event);
         if consumed && event_type != KCG_EVENT_KEY_UP && !modifier_release {
             return ptr::null_mut();
         }

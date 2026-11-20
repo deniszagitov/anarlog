@@ -6,6 +6,7 @@
   "bundle": {
     "createUpdaterArtifacts": false,
     "externalBin": [
+      "binaries/anarlog-meeting-capture",
       "binaries/char-chrome-native-host",
       "binaries/check-permissions",
       "resources/cli/anarlog-cli"
@@ -14,6 +15,7 @@
       "frameworks": []
     },
     "resources": {
+      "../../../target/meeting-helpers/browser-meeting-extension": "browser-meeting-extension",
       "../../../LICENSE": "licenses/Anarlog-MIT.txt",
       "../../../LOCAL_INSTALL.md": "LOCAL_INSTALL.md",
       "../../../crates/transcribe-soniqo/third-party/hub/gpt2_tokenizer_config.json": "gpt2_tokenizer_config.json",
