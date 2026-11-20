@@ -37,7 +37,7 @@ After each update, inspect the complete remaining fork diff, remove patches alre
 
 ### Desktop-specific merge checks
 
-- Resolve conflicts in the Lingui source catalogs by message ID. Preserve fork Russian translations and upstream additions, and review overlapping translation edits. Once the React sources and `messages.po` files are merged, regenerate every `messages.ts` with `pnpm -F @anlg/desktop exec lingui extract --clean --workers 1` and `pnpm -F @anlg/desktop exec lingui compile --strict --workers 1`. The compiled files require no manual conflict resolution.
+- After resolving and staging the code conflicts, run `node apps/desktop/scripts/merge-local-catalogs.mjs` from the checkout root. Run it before hand-editing conflicted catalogs. It compares translations by Lingui message ID against the common base, flags overlapping edits for review, and regenerates catalogs from the merged UI. Review and stage the results.
 - Reuse upstream's system and chat dictation engine. Local's device-scoped owner in `apps/desktop/src/local-ai.ts` keeps recovery and dictionary learning available offline. For new desktop subscription gates, check the UI, background scheduler and mutation together. Use the Local capability hook for on-device actions and preserve upstream authentication for hosted operations.
 - Preserve the Local bundle identifier, storage, Keychain service and CLI command when upstream changes packaging or desktop identity. Native meeting capture uses the upstream helper. An unsigned Local build can ship the capture helper without a provisioned camera extension.
 
