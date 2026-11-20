@@ -1,4 +1,4 @@
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import {
   existsSync,
   mkdirSync,
@@ -10,6 +10,7 @@ import { homedir } from "node:os";
 import { dirname, isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { HELPER_BIN } from "../apps/desktop/src-tauri/scripts/prepare-meeting-helpers.mjs";
 import {
   localBuildEnvironment,
   prependTools,
@@ -235,6 +236,16 @@ if (failures.length) {
   );
   if (meetingHelpers.error) throw meetingHelpers.error;
   if (meetingHelpers.status !== 0) process.exit(meetingHelpers.status ?? 1);
+  // The linker records absolute object paths in the helper's debug symbols.
+  execFileSync("xcrun", [
+    "strip",
+    "-S",
+    resolve(
+      root,
+      "apps/desktop/src-tauri",
+      `${HELPER_BIN}-aarch64-apple-darwin`,
+    ),
+  ]);
   for (const args of [
     ["-F", "@anlg/ui", "build"],
     [
